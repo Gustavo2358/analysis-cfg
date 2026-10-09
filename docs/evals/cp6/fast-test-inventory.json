@@ -483,6 +483,8 @@
       "nativeRegionalGroupsBorrowPagedDirectoriesAndPreserveTransitiveCanonicalOrder",
       "failedNativeRegionalGroupWriteClosesPartialColumnsAndPreservesPrimary",
       "nativeRegionalExecutionBorrowsColdCellTraceLocationsAndPreservesPublicEvidence",
+      "nativeEffectsAndDomainPlansBorrowLiteralBodiesAndPreserveReachedEvidence",
+      "nativeFileFallbackReadsOneTypedOperationWithoutBulkBodyCopies",
       "nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail",
       "failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary",
       "nativeOpenAllMemoryAliasesPreserveLogicalOrderWithoutColdStorageCopies",

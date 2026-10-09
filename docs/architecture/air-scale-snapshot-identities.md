@@ -491,3 +491,44 @@ post-checks,741.779s. Seven frozen inputs and1234 runtime classfiles match after
 the clean rebuild, linking the physical CLI result to the same executable content.
 Plans, relation stores, states and other input-cardinality metadata still prevent
 AS-W09/W10 completion. No global qualification or fully spilled engine is claimed.
+
+### Borrowed canonical operation payloads and streaming FILE fallback
+
+Native canonical effects now retain the existing indexed Site address instead
+of another decoded Operation body. Assignment ExpressionSource borrows that same
+occurrence; typed access reconstructs one expression without installing a cache.
+Regional provenance events and RD plans share the address. Resident compatibility
+keeps explicit caller-owned payloads; existing operation()/value() accessors and
+value equality remain. Native access expires with the admitted owner. This does
+not select code by reachability or reduce admission, effects, partition geometry
+or event numbering.
+
+An admitted unreachable body with64 TEXT assignments of4096 characters exposed
+64 retained texts in effects and Regional preparation,versus zero in the native
+index. Independent GREEN now shows zero in all three. JUnit fixes16 retained
+texts to zero in effects,RD and Regional plans,compares complete public values
+and definitions with resident results for both unreachable and reachable Entry
+mutations,and fixes the reached literal/producer independently. Owner expiry
+and zero resource pools are checked. Kernel29,Regional47,consumer3 and compiled
+boundaries PASS; no producer/wire change.
+
+The same64 occurrences with only text width changed to2200000 form141028067bytes
+of admitted AIR. Physical production CLI Java21/Xmx128m with original8min quotas
+initially failed OutOfMemoryError in92.79s: FILE inventory fallback eagerly copied
+every instruction body with ArrayList,including all large literals. The failure
+and complete pre/post input/runtime checks are preserved,not PASS. Fallback now
+borrows instructions and reads one typed occurrence at a time,including the
+terminator at its original offset. A legal List.toArray counter fixes bulk copies
+2→0 while preserving the complete positive FILE site/edge/origin/bindings and
+explicit unavailable reachability. FILE37 and dependencies10 PASS. The physical
+repeat PASS:Java21/Xmx128m,original quotas,95.06s,CPU92.39+6.31s,RSS255588KiB,
+exit0. Independent pre-fix product oracle preserves21 wire fields,83 complete
+origins and exact CFG parity,dependencies59612bytes. Thirteen material inputs and
+1235 runtime classfiles frozen before this repeat match afterwards. The source
+contains64 literal occurrences of2200000 characters,not a sampled subset. Generator
+heap768MiB is separate from the application heap128MiB. Original-environment
+coherent FAST PASS:1167 required methods,zero failures/errors/skips,architecture
+and post-checks,743.400s. Ten frozen consumer inputs,thirteen physical material
+inputs and1235 runtime classfiles match after the clean rebuild. Global
+maps/plans/states/relations still
+prevent AS-W09/W10 completion.

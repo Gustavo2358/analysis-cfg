@@ -53,9 +53,11 @@ public final class RegionalValuesAnalysis {
     private record LogicalValue(LogicalText text,int event) {
         LogicalValue(Values.TextValue text,int event){this(LogicalText.of(text.value()),event);}
     }
-    private record PreparedEvent(Operation operation,Entries.InitialCondition initial,StatementEffects.Write write,TargetRef reference,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
+    private record PreparedEvent(StatementEffects.OperationRef occurrence,Entries.InitialCondition initial,StatementEffects.Write write,TargetRef reference,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
         StatementEffects.Target target(){return reference==null?null:reference.value();}
+        Operation operation(){return occurrence==null?null:occurrence.value();}
         DefinitionEvent definition(EntryId entry) {
+            var operation=operation();
             if(logical!=null)return operation==null?DefinitionEvent.logicalInitial(entry,initial,write.slot(),logical.object(),write.destination()):DefinitionEvent.logicalWrite(entry,operation,write,logical,outcome);
             return operation==null?DefinitionEvent.initial(entry,initial,write.slot(),target(),write.destination()):DefinitionEvent.write(entry,operation,write,target(),outcome);
         }
@@ -138,10 +140,10 @@ public final class RegionalValuesAnalysis {
         // instead be canonical, including allocation/work metrics in the public wire.
         if(nativeMetadata==null)for(var base:bases)for(var segment:partition.intersecting(base))residentLevels.put(segment,residentLevels.size());
         for(var statement:effects.statements()) {
-            var op=statement.operation();operations.put(op.header().id(),compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(Control.NormalOutcome.INSTANCE)));
-            otherwise.put(op.header().id(),compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),op,null,Optional.empty()));
+            var op=statement.operation();operations.put(op.header().id(),compile(statement.writes(),op.header().id(),op.header().origin(),List.of(),statement.reference(),null,Optional.of(Control.NormalOutcome.INSTANCE)));
+            otherwise.put(op.header().id(),compile(statement.otherwise(),op.header().id(),op.header().origin(),List.of(),statement.reference(),null,Optional.empty()));
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
-            statement.outcomes().forEach((key,writes)->choices.put(key,compile(writes,op.header().id(),op.header().origin(),List.of(),op,null,Optional.of(key))));
+            statement.outcomes().forEach((key,writes)->choices.put(key,compile(writes,op.header().id(),op.header().origin(),List.of(),statement.reference(),null,Optional.of(key))));
             outcomes.put(op.header().id(),Map.copyOf(choices));
             if(op instanceof Operations.Invoke i&&i.outcomes().remainder() instanceof Scopes.WithinControl)
                 controlOpen.add(op.header().id().unit());
@@ -334,7 +336,7 @@ public final class RegionalValuesAnalysis {
         int root=member;while(parent.get(root)!=root)root=Math.toIntExact(parent.get(root));
         while(parent.get(member)!=member){int next=Math.toIntExact(parent.get(member));parent.set(member,root);member=next;}return root;
     }
-    private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,Operation operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
+    private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,StatementEffects.OperationRef operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
         for(var write:writes)closureImpacts.computeIfAbsent(write,w->{
             var impacted=new HashSet<ObjectId>();

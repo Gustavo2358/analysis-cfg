@@ -67,9 +67,13 @@ final class FileDependencyAnalysis {
             metrics.put("possibleValuesStable",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)&&a.status()==AnalysisOutcome.Status.STABLE).count());
         }
         for(var unit:p.units())for(var entry:unit.entries())for(var sequence:unit.sequences()) {
-            var operations=new ArrayList<Operation>(sequence.instructions());operations.add(sequence.terminator());
-            for(int offset=0;offset<operations.size();offset++) {
-                var operation=operations.get(offset);if(!FileDependencyConsumer.selected(operation,locals))continue;
+            // Borrow the typed body; inventory fallback must not materialize every
+            // operand/literal merely to select FILE occurrences. Include the
+            // terminator at its original offset, even at the int address boundary.
+            var instructions=sequence.instructions();int count=instructions.size();
+            for(long position=0;position<=count;position++) {
+                int offset=Math.toIntExact(position);
+                var operation=offset==count?sequence.terminator():instructions.get(offset);if(!FileDependencyConsumer.selected(operation,locals))continue;
                 var view=new SiteView(entry.id(),sequence.label(),offset,operation);
                 retained.computeIfAbsent(new Key(entry.id(),operation.header().id()),key->FileDependencyConsumer.site(view,bindings,Optional.empty(),List.of(unavailable==null?"FILE_REACHABILITY_UNAVAILABLE":unavailable)));
             }

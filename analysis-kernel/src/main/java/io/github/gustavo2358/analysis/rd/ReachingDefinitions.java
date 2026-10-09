@@ -23,7 +23,7 @@ public final class ReachingDefinitions {
     private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
     private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
     private final Map<UnitId,Boolean> controlOpen=new HashMap<>();
-    private record Plan(Operation operation,StatementEffects.Write write,StatementEffects.Target target,
+    private record Plan(StatementEffects.OperationRef occurrence,StatementEffects.Write write,StatementEffects.Target target,
                         Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments,StatementEffects.LogicalTarget logical) { }
     private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
@@ -44,10 +44,10 @@ public final class ReachingDefinitions {
         }
         for(var statement:effects.statements()) {
             var op=statement.operation();var normal=Optional.<Control.OutcomeKey>of(Control.NormalOutcome.INSTANCE);
-            operations.put(op.header().id(),compile(op,statement.writes(),normal));
-            otherwise.put(op.header().id(),compile(op,statement.otherwise(),Optional.empty()));
+            operations.put(op.header().id(),compile(statement.reference(),statement.writes(),normal));
+            otherwise.put(op.header().id(),compile(statement.reference(),statement.otherwise(),Optional.empty()));
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
-            statement.outcomes().forEach((key,writes)->choices.put(key,compile(op,writes,Optional.of(key))));
+            statement.outcomes().forEach((key,writes)->choices.put(key,compile(statement.reference(),writes,Optional.of(key))));
             outcomes.put(op.header().id(),Map.copyOf(choices));
         }
         for(var context:session.contexts()) {
@@ -66,7 +66,7 @@ public final class ReachingDefinitions {
             initial.put(context.entry().id(),List.copyOf(seeds));logicalInitial.put(context.entry().id(),List.copyOf(logicalSeeds));
         }
     }
-    private List<Plan> compile(Operation operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
+    private List<Plan> compile(StatementEffects.OperationRef operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
         for(var write:writes) {
             for(var target:write.targets())result.add(new Plan(operation,write,target,outcome,List.copyOf(partition.intersecting(target.location())),null));
@@ -157,7 +157,7 @@ public final class ReachingDefinitions {
             var equal=new boolean[]{true};a.bindings.forEach((key,value)->{work.stateCompareEntry();if(!value.equals(b.bindings.get(key)))equal[0]=false;});return equal[0];
         }
         private EventHandle event(EntryId entry,Plan plan) {
-            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(p.logical==null?DefinitionEvent.write(entry,p.operation,p.write,p.target,p.outcome):DefinitionEvent.logicalWrite(entry,p.operation,p.write,p.logical,p.outcome)));
+            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(p.logical==null?DefinitionEvent.write(entry,p.occurrence.value(),p.write,p.target,p.outcome):DefinitionEvent.logicalWrite(entry,p.occurrence.value(),p.write,p.logical,p.outcome)));
         }
         private State apply(State state,List<Plan> plans,boolean forceMay) {
             if(!state.reached())return state;var root=state.bindings;var logical=new HashMap<>(state.logical);

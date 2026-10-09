@@ -418,6 +418,99 @@ final class SnapshotDependencyAnalysisTest {
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
     }
 
+    @Test void nativeEffectsAndDomainPlansBorrowLiteralBodiesAndPreserveReachedEvidence() throws Exception {
+        for(boolean reached:new boolean[]{false,true}){
+            var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();
+            var type=Types.known(Types.Builtin.TEXT);var sink=new ObjectId(unit.id(),"dormant-literal-sink");
+            var storageId=new StorageId(seed.id(),"dormant-literal-sink");
+            var objects=new java.util.ArrayList<>(unit.objects());
+            var precision=unit.objects().getFirst().precision();
+            objects.add(new Memory.ObjectDeclaration(sink,Optional.empty(),type,new Memory.CellBinding(storageId),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,precision));
+            var storage=new java.util.ArrayList<>(seed.storage());
+            storage.add(new Memory.Cell(new Memory.StorageHeader(storageId,Optional.of(unit.id()),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin),type));
+            var instructions=new java.util.ArrayList<Instruction>();
+            for(int at=0;at<16;at++){
+                var id=new OperationId(unit.id(),"dormant-literal-"+at);var owner=new OperationOwner(id);
+                var destination=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"destination"),Operand.Role.VALUE_WRITE,origin),sink);
+                var expression=new Expressions.Literal(new Operand.Header(new OperandId(owner,"value"),Operand.Role.VALUE_READ,origin),new Values.TextValue("cold-dormant-literal-"+at+"/"+"x".repeat(4096)));
+                instructions.add(new Operations.Assign(new Operations.Header(id,origin,Evidence.CoverageStatus.MODELED,precision,List.of()),destination,expression));
+            }
+            var label=new LabelId(unit.id(),"dormant-literal-body");
+            var terminal=new Operations.Return(new Operations.Header(new OperationId(unit.id(),"dormant-literal-return"),origin,Evidence.CoverageStatus.MODELED,precision,List.of()),List.of());
+            var sequences=new java.util.ArrayList<>(unit.sequences());sequences.add(new Sequence(label,instructions,terminal,origin));
+            var entries=unit.entries().stream().map(entry->reached?new Entries.Entry(entry.id(),Optional.of(label),entry.signature(),entry.state(),entry.origin()):entry).toList();
+            var changed=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),entries,sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),origin);
+            var artifact=new ArtifactId(seed.id(),"source");
+            var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),List.of(new Origins.Artifact(artifact,"borrowed-literal-bodies.synthetic",Optional.empty())),List.of(changed),storage,seed.resources(),seed.artifactRelations(),
+                List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),seed.coverage(),seed.uncertainties(),seed.premises());
+            var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());var residentCfg=coordinator.build(publication,BuildOptions.defaults());
+            var residentSession=io.github.gustavo2358.analysis.structure.AnalysisSession.open(residentCfg,publication,residentCfg.options().projectionPolicy(),entries).session().orElseThrow();
+            var point=io.github.gustavo2358.analysis.query.ProgramPoint.after(entries.getFirst().id(),new OperationId(unit.id(),"dormant-literal-0"));
+            var query=new io.github.gustavo2358.analysis.query.PointQuery<io.github.gustavo2358.analysis.storage.StorageSubject>(point,new io.github.gustavo2358.analysis.storage.StorageSubject.NamedObject(sink));
+            var expected=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(residentSession,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow().execute().observeStorage(List.of(query));
+            var residentEffects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(residentSession));
+            var expectedDefinitions=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(residentEffects).analysis().orElseThrow().execute().observeStorage(List.of(query));
+            var ledger=resources();var input=directory.resolve("borrowed-literal-"+reached+".air.json");Files.write(input,new AirJson().encode(publication));
+            io.github.gustavo2358.analysis.storage.StatementEffects.Statement borrowed;
+            io.github.gustavo2358.analysis.storage.StatementEffects.ExpressionSource source;
+            try(var read=new DataflowAirReader().readSnapshot(input,ledger);
+                var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)){
+                assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());
+                var cfg=coordinator.buildChecked(program,read.checked(),BuildOptions.defaults());
+                var session=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),entries.stream().map(Entries.Entry::id).toList()).session().orElseThrow();
+                var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(session));
+                assertEquals(sequences.stream().mapToInt(sequence->sequence.instructions().size()+1).sum(),effects.statements().size(),"all code is prepared, including the body without a path");
+                assertEquals(0,retainedDormantTexts(effects),"native canonical effects must not own decoded literal bodies");
+                borrowed=effects.statement(new OperationId(unit.id(),"dormant-literal-0"));
+                source=assertInstanceOf(io.github.gustavo2358.analysis.storage.StatementEffects.ExpressionSource.class,borrowed.writes().getFirst().source());
+                assertEquals(instructions.getFirst(),borrowed.operation());
+                assertEquals(((Operations.Assign)instructions.getFirst()).value(),source.value());
+                assertEquals(0,retainedDormantTexts(effects),"explicit typed access does not install a payload cache");
+                var rd=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(effects).analysis().orElseThrow();
+                assertEquals(0,retainedDormantTexts(rd),"RD plans share the same cold occurrence owner");
+                assertEquals(expectedDefinitions.observations(),rd.execute().observeStorage(List.of(query)).observations(),"cold RD plans preserve complete reached/unreached definitions");
+                assertEquals(0,retainedDormantTexts(rd));
+                var prepared=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(session,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
+                assertEquals(0,retainedDormantTexts(prepared),"Regional events/plans must not regain the operation body");
+                var observed=prepared.execute().observeStorage(List.of(query));
+                assertEquals(expected.observations(),observed.observations(),"reachability, literals and complete public producer evidence remain equal");
+                assertEquals(0,retainedDormantTexts(prepared));
+                if(reached){
+                    var value=observed.observations().getFirst().value();
+                    assertEquals(List.of(new Values.TextValue("cold-dormant-literal-0/"+"x".repeat(4096))),value.candidates());
+                    assertTrue(value.alternatives().stream().flatMap(alternative->alternative.fragments().stream()).anyMatch(fragment->fragment.producer().flatMap(producer->producer.definition().operation()).filter(new OperationId(unit.id(),"dormant-literal-0")::equals).isPresent()));
+                }
+            }
+            assertThrows(IllegalStateException.class,borrowed::operation);
+            assertThrows(IllegalStateException.class,source::value);
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
+    @Test void nativeFileFallbackReadsOneTypedOperationWithoutBulkBodyCopies() throws Exception {
+        var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();
+        var sequences=new java.util.ArrayList<>(unit.sequences());var start=sequences.getFirst();
+        var invoke=(Operations.Invoke)start.terminator();
+        var file=new Operations.Invoke(invoke.header(),invoke.action(),new Interactions.LiteralTarget("file","synthetic.dataset","SYNTHETICDD",Interactions.ExactName.INSTANCE,origin),invoke.arguments(),invoke.results(),invoke.signature(),invoke.effectOperands(),invoke.effectBound(),invoke.outcomes(),invoke.contract());
+        sequences.set(0,new Sequence(start.label(),start.instructions(),file,start.origin()));
+        var changed=new Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),unit.entries(),sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),origin);
+        var artifact=new ArtifactId(seed.id(),"source");
+        var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),List.of(new Origins.Artifact(artifact,"borrowed-file-fallback.synthetic",Optional.empty())),List.of(changed),seed.storage(),seed.resources(),seed.artifactRelations(),
+            List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),seed.coverage(),seed.uncertainties(),seed.premises());
+        var expected=io.github.gustavo2358.analysis.dependencies.FilePreparationBridge.prepare(ProgramStore.resident(publication),new int[1]);
+        assertEquals(1,expected.sites().size());assertEquals(1,expected.edges().size());
+        var input=directory.resolve("borrowed-file-fallback.air.json");Files.write(input,new AirJson().encode(publication));
+        var ledger=resources();int[] bulkReads={0};
+        try(var read=new DataflowAirReader().readSnapshot(input,ledger);
+            var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)){
+            assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());
+            var actual=io.github.gustavo2358.analysis.dependencies.FilePreparationBridge.prepare(program,bulkReads);
+            assertEquals(expected,actual,"FILE candidates, origins, bindings, unavailable reachability and remainders survive streaming inventory fallback");
+            assertEquals(0,bulkReads[0],"FILE inventory must not copy entire typed instruction bodies before selecting sites");
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
     @Test void nativeFinitePartitionPreservesArbitraryCutsAndUnknownTail() {
         var seed=directCall();var unit=seed.units().getFirst();var origin=seed.origins().getFirst().id();
         var huge=BigInteger.ONE.shiftLeft(256).add(BigInteger.valueOf(7));
@@ -649,11 +742,17 @@ final class SnapshotDependencyAnalysisTest {
     private static int retainedUnusedStorageIds(Object root) throws ReflectiveOperationException {
         return retainedUnusedIdentities(root,StorageId.class);
     }
+    private static int retainedDormantTexts(Object root) throws ReflectiveOperationException {
+        return retainedUnusedIdentities(root,String.class);
+    }
     private static int retainedUnusedIdentities(Object root,Class<?> identityType) throws ReflectiveOperationException {
         var seen=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Object,Boolean>());
         var pending=new java.util.ArrayDeque<Object>();pending.add(root);int count=0;
         while(!pending.isEmpty()) {
             var value=pending.removeFirst();if(!seen.add(value))continue;
+            if(value instanceof String text&&text.startsWith("cold-dormant-literal-")){
+                if(identityType==String.class)count++;continue;
+            }
             if(value instanceof ObjectId id&&id.localId().startsWith("unused-")){
                 if(identityType==ObjectId.class)count++;continue;
             }

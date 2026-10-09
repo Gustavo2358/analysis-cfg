@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.storage;
 import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
+import io.github.gustavo2358.analysis.structure.ProgramIndex;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -13,7 +14,27 @@ public final class StatementEffects {
     public enum Selection { SINGLE_DESTINATION, MAY_SET }
     public enum ReadKind { VALUE, ADDRESS, TARGET, FOREIGN }
     public sealed interface Source permits ExpressionSource, CapturedBytes, UnknownSource { }
-    public record ExpressionSource(Expression value) implements Source { }
+    /** Explicit resident values or a borrowed canonical assignment occurrence.
+     * Access reconstructs one expression; it never installs a decoded-value cache. */
+    public static final class ExpressionSource implements Source {
+        private final Expression resident;
+        private final OperationRef occurrence;
+        public ExpressionSource(Expression value){resident=Objects.requireNonNull(value);occurrence=null;}
+        private ExpressionSource(OperationRef occurrence){this.occurrence=Objects.requireNonNull(occurrence);resident=null;}
+        public Expression value(){return occurrence==null?resident:((Operations.Assign)occurrence.value()).value();}
+        @Override public boolean equals(Object other){return this==other||other instanceof ExpressionSource source&&value().equals(source.value());}
+        @Override public int hashCode(){return value().hashCode();}
+        @Override public String toString(){return "ExpressionSource[value="+value()+"]";}
+    }
+    /** Owner-local typed code address, shared by effect and domain preparation.
+     * Resident compatibility keeps the caller's operation explicitly. */
+    public static final class OperationRef {
+        private final ProgramIndex.Site site;
+        private final Operation resident;
+        private OperationRef(Operation operation){resident=Objects.requireNonNull(operation);site=null;}
+        private OperationRef(ProgramIndex.Site site){this.site=Objects.requireNonNull(site);resident=null;}
+        public Operation value(){return site==null?resident:site.operation();}
+    }
     public record CapturedBytes(StorageIndex.Resolution source, BigInteger length) implements Source { }
     public record UnknownSource(String reason) implements Source { }
     public record Read(Optional<OperandId> occurrence,ReadKind kind,StorageIndex.Resolution location) { }
@@ -32,9 +53,15 @@ public final class StatementEffects {
             this(slot,occurrence,destination,source,targets,Selection.SINGLE_DESTINATION,Strength.MUST);
         }
     }
-    public record Statement(Operation operation,List<Read> reads,List<Write> writes,
+    public record Statement(OperationRef reference,List<Read> reads,List<Write> writes,
                             Map<Control.OutcomeKey,List<Write>> outcomes,List<Write> otherwise) {
-        public Statement { reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
+        public Statement { Objects.requireNonNull(reference);reads=List.copyOf(reads);writes=List.copyOf(writes);outcomes=Map.copyOf(outcomes);otherwise=List.copyOf(otherwise); }
+        public Statement(Operation operation,List<Read> reads,List<Write> writes,Map<Control.OutcomeKey,List<Write>> outcomes,List<Write> otherwise){
+            this(new OperationRef(operation),reads,writes,outcomes,otherwise);
+        }
+        public Operation operation(){return reference.value();}
+        @Override public boolean equals(Object other){return this==other||other instanceof Statement statement&&operation().equals(statement.operation())&&reads.equals(statement.reads)&&writes.equals(statement.writes)&&outcomes.equals(statement.outcomes)&&otherwise.equals(statement.otherwise);}
+        @Override public int hashCode(){return Objects.hash(operation(),reads,writes,outcomes,otherwise);}
     }
     private final StorageIndex storage;
     private record OpenLocation(int declarationOrdinal,ObjectId object,StorageIndex.Location location) { }
@@ -101,10 +128,12 @@ public final class StatementEffects {
         var result=statements.get(operation);if(result==null)throw new IllegalArgumentException("operation outside prepared snapshot");return result;
     }
     private Statement prepare(Operation operation) {
+        var reference=storage.session().index().store().storageInventory().isPresent()
+            ?new OperationRef(storage.session().index().site(operation.header().id())):new OperationRef(operation);
         var b=new Builder(operation);
         if(operation instanceof Operations.Assign a) {
             b.visit(a.value(),ReadKind.VALUE);b.visit(a.destination(),ReadKind.ADDRESS);
-            b.write(b.writes,Optional.of(a.destination().header().id()),storage.resolve(a.destination()),Strength.MUST,new ExpressionSource(a.value()));
+            b.write(b.writes,Optional.of(a.destination().header().id()),storage.resolve(a.destination()),Strength.MUST,reference.site==null?new ExpressionSource(a.value()):new ExpressionSource(reference));
         } else if(operation instanceof Operations.HavocMust h) {
             b.visit(h.destination(),ReadKind.ADDRESS);b.write(b.writes,Optional.of(h.destination().header().id()),storage.resolve(h.destination()),Strength.MUST,new UnknownSource("HAVOC_MUST"));
         } else if(operation instanceof Operations.HavocMay h)b.scopeWrite(b.writes,h.scope(),"HAVOC_MAY");
@@ -146,7 +175,7 @@ public final class StatementEffects {
         else if(!(operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind||operation instanceof Operations.Nop||operation instanceof Operations.Jump||operation instanceof Operations.Halt))
             throw new IllegalArgumentException("unsupported operation effect");
         b.outcomes.replaceAll((key,value)->List.copyOf(value));
-        return new Statement(operation,b.reads,b.writes,b.outcomes,b.otherwise);
+        return new Statement(reference,b.reads,b.writes,b.outcomes,b.otherwise);
     }
     /** Normalized finite targets; only a proved singleton can replace old contributors. */
     public List<Target> targets(StorageIndex.Resolution destination,Strength requested) {
