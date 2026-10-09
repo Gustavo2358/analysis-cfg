@@ -22,32 +22,24 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
 
     private final AirSnapshot snapshot;
     private final SnapshotIdentityKeys keys;
-    private final CfgSource source;
-    private final List<Capabilities.Capability> requiredCapabilities;
-    private final Set<Capabilities.Capability> namePolicyExtensions;
+    private CfgSource source;
+    private List<Capabilities.Capability> requiredCapabilities;
+    private Set<Capabilities.Capability> namePolicyExtensions;
     private boolean closed;
 
     public SnapshotProgram(SnapshotValidator.CheckedSnapshot checked,SnapshotIdentityKeys.Storage identityStorage) {
         Objects.requireNonNull(checked);snapshot=checked.snapshot();var owned=Objects.requireNonNull(identityStorage);
         if(checked.result().status()!=ValidationResult.Status.STRUCTURALLY_VALID){owned.close();throw new IllegalArgumentException("complete snapshot validation required");}
         keys=new SnapshotIdentityKeys(snapshot,owned);
-        try {
-            requiredCapabilities=capabilities();
-            namePolicyExtensions=namePolicyExtensionsFromSnapshot();
-            source=cfgSource();
-        } catch(RuntimeException|Error failure) {
-            keys.close();
-            throw failure;
-        }
     }
 
     public PublicationId publication(){open();return (PublicationId)id(snapshot.field(snapshot.root(),PUBLICATION,0));}
     public Evidence.InventoryStatus coverage(){open();long coverage=snapshot.field(snapshot.root(),PUBLICATION,9);return Evidence.InventoryStatus.values()[(int)snapshot.scalar(snapshot.field(coverage,EVIDENCE_COVERAGE,0))];}
     @Override public PublicationId publicationId(){return publication();}
     @Override public Evidence.InventoryStatus inventory(){return coverage();}
-    @Override public CfgSource source(){open();return source;}
-    @Override public List<Capabilities.Capability> requiredCapabilities(){open();return requiredCapabilities;}
-    @Override public Set<Capabilities.Capability> namePolicyExtensions(){open();return namePolicyExtensions;}
+    @Override public CfgSource source(){open();if(source==null)source=cfgSource();return source;}
+    @Override public List<Capabilities.Capability> requiredCapabilities(){open();if(requiredCapabilities==null)requiredCapabilities=capabilities();return requiredCapabilities;}
+    @Override public Set<Capabilities.Capability> namePolicyExtensions(){open();if(namePolicyExtensions==null)namePolicyExtensions=namePolicyExtensionsFromSnapshot();return namePolicyExtensions;}
     public String textValue(long handle){open();return text(handle);}
     @Override public OperationId operationId(long handle){open();return (OperationId)id(handle);}
     @Override public OriginId originId(long handle){open();return (OriginId)id(handle);}
@@ -97,7 +89,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         units.sort(Comparator.comparing(unit->unit.id().localId()));
         return new CfgSource(publication(),new SemanticVersion(integer(snapshot.field(version,SEMANTIC_VERSION,0)),
                 integer(snapshot.field(version,SEMANTIC_VERSION,1)),integer(snapshot.field(version,SEMANTIC_VERSION,2))),
-                coverage(),units,requiredCapabilities.stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
+                coverage(),units,requiredCapabilities().stream().filter(CoreCfgProjection::supportsControlCapability).distinct().toList());
     }
 
     private Evidence.InventoryStatus inventory(long coverage) {
@@ -272,8 +264,37 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private Literal literal(Arm arm,long object){return arm.values().stream().filter(value->value.object()==object).findFirst().orElseThrow(()->new IllegalStateException("admitted correlated source is missing"));}
     private long readObject(long expression){return keys.key(snapshot.field(snapshot.field(expression,EXPRESSIONS_READ,1),PLACES_OBJECT_PLACE,1));}
     private long sequence(long sequences,long label){try(var rows=snapshot.elements(sequences,SEQUENCE)){while(rows.advance()){long sequence=rows.value();if(keys.key(snapshot.field(sequence,SEQUENCE,0))==label)return sequence;}}return 0;}
-    @Override public long materializationBytes(Definition definition) {open();return definition.direct()?Math.multiplyExact(snapshot.characterCount(definition.firstText()),Character.BYTES):Math.multiplyExact((long)definition.fitLength(),2L*Character.BYTES);}
     @Override public String materialize(Definition definition) {open();return definition.direct()?text(definition.firstText()):fitConcat(definition.firstText(),definition.secondText(),definition.fitLength(),definition.pad());}
+    @Override public TextCursor cursorText(Definition definition) {
+        open();Objects.requireNonNull(definition);
+        if(definition.direct()) {
+            long source=definition.firstText(),length=snapshot.characterCount(source);
+            return new TextCursor(){private long offset;public int read(char[] target,int start,int maximum){Objects.checkFromIndexSize(start,maximum,target.length);if(maximum==0)return 0;if(offset==length)return -1;int count=snapshot.readCharacters(source,offset,target,start,(int)Math.min(maximum,length-offset));if(count<=0)throw new IllegalStateException("snapshot text cursor made no progress");offset+=count;return count;}};
+        }
+        return new FittedTextCursor(definition);
+    }
+    private final class FittedTextCursor implements TextCursor {
+        private final Definition definition;private final long firstLength,secondLength;private final char[] scalar=new char[2];
+        private long sourceOffset;private boolean second;private int points;private char pending;
+        private FittedTextCursor(Definition definition){this.definition=definition;firstLength=snapshot.characterCount(definition.firstText());secondLength=snapshot.characterCount(definition.secondText());definition.pad().codePointAt(0);}
+        @Override public int read(char[] target,int start,int maximum) {
+            open();Objects.checkFromIndexSize(start,maximum,target.length);if(maximum==0)return 0;int written=0;
+            if(pending!=0){target[start+written++]=pending;pending=0;}
+            while(written<maximum&&points<definition.fitLength()) {
+                int value=nextScalar();if(value<0)value=definition.pad().codePointAt(0);int characters=Character.charCount(value);
+                target[start+written++]=characters==1?(char)value:Character.highSurrogate(value);if(characters==2){char low=Character.lowSurrogate(value);if(written<maximum)target[start+written++]=low;else pending=low;}points++;
+            }
+            return written==0?-1:written;
+        }
+        private int nextScalar() {
+            while(true) {
+                long source=second?definition.secondText():definition.firstText(),length=second?secondLength:firstLength;
+                if(sourceOffset>=length){if(second)return -1;second=true;sourceOffset=0;continue;}
+                int count=snapshot.readCharacters(source,sourceOffset,scalar,0,(int)Math.min(2,length-sourceOffset));if(count<=0)throw new IllegalStateException("snapshot fitted text cursor made no progress");
+                int value=Character.codePointAt(scalar,0,count),characters=Character.charCount(value);sourceOffset+=characters;return value;
+            }
+        }
+    }
     private String fitConcat(long first,long second,int length,String pad) {
         if(length<0)throw new IllegalArgumentException("negative text fit length");var result=new StringBuilder();
         int count=appendPrefix(result,first,length);count+=appendPrefix(result,second,length-count);

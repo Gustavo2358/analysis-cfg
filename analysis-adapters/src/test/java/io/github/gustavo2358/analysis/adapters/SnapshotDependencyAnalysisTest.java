@@ -25,6 +25,24 @@ import static org.junit.jupiter.api.Assertions.*;
 final class SnapshotDependencyAnalysisTest {
     private static AnalysisResources resources(){return new AnalysisResources(new AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,1_000_000_000,1_000_000));}
 
+    @Test void dependencyProgramConstructionDoesNotPrepareInputSizedCfgMetadata() {
+        long fixed=-1;
+        for(int units:new int[]{1,16,64}) {
+            var ledger=resources();
+            try(var pages=new MemoryPageStore(128,ledger);var snapshot=AirSnapshot.fromPublication(directCalls(units));
+                var checked=SnapshotValidator.check(snapshot,ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))) {
+                assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status(),checked.result().toString());
+                long before=ledger.workUsed();
+                try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger))) {
+                    assertEquals(units,program.inventory()==Evidence.InventoryStatus.COMPLETE?units:-1);
+                    long construction=ledger.workUsed()-before;
+                    if(fixed<0)fixed=construction;else assertEquals(fixed,construction,"dependency construction must not scan CFG metadata for every Unit");
+                }
+            }
+            assertEquals(0,ledger.heapUsed());
+        }
+    }
+
     @Test void validatedPagedSnapshotPreservesVariableCallEvidenceWithoutPublicationMaterialization() {
         var publication=directCall();var ledger=resources();
         try(var pages=new MemoryPageStore(128,ledger);var source=AirSnapshot.fromPublication(publication);
@@ -140,12 +158,21 @@ final class SnapshotDependencyAnalysisTest {
     }
 
     private static Publication directCall() {
-        var publication=new PublicationId("snapshot-direct");var unit=new UnitId(publication,"caller");var cell=new StorageId(publication,"program-name-cell");var object=new ObjectId(unit,"program-name");var origin=ResultFixtures.origin(publication);
-        var declaration=new Memory.ObjectDeclaration(object,Optional.of("PROGRAM-NAME"),new Types.Known(Types.Builtin.TEXT),new Memory.CellBinding(cell),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,ResultFixtures.header(unit,"metadata").precision());
-        var storage=new Memory.Cell(new Memory.StorageHeader(cell,Optional.of(unit),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin),new Types.Known(Types.Builtin.TEXT));
-        var start=new Sequence(new LabelId(unit,"start"),List.of(ResultFixtures.assign(unit,"seed",object,"PROGA   ")),W1dModelTest.call(unit,"invoke","end",object,false),origin);
-        var end=ResultFixtures.returning(unit,"end",List.of());
-        return ResultFixtures.publication(publication,List.of(ResultFixtures.unit(unit,List.of(ResultFixtures.entry(unit,"entry","start")),List.of(start,end),List.of(declaration))),List.of(storage));
+        return directCalls(1);
+    }
+
+    private static Publication directCalls(int count) {
+        var publication=new PublicationId("snapshot-direct");var origin=ResultFixtures.origin(publication);
+        var units=new java.util.ArrayList<Unit>();var storage=new java.util.ArrayList<Memory.Storage>();
+        for(int i=0;i<count;i++) {
+            String suffix=String.format("%04d",i);var unit=new UnitId(publication,count==1?"caller":"caller-"+suffix);var cell=new StorageId(publication,count==1?"program-name-cell":"program-name-cell-"+suffix);var object=new ObjectId(unit,"program-name");
+            var declaration=new Memory.ObjectDeclaration(object,Optional.of("PROGRAM-NAME"),new Types.Known(Types.Builtin.TEXT),new Memory.CellBinding(cell),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,ResultFixtures.header(unit,"metadata").precision());
+            storage.add(new Memory.Cell(new Memory.StorageHeader(cell,Optional.of(unit),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin),new Types.Known(Types.Builtin.TEXT)));
+            var start=new Sequence(new LabelId(unit,"start"),List.of(ResultFixtures.assign(unit,"seed",object,"PROGA   ")),W1dModelTest.call(unit,"invoke","end",object,false),origin);
+            var end=ResultFixtures.returning(unit,"end",List.of());
+            units.add(ResultFixtures.unit(unit,List.of(ResultFixtures.entry(unit,"entry","start")),List.of(start,end),List.of(declaration)));
+        }
+        return ResultFixtures.publication(publication,units,storage);
     }
 
     private static Publication correlatedCall() {

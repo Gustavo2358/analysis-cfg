@@ -20,27 +20,29 @@ public final class PagedSnapshotDependencyStorage implements SnapshotDependencyA
     private PagedHandleOrder artifactOrder,originOrder;
     private PagedOwnedHandleOrder originInputOrder;
     private PagedLongIndex.Cursor candidateCursor,supportCursor,callCursor;
+    private char[] textBlock;
     private long count,characterCount,supportCount,supportCharacterCount,selectedObject,currentCandidate,textStart,textLength;
     private long selectedCandidate,currentSupport;
     private long callRowsCount,callCharacterCount,currentCall,candidateCount,unknownRemainderCount;
     private boolean closed,failed;
 
     public PagedSnapshotDependencyStorage(PageStore pages,AnalysisResources resources) {
-        this.pages=Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);resident=resources.reserve(AnalysisResources.Pool.RESIDENT,256,PHASE);
+        this.pages=Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);resident=resources.reserve(AnalysisResources.Pool.RESIDENT,2304,PHASE);
         try{rows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);characters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);candidateOrder=new PagedLongIndex(pages,resources,PHASE,this::compareCandidates);
             supportRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);supportCharacters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);supportOrder=new PagedLongIndex(pages,resources,PHASE,this::compareSupports);supportInsertionOrder=new PagedLongIndex(pages,resources,PHASE,this::compareSupportInsertion);
-            callRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);callCharacters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);callOrder=new PagedLongIndex(pages,resources,PHASE,this::compareCalls);clearCurrent();}
+            callRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);callCharacters=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);callOrder=new PagedLongIndex(pages,resources,PHASE,this::compareCalls);textBlock=new char[1024];clearCurrent();}
         catch(RuntimeException|Error failure){closeSuppressed(failure);throw failure;}
     }
 
-    public synchronized long add(long object,String text) {
+    public synchronized long add(long object,String text) {Objects.requireNonNull(text);return add(object,new DependencyProgramStore.TextCursor(){private int offset;public int read(char[] target,int start,int length){if(offset==text.length())return -1;int count=Math.min(length,text.length()-offset);text.getChars(offset,offset+count,target,start);offset+=count;return count;}});}
+    @Override public synchronized long add(long object,DependencyProgramStore.TextCursor text) {
         open();Objects.requireNonNull(text);
         try {
             closeCandidateCursor();
-            if(count==Long.MAX_VALUE/FIELDS||characterCount>Long.MAX_VALUE-text.length())throw new IllegalStateException("dependency candidate payload exceeds paged row space");
+            if(count==Long.MAX_VALUE/FIELDS)throw new IllegalStateException("dependency candidate payload exceeds paged row space");
             long candidate=++count+1,at=(candidate-1)*FIELDS,firstCharacter=characterCount;
-            for(int i=0;i<text.length();i++)characters.set(characterCount++,text.charAt(i));
-            rows.set(at,firstCharacter);rows.set(at+1,text.length());rows.set(at+2,object);return candidateOrder.intern(candidate,candidate);
+            while(true){int read=text.read(textBlock,0,textBlock.length);if(read<0)break;if(read==0||read>textBlock.length)throw new IllegalStateException("dependency candidate cursor made invalid progress");if(characterCount>Long.MAX_VALUE-read)throw new IllegalStateException("dependency candidate payload exceeds paged row space");for(int i=0;i<read;i++)characters.set(characterCount++,textBlock[i]);}
+            rows.set(at,firstCharacter);rows.set(at+1,characterCount-firstCharacter);rows.set(at+2,object);return candidateOrder.intern(candidate,candidate);
         } catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     private int compareCandidates(long first,long second){long a=(first-1)*FIELDS,b=(second-1)*FIELDS;int comparison=Long.compare(rows.get(a+2),rows.get(b+2));return comparison!=0?comparison:compareText(a,b);}
@@ -144,7 +146,7 @@ public final class PagedSnapshotDependencyStorage implements SnapshotDependencyA
     public synchronized AirSnapshotBuilder.Lease claim(long bytes){open();try{var lease=resources.reserve(AnalysisResources.Pool.RESIDENT,bytes,PHASE);return lease::close;}catch(RuntimeException|Error failure){failed=true;throw failure;}}
     private void open(){if(closed||failed)throw new IllegalStateException("paged dependency definitions are closed or aborted");}
     private void closeSuppressed(Throwable failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}}
-    @Override public synchronized void close(){if(closed)return;closed=true;Throwable failure=null;try{closeCallCursor();closeSupportCursor();closeCandidateCursor();}catch(RuntimeException|Error cleanup){failure=cleanup;}for(var owner:new AutoCloseable[]{candidateOrder,supportOrder,supportInsertionOrder,rows,characters,supportRows,supportCharacters,callOrder,callRows,callCharacters,artifactOrder,originOrder,originInputOrder})try{if(owner!=null)owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}candidateOrder=supportOrder=supportInsertionOrder=callOrder=null;rows=characters=supportRows=supportCharacters=callRows=callCharacters=null;artifactOrder=originOrder=null;originInputOrder=null;count=characterCount=supportCount=supportCharacterCount=selectedObject=selectedCandidate=currentSupport=callRowsCount=callCharacterCount=currentCall=candidateCount=unknownRemainderCount=0;clearCurrent();resident.close();if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException(failure);}
+    @Override public synchronized void close(){if(closed)return;closed=true;Throwable failure=null;try{closeCallCursor();closeSupportCursor();closeCandidateCursor();}catch(RuntimeException|Error cleanup){failure=cleanup;}for(var owner:new AutoCloseable[]{candidateOrder,supportOrder,supportInsertionOrder,rows,characters,supportRows,supportCharacters,callOrder,callRows,callCharacters,artifactOrder,originOrder,originInputOrder})try{if(owner!=null)owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}candidateOrder=supportOrder=supportInsertionOrder=callOrder=null;rows=characters=supportRows=supportCharacters=callRows=callCharacters=null;artifactOrder=originOrder=null;originInputOrder=null;textBlock=null;count=characterCount=supportCount=supportCharacterCount=selectedObject=selectedCandidate=currentSupport=callRowsCount=callCharacterCount=currentCall=candidateCount=unknownRemainderCount=0;clearCurrent();resident.close();if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException(failure);}
 
     private final class PagedHandleOrder implements AutoCloseable {
         private static final int HANDLE_FIELDS=3;

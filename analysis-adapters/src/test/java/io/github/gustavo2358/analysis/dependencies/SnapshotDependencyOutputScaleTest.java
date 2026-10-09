@@ -50,8 +50,8 @@ final class SnapshotDependencyOutputScaleTest {
         @Override public OriginView originView(long handle){String suffix=String.format("%04d",handle-1);return handle==1?new OriginView.Derived(new OriginId(PUBLICATION,"origin-"+suffix),"scale-derived"):new OriginView.Unavailable(new OriginId(PUBLICATION,"origin-"+suffix),"scale evidence "+suffix);}
         @Override public OriginId materializeOriginInput(long handle){return new OriginId(PUBLICATION,"input-"+String.format("%04d",handle-5000));}
         @Override public Iterable<Origins.IncludeFrame> cursorOriginIncludes(long originHandle){return List.of();}
-        @Override public long materializationBytes(Definition definition){return 16;}
-        @Override public String materialize(Definition definition){return "TARGET  ";}
+        @Override public String materialize(Definition definition){throw new AssertionError("cursor path must not materialize a whole candidate");}
+        @Override public TextCursor cursorText(Definition definition){return new TextCursor(){private int offset;private final String value="TARGET  ";public int read(char[] target,int start,int length){if(offset==value.length())return -1;int count=Math.min(length,value.length()-offset);value.getChars(offset,offset+count,target,start);offset+=count;return count;}};}
         @Override public OperationId operationId(long handle){return new OperationId(UNIT,"producer");}
         @Override public OriginId originId(long handle){return new OriginId(PUBLICATION,"producer-origin");}
         @Override public void close(){ }

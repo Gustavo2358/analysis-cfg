@@ -9,7 +9,7 @@ import java.util.*;
 /** Dependency analysis over the admitted snapshot program view. */
 public final class SnapshotDependencyAnalysis {
     public interface Storage extends AutoCloseable {
-        long add(long objectKey,String rawText);
+        long add(long objectKey,DependencyProgramStore.TextCursor rawText);
         void addSupport(long candidate,OperationId producer,OriginId origin);
         void select(long objectKey);boolean advance();long candidate();String rawText();
         void selectSupports(long candidate);void selectOrderedSupports(long candidate);boolean advanceSupport();OperationId supportProducer();OriginId supportOrigin();
@@ -49,7 +49,7 @@ public final class SnapshotDependencyAnalysis {
         Objects.requireNonNull(program);Objects.requireNonNull(storage);
         try(var lease=storage.claim(512)) {
             Objects.requireNonNull(lease,"storage returned a null analysis lease");
-            program.definitions(definition->{try(var materialized=storage.claim(program.materializationBytes(definition))){Objects.requireNonNull(materialized);long candidate=storage.add(definition.objectKey(),program.materialize(definition));
+            program.definitions(definition->{try(var text=program.cursorText(definition)){Objects.requireNonNull(text);long candidate=storage.add(definition.objectKey(),text);
                 for(var producer:definition.producers())storage.addSupport(candidate,program.operationId(producer.operation()),program.originId(producer.origin()));}});
             program.computedCalls(storage::addCall);
             program.originHandles((handle,localId)->{storage.addOrigin(handle,localId);program.originInputHandles(handle,(input,inputId)->storage.addOriginInput(handle,input,inputId));});

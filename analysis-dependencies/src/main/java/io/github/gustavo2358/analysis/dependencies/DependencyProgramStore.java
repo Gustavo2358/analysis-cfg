@@ -12,6 +12,11 @@ import java.util.function.Consumer;
 /** Streaming dependency events over an admitted program store. */
 public interface DependencyProgramStore extends ProgramStore, AutoCloseable {
     @FunctionalInterface interface MetadataHandleConsumer {void accept(long handle,String localId);}
+    interface TextCursor extends AutoCloseable {
+        /** Sequential UTF-16 characters; positive progress or -1 at exhaustion. */
+        int read(char[] target,int offset,int length);
+        @Override default void close(){ }
+    }
     sealed interface OriginView {
         OriginId id();
         record Unavailable(OriginId id,String reason) implements OriginView {public Unavailable{Objects.requireNonNull(id);Objects.requireNonNull(reason);}}
@@ -39,8 +44,15 @@ public interface DependencyProgramStore extends ProgramStore, AutoCloseable {
     OriginView originView(long handle);
     OriginId materializeOriginInput(long handle);
     Iterable<Origins.IncludeFrame> cursorOriginIncludes(long originHandle);
-    long materializationBytes(Definition definition);
     String materialize(Definition definition);
+    /** Managed production route. The default is the explicit small-consumer compatibility path. */
+    default TextCursor cursorText(Definition definition) {
+        String value=materialize(definition);
+        return new TextCursor(){private int offset;public int read(char[] target,int start,int length){
+            Objects.checkFromIndexSize(start,length,target.length);if(length==0)return 0;if(offset==value.length())return -1;
+            int count=Math.min(length,value.length()-offset);value.getChars(offset,offset+count,target,start);offset+=count;return count;
+        }};
+    }
     OperationId operationId(long handle);
     OriginId originId(long handle);
     @Override void close();
