@@ -21,6 +21,16 @@ public final class ContextView {
     public ProgramIndex.Node normalExit() { return index.normalExits.get(entry.id()); }
     public EdgeCursor successors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, true); }
     public EdgeCursor predecessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, false); }
+    /** Stored ordinary edges only; the caller handles the original open relation separately. */
+    public EdgeCursor knownSuccessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node,true,true,false); }
+    /** Original bounded relation only, with the same activation ownership as successors. */
+    public EdgeCursor unknownSuccessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node,true,false,true); }
+    /** Exact effective bound, including the admitted partial-projection policy. */
+    public io.github.gustavo2358.air.model.Scopes.ControlBound unknownControl(ProgramIndex.Node node) {
+        requireOrdinary();Objects.requireNonNull(node);
+        if(node.identity!=index.identity||!node.owner().id().equals(entry.id().unit()))throw new IllegalArgumentException("foreign node");
+        return OpenControl.bound(node,index.policy);
+    }
 
     private void requireOrdinary() {
         if(!index.localRules.isEmpty())throw new IllegalArgumentException("local control requires a traversal point with its stack");
@@ -77,6 +87,9 @@ public final class ContextView {
     }
 
     private EdgeCursor cursor(ProgramIndex.Node node, boolean forward) {
+        return cursor(node,forward,true,true);
+    }
+    private EdgeCursor cursor(ProgramIndex.Node node,boolean forward,boolean stored,boolean bounds) {
         Objects.requireNonNull(node, "node");
         if (node.identity != index.identity) throw new IllegalArgumentException("node from another index");
         long key = LongIntDirectory.key(ordinal, node.ordinal);
@@ -89,7 +102,7 @@ public final class ContextView {
             }
             if(anchor!=null)shared=(forward?index.forwardHeads:index.backwardHeads).get(LongIntDirectory.key(-1,anchor.ordinal));
         }
-        return new EdgeCursor(index, forward ? index.forwardNext : index.backwardNext, head, shared, node, entry, forward);
+        return new EdgeCursor(index, forward ? index.forwardNext : index.backwardNext, stored?head:-1, stored?shared:-1, node, entry, forward,bounds);
     }
 
     /** Stored edges retain identity; bounded unknown edges are transient views over original nodes. */
@@ -106,12 +119,12 @@ public final class ContextView {
         private final java.util.Iterator<ProgramIndex.Node> candidates;
         private ProgramIndex.Node symbolicSource, symbolicTarget;
         private CfgTransition symbolicEdge,boundEdge;
-        EdgeCursor(ProgramIndex index, int[] next, int position,int sharedPosition, ProgramIndex.Node anchor, ProgramStore.EntryView entry, boolean forward) {
+        EdgeCursor(ProgramIndex index, int[] next, int position,int sharedPosition, ProgramIndex.Node anchor, ProgramStore.EntryView entry, boolean forward,boolean bounds) {
             this.index = index; this.next = next; this.position = position;this.sharedPosition=sharedPosition; this.anchor = anchor; this.entry = entry; this.forward = forward;
             var sources = index.openSources.getOrDefault(entry.id().unit(), java.util.List.of());
             var labels=forward ? index.labelTargets.get(anchor) : null;
             exactLabels=labels!=null;
-            candidates=(exactLabels
+            candidates=(!bounds?java.util.List.<ProgramIndex.Node>of():exactLabels
                 ? anchor.owner().id().equals(entry.id().unit()) ? labels : java.util.List.<ProgramIndex.Node>of()
                 : sources.isEmpty() || forward && !(OpenControl.bound(anchor,index.policy) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl)
                     ? java.util.List.<ProgramIndex.Node>of() : forward ? index.unitNodes.get(entry.id().unit()) : sources).iterator();

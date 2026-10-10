@@ -1124,7 +1124,7 @@
       "removedQualifiedSourceOptionIsRejectedWithoutReplacingDestination"
     ],
     "io.github.gustavo2358.analysis.launcher.DependencyInputCliTest": [
-      "removedResidentBundleRouteFailsClosedAndPreservesDestination"
+      "nativeBundleAdmitsExactSnapshotsAndRejectsContradictionsAtomically"
     ],
     "io.github.gustavo2358.analysis.launcher.PipelineCliTest": [
       "exhaustedCommonBudgetStopsBeforeSourceParsingAndPreservesProducts",

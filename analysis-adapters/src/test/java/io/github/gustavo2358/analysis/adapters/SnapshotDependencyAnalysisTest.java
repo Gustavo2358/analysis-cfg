@@ -7,6 +7,7 @@ import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.analysis.dependencies.SnapshotDependencyAnalysis;
 import io.github.gustavo2358.analysis.dependencies.SnapshotProgram;
 import io.github.gustavo2358.analysis.dependencies.DirectDependencyResult;
+import io.github.gustavo2358.analysis.dependencies.ReachabilityProvider;
 import io.github.gustavo2358.analysis.cfg.domain.CoreCfgProjection;
 import io.github.gustavo2358.analysis.cfg.application.*;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
@@ -333,6 +334,71 @@ final class SnapshotDependencyAnalysisTest {
             for(var view:borrowed){assertThrows(IllegalStateException.class,view::size);assertThrows(IllegalStateException.class,()->view.get(0));}
         }
         for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    private void ordinarySharedEntriesPreserveRootsAndLeaseLifetimes(Publication base) throws Exception {
+        var unit=base.units().getFirst();var gap=base.uncertainties().getFirst().id();
+        var first=ResultFixtures.entry(unit.id(),"Aa","open-0");
+        var second=ResultFixtures.entry(unit.id(),"BB","open-0");
+        second=new Entries.Entry(second.id(),second.initialLabel(),second.signature(),
+            new Entries.EntryState(List.of(),List.of(gap)),second.origin());
+        var other=ResultFixtures.entry(unit.id(),"other-root","end");
+        var changed=ResultFixtures.unit(unit.id(),List.of(first,second,other),unit.sequences(),unit.objects());
+        var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),base.storage(),
+            base.resources(),base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var ledger=resources();var provider=new io.github.gustavo2358.analysis.dependencies.ReachabilityProvider();
+        io.github.gustavo2358.analysis.application.AnalysisProvider.Run<LabelId,io.github.gustavo2358.analysis.dependencies.ReachabilityProvider.Fact> expired;
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)) {
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status());
+            var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+            var admitted=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),List.of(first.id(),second.id(),other.id()));
+            assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,admitted.status(),admitted.reason());
+            var session=admitted.session().orElseThrow();long before=ledger.heapUsed();
+            var a=provider.prepare(session,ReachabilityProvider.key(first.id())).execute();
+            var b=provider.prepare(session,ReachabilityProvider.key(second.id())).execute();
+            var c=provider.prepare(session,ReachabilityProvider.key(other.id())).execute();
+            assertEquals(1L,a.outcome().metrics().get("reachabilityPhysicalRuns"));
+            assertEquals(0L,b.outcome().metrics().get("reachabilityPhysicalRuns"));
+            assertEquals(1L,c.outcome().metrics().get("reachabilityPhysicalRuns"));
+            assertEquals(1L,a.outcome().metrics().get("reachabilityOpenGroups"));
+            assertTrue(ledger.heapUsed()>before);
+            var operation=new OperationId(unit.id(),"invoke");var label=new LabelId(unit.id(),"start");
+            var qa=new io.github.gustavo2358.analysis.query.PointQuery<>(io.github.gustavo2358.analysis.query.ProgramPoint.before(first.id(),operation),label);
+            var qb=new io.github.gustavo2358.analysis.query.PointQuery<>(io.github.gustavo2358.analysis.query.ProgramPoint.before(second.id(),operation),label);
+            var qc=new io.github.gustavo2358.analysis.query.PointQuery<>(io.github.gustavo2358.analysis.query.ProgramPoint.before(other.id(),operation),label);
+            assertEquals(new io.github.gustavo2358.analysis.dependencies.ReachabilityProvider.Fact(true,false,true),a.observe(List.of(qa)).batch().observations().getFirst().value());
+            assertEquals(new io.github.gustavo2358.analysis.dependencies.ReachabilityProvider.Fact(true,true,true),b.observe(List.of(qb)).batch().observations().getFirst().value());
+            assertEquals(new io.github.gustavo2358.analysis.dependencies.ReachabilityProvider.Fact(false,false,false),c.observe(List.of(qc)).batch().observations().getFirst().value());
+            assertThrows(io.github.gustavo2358.analysis.query.ObservationBatch.ObservationException.class,()->a.observe(List.of(qb)));
+            a.close();a.close();assertThrows(IllegalStateException.class,a::outcome);
+            assertRetiredRunHasNoExecutionRoots(a);
+            assertTrue(b.observe(List.of(qb)).batch().observations().getFirst().value().reachable(),"closing one shared binding cannot retire the live sibling");
+            b.close();c.close();assertEquals(before,ledger.heapUsed(),"last binding releases the shared closure");
+            expired=provider.prepare(session,ReachabilityProvider.key(first.id())).execute();
+            assertEquals(1L,expired.outcome().metrics().get("reachabilityPhysicalRuns"),"retired roots are recomputed, not retained indefinitely");
+            var foreign=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),List.of(first.id())).session().orElseThrow();
+            try(var differentIndex=provider.prepare(foreign,ReachabilityProvider.key(first.id())).execute()) {
+                assertEquals(1L,differentIndex.outcome().metrics().get("reachabilityPhysicalRuns"),"equal IDs in another index are not a sharing proof");
+            }
+        }
+        assertThrows(IllegalStateException.class,expired::outcome,"native owner expiry retires the still-open binding");
+        assertRetiredRunHasNoExecutionRoots(expired);
+        assertDoesNotThrow(expired::close);
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+    }
+
+    private static void assertRetiredRunHasNoExecutionRoots(Object run) throws Exception {
+        for(var field:run.getClass().getDeclaredFields()) {
+            if(field.getType().isPrimitive())continue;field.setAccessible(true);var value=field.get(run);
+            boolean retained=value instanceof io.github.gustavo2358.analysis.structure.AnalysisSession
+                ||value instanceof AnalysisResources.Reservation
+                ||value instanceof io.github.gustavo2358.analysis.application.AnalysisProvider.Prepared<?,?>
+                ||value instanceof ReachabilityProvider
+                ||value!=null&&value.getClass().getName().startsWith(ReachabilityProvider.class.getName()+"$");
+            assertFalse(retained,"closed reachability run retained execution root: "+field.getName());
+        }
     }
 
     @Test void failedNativeRegionalGroupWriteClosesPartialColumnsAndPreservesPrimary() {
@@ -1929,6 +1995,8 @@ final class SnapshotDependencyAnalysisTest {
     }
 
     @Test void nativeGeneralPlannerPreservesAllUnitsColdOperationsAndCorrelatedCallFacts() throws Exception {
+        ordinaryOpenReachabilityDoesNotMaterializeTheCartesianTopology();
+        acceptedInventoryUsesTheAdmittedTypedSitesInsteadOfRescanningBodies();
         for(int count:new int[]{1,4,16,64,256}) {
             var base=directCalls(count);var ledger=resources();
             // Written evidence is supported by the pinned wire; IDs/expected facts stay exact.
@@ -1977,6 +2045,79 @@ final class SnapshotDependencyAnalysisTest {
                 assertEquals(reference.get(field),actual.get(field),field);
         }
         assertEquals(0,ledger.heapUsed());
+    }
+
+    private void ordinaryOpenReachabilityDoesNotMaterializeTheCartesianTopology() throws Exception {
+        var base=directCall();var unit=base.units().getFirst();var origin=unit.origin();
+        var invoke=(Operations.Invoke)unit.sequences().getFirst().terminator();
+        var literal=new Operations.Invoke(invoke.header(),invoke.action(),
+            new Interactions.LiteralTarget("program","cobol.program","PROGA",Interactions.ExactName.INSTANCE,origin),
+            invoke.arguments(),invoke.results(),invoke.signature(),invoke.effectOperands(),invoke.effectBound(),invoke.outcomes(),invoke.contract());
+        var sequences=new java.util.ArrayList<Sequence>();
+        sequences.add(new Sequence(unit.sequences().getFirst().label(),List.of(),literal,origin));
+        sequences.add(unit.sequences().getLast());
+        var gap=new UncertaintyId(base.id(),"ordinary-open-control");
+        for(int i=0;i<128;i++) {
+            var header=ResultFixtures.header(unit.id(),"open-"+i);
+            header=new Operations.Header(header.id(),origin,Evidence.CoverageStatus.ABSTRACTED,header.precision(),List.of(gap));
+            var envelope=new Envelopes.Envelope(new Envelopes.MemoryEnvelope(List.of(),Scopes.NoMemory.INSTANCE,List.of(),Scopes.NoMemory.INSTANCE,List.of()),
+                new Control.ControlEnvelope(List.of(),new Scopes.WithinControl(new Scopes.UnitControl(unit.id(),true,false,false,false,false,false))),
+                new Envelopes.DependencyEnvelope(List.of(),Scopes.NoResources.INSTANCE));
+            sequences.add(new Sequence(new LabelId(unit.id(),"open-"+i),List.of(),new Operations.Opaque(header,"synthetic",List.of(),List.of(),envelope),origin));
+        }
+        var changed=ResultFixtures.unit(unit.id(),List.of(ResultFixtures.entry(unit.id(),"entry","open-0")),sequences,List.of());
+        var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),List.of(),base.resources(),
+            base.artifactRelations(),base.origins(),base.coverage(),List.of(new Evidence.Uncertainty(gap,"MODEL_GAP",List.of(Evidence.Dimension.CONTROL),
+                new Scopes.UnitScope(unit.id()),"synthetic open control",origin)),base.premises());
+        var ledger=new AnalysisResources(new AnalysisResources.Limits(64_000_000,131072,0,256_000_000,4,1_000_000_000,1_000_000));
+        try(var pages=new FilePageStore(directory,512,16,ledger);
+            var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger));
+            var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),new PagedSnapshotOrderStorage(pages,ledger),ledger)) {
+            assertEquals(ValidationResult.Status.STRUCTURALLY_VALID,checked.result().status());
+            var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,checked,BuildOptions.defaults());
+            var result=new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis().prepareLeased(program,cfg);
+            assertEquals(1,result.sites().size());var site=result.sites().getFirst();
+            assertEquals(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Reachability.REACHABLE,site.reachability());
+            assertTrue(site.openControlRemainder());assertFalse(site.effectiveUnknownRemainder());
+            assertEquals(List.of("PROGA"),site.candidates().stream().map(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Candidate::referenceName).toList());
+            assertEquals("invoke",site.candidates().getFirst().supports().getFirst().producer().localId());
+        }
+        for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        ordinarySharedEntriesPreserveRootsAndLeaseLifetimes(publication);
+    }
+
+    private void acceptedInventoryUsesTheAdmittedTypedSitesInsteadOfRescanningBodies() throws Exception {
+        var base=directCall();var unit=base.units().getFirst();var invoke=(Operations.Invoke)unit.sequences().getFirst().terminator();
+        var literal=new Operations.Invoke(invoke.header(),invoke.action(),new Interactions.LiteralTarget("program","cobol.program","PROGA",Interactions.ExactName.INSTANCE,unit.origin()),
+            invoke.arguments(),invoke.results(),invoke.signature(),invoke.effectOperands(),invoke.effectBound(),invoke.outcomes(),invoke.contract());
+        var entries=new java.util.ArrayList<Entries.Entry>();
+        for(int i=0;i<64;i++)entries.add(ResultFixtures.entry(unit.id(),"entry-"+i,"start"));
+        var changed=ResultFixtures.unit(unit.id(),entries,List.of(new Sequence(unit.sequences().getFirst().label(),List.of(),literal,unit.origin()),unit.sequences().getLast()),List.of());
+        var publication=new Publication(base.id(),base.airVersion(),base.capabilities(),base.artifacts(),List.of(changed),List.of(),base.resources(),
+            base.artifactRelations(),base.origins(),base.coverage(),base.uncertainties(),base.premises());
+        var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(publication,BuildOptions.defaults());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());
+        var resident=ProgramStore.resident(publication);var original=resident.units().getFirst();long[] bodyReads={0};
+        // Read-only test instrumentation: production still receives the complete typed inventory.
+        var measuredUnit=(ProgramStore.UnitView)java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{ProgramStore.UnitView.class},(proxy,method,arguments)->{
+            if(method.getName().equals("sequences"))bodyReads[0]++;
+            try{return method.invoke(original,arguments);}catch(java.lang.reflect.InvocationTargetException failure){throw failure.getCause();}
+        });
+        var measured=(ProgramStore.Structural)java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{ProgramStore.Structural.class},(proxy,method,arguments)->{
+            if(method.getName().equals("units"))return List.of(measuredUnit);
+            try{return method.invoke(resident,arguments);}catch(java.lang.reflect.InvocationTargetException failure){throw failure.getCause();}
+        });
+        var prepare=io.github.gustavo2358.analysis.dependencies.DependencyAnalysis.class.getDeclaredMethod("prepareExecutable",ProgramStore.Structural.class,CfgBuildResult.class);
+        prepare.setAccessible(true);
+        var result=(io.github.gustavo2358.analysis.dependencies.DependencyResult)prepare.invoke(new io.github.gustavo2358.analysis.dependencies.DependencyAnalysis(),measured,cfg);
+        assertEquals(64,result.sites().size());assertEquals(64,result.edges().size());assertTrue(result.fileDependencies().sites().isEmpty());
+        for(var site:result.sites()) {
+            assertEquals(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Reachability.REACHABLE,site.reachability());
+            assertEquals(List.of("PROGA"),site.candidates().stream().map(io.github.gustavo2358.analysis.dependencies.DependencySiteFact.Candidate::referenceName).toList());
+            assertEquals("invoke",site.candidates().getFirst().supports().getFirst().producer().localId());
+        }
+        System.out.println("ACCEPTED_INVENTORY_BODY_READS entries=64 reads="+bodyReads[0]);
+        assertTrue(bodyReads[0]<=16,"admitted CALL/FILE inventory must not reread each Unit body once per Entry: "+bodyReads[0]);
     }
 
     private static Publication directCallWithNops(int count) {

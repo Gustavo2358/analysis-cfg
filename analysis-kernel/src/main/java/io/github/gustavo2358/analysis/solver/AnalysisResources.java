@@ -53,7 +53,9 @@ public final class AnalysisResources {
         private boolean closed;
         private Reservation(Pool pool, long amount,ProgramStore.CapacityLease backing) { this.pool = pool; this.amount = amount;this.backing=backing; }
         public long amount() { synchronized (AnalysisResources.this) { return amount; } }
-        void onOwnerClose(Runnable cleanup) {
+        /** Register cleanup on native owner expiry; explicit close unregisters it.
+         * Resident compatibility has no native expiry and still requires explicit close. */
+        public void onOwnerClose(Runnable cleanup) {
             synchronized(AnalysisResources.this){if(closed)throw new IllegalStateException("reservation is closed");Objects.requireNonNull(cleanup);if(backing!=null)backing.onOwnerClose(cleanup);}
         }
         private AnalysisResources owner() { return AnalysisResources.this; }
@@ -120,7 +122,7 @@ public final class AnalysisResources {
     /** An execution view records its own capacities while native reservations
      * borrow the admitted common ledger. Resident compatibility stays explicit.
      * This does not fund stores that never request capacity from the view. */
-    static AnalysisResources executionFor(ProgramStore program) {
+    public static AnalysisResources executionFor(ProgramStore program) {
         Objects.requireNonNull(program);
         return new AnalysisResources(new Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE),0,()->0,
             phase->program.progress(executionPhase(phase)),program.executionBudget().orElse(null));

@@ -66,7 +66,31 @@ final class FileDependencyAnalysis {
             metrics.put("possibleValuesPreparations",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)).count());
             metrics.put("possibleValuesStable",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)&&a.status()==AnalysisOutcome.Status.STABLE).count());
         }
-        for(var unit:p.units())for(var entry:unit.entryViews())for(var sequence:unit.sequences()) {
+        if(session!=null) {
+            var resources=io.github.gustavo2358.analysis.solver.AnalysisResources.executionFor(p);
+            for(var unit:p.units())try(var selectedCapacity=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.SCRATCH,1024,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DEMAND)) {
+                var selected=new ArrayList<io.github.gustavo2358.analysis.structure.ProgramIndex.Site>();
+                for(var indexed:session.index().sites(Operations.Invoke.class,unit.id())) {
+                    p.progress(io.github.gustavo2358.analysis.structure.ProgramStore.ExecutionPhase.DEMAND);
+                    if(!FileDependencyConsumer.selected(indexed.operation(),locals))continue;
+                    selectedCapacity.grow(128,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DEMAND);selected.add(indexed);
+                }
+                for(var id:locals)if(id.unit().equals(unit.id())) {
+                    p.progress(io.github.gustavo2358.analysis.structure.ProgramStore.ExecutionPhase.DEMAND);
+                    var indexed=session.index().site(id);
+                    if(indexed==null||indexed.operation() instanceof Operations.Invoke)continue;
+                    selectedCapacity.grow(128,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DEMAND);selected.add(indexed);
+                }
+                if(selected.isEmpty())continue;
+                for(var entry:unit.entryViews())for(var indexed:selected) {
+                    p.progress(io.github.gustavo2358.analysis.structure.ProgramStore.ExecutionPhase.DEMAND);
+                    var key=new Key(entry.id(),indexed.operation().header().id());
+                    if(retained.containsKey(key))continue;
+                    var view=new SiteView(entry.id(),indexed.sequence().label(),indexed.offset(),indexed.operation());
+                    retained.put(key,FileDependencyConsumer.site(view,bindings,Optional.empty(),List.of(unavailable==null?"FILE_REACHABILITY_UNAVAILABLE":unavailable)));
+                }
+            }
+        } else for(var unit:p.units())for(var entry:unit.entryViews())for(var sequence:unit.sequences()) {
             // Borrow the typed body; inventory fallback must not materialize every
             // operand/literal merely to select FILE occurrences. Include the
             // terminator at its original offset, even at the int address boundary.

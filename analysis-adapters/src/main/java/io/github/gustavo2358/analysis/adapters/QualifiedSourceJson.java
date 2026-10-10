@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies;
 import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.*;
+import io.github.gustavo2358.analysis.solver.AnalysisResources;
 /** Closed v1 codec with explicit field mapping; no polymorphic/bean deserialization. */
 public final class QualifiedSourceJson {
     private final ObjectMapper mapper=JsonMapper.builder(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build()).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
@@ -25,7 +26,18 @@ public final class QualifiedSourceJson {
     }
     /** Decoding and mandatory model admission use the same caller's budget, with distinct phases. */
     public QualifiedSourceDependencies decode(InputStream input,Runnable progress,Runnable validation) throws IOException {
+        return decode(input,progress,validation,null);
+    }
+    /** Native decoding owns a bounded, temporary exact-metadata cache, not a global intern table. */
+    public QualifiedSourceDependencies decode(InputStream input,AnalysisResources resources) throws IOException {
+        Objects.requireNonNull(resources);
+        return decode(input,()->resources.work(1,AnalysisResources.Phase.DECODE),
+            ()->resources.work(1,AnalysisResources.Phase.VALIDATION),resources);
+    }
+    private QualifiedSourceDependencies decode(InputStream input,Runnable progress,Runnable validation,
+            AnalysisResources resources) throws IOException {
         Objects.requireNonNull(input);Objects.requireNonNull(validation);Objects.requireNonNull(progress).run();
+        try(var metadata=new SourceMetadataCache(resources)) {
         var checkedInput=new FilterInputStream(input) {
             @Override public int read() throws IOException {progress.run();return in.read();}
             @Override public int read(byte[] bytes,int offset,int length) throws IOException {progress.run();return in.read(bytes,offset,length);}
@@ -48,9 +60,10 @@ public final class QualifiedSourceJson {
         }) {
             parser.disable(JsonParser.Feature.AUTO_CLOSE_SOURCE);
             if(parser.nextToken()!=JsonToken.START_OBJECT)throw new IllegalArgumentException("object required");
-            var result=readSourceStream(parser,validation);
+            var result=readSourceStream(parser,validation,metadata);
             if(parser.nextToken()!=null)throw new IllegalArgumentException("trailing source content");
             return result;
+        }
         }
     }
     @FunctionalInterface private interface Element<T> {T read(JsonParser parser)throws IOException;}
@@ -73,8 +86,8 @@ public final class QualifiedSourceJson {
     private JsonNode tree(JsonParser parser)throws IOException {
         return elementReader.readTree(parser);
     }
-    private QualifiedSourceDependencies readSourceStream(JsonParser parser,Runnable validation)throws IOException {
-        var admission=new SourceAdmissionReader(validation);
+    private QualifiedSourceDependencies readSourceStream(JsonParser parser,Runnable validation,SourceMetadataCache metadata)throws IOException {
+        var admission=new SourceAdmissionReader(validation,metadata);
         String schema=null,version=null,producer=null;Document source=null;
         List<AirCorrelation> air=null;List<UnitEvidence> units=null;var fields=new HashSet<String>();
         while(parser.nextToken()!=JsonToken.END_OBJECT) {
@@ -183,10 +196,60 @@ public final class QualifiedSourceJson {
     private static Object value(NominalValues v){var out=object("authority",v.authority(),"symbols",v.symbols().stream().map(d->!v.authority().equals("NOMINAL_TEXT_SOURCE_V1")?object("node",d.node(),"extent",d.extent(),"modelAssumed",d.modelAssumed()):object("node",d.node(),"extent",d.extent())).toList(),"assignments",v.assignments().stream().map(d->object("statement",d.statement(),"target",d.target(),"source",value(d.source()))).toList(),"conditions",v.conditions().stream().map(d->object("statement",d.statement(),"predicate",value(d.predicate()))).toList(),"queries",v.queries().stream().map(d->object("statement",d.statement(),"node",d.node())).toList());if(v.authority().equals("NOMINAL_TEXT_SOURCE_V4"))out.put("tableFields",v.tableFields().stream().map(f->object("node",f.node(),"initial",f.initial().stream().map(i->object("origin",i.origin(),"value",i.value())).toList())).toList());return out;}
     private static Object value(NominalValues.Term v){return v.arguments().isEmpty()?object("kind",v.kind(),"value",v.value()):object("kind",v.kind(),"value",v.value(),"arguments",v.arguments().stream().map(QualifiedSourceJson::value).toList());}
     private static Object value(NominalValues.Predicate v){return object("kind",v.kind(),"terms",v.terms().stream().map(QualifiedSourceJson::value).toList(),"children",v.children().stream().map(QualifiedSourceJson::value).toList());}
+    /** Optional exact reuse; eviction or oversized metadata never changes the decoded value.
+     * 64 KiB covers the temporary index and conservatively sized key payloads, including
+     * old/new table capacity during resize. This is not a source cardinality limit.
+     * The detached source inventories still require their own complete funding/spill. */
+    private static final class SourceMetadataCache implements AutoCloseable {
+        private static final long CAPACITY=64L*1024,BASE_BYTES=1024,ENTRY_BYTES=192;
+        private record Cached(Object value,long bytes) { }
+        private final LinkedHashMap<Object,Cached> values;
+        private final AnalysisResources.Reservation capacity;
+        private long used;
+        SourceMetadataCache(AnalysisResources resources) {
+            capacity=resources==null?null:resources.reserve(AnalysisResources.Pool.RESIDENT,CAPACITY,AnalysisResources.Phase.DECODE);
+            try{values=new LinkedHashMap<>(16,0.75f,true);}
+            catch(RuntimeException|Error failure){if(capacity!=null)capacity.close();throw failure;}
+        }
+        @SuppressWarnings("unchecked") // Exact record equality and class identify each cache key.
+        <T> T canonical(T value) {
+            long bytes=ENTRY_BYTES+payload(value);
+            if(bytes>CAPACITY-BASE_BYTES)return value;
+            var prior=values.get(value);
+            if(prior!=null)return (T)prior.value();
+            while(used+bytes>CAPACITY-BASE_BYTES){var removed=values.pollFirstEntry();used-=removed.getValue().bytes();}
+            values.put(value,new Cached(value,bytes));used+=bytes;return value;
+        }
+        private static long textBytes(String text){return 32+2L*text.length();}
+        private static long unitBytes(UnitId unit){return 128+16L*unit.structuralPath().size()+textBytes(unit.compilationUnitId())+textBytes(unit.canonicalProgramName());}
+        private static long locationBytes(Location location){return 64+textBytes(location.file());}
+        private static long provenanceBytes(Provenance provenance) {
+            long bytes=96+locationBytes(provenance.expanded())+locationBytes(provenance.original());
+            for(var include:provenance.includeChain()) {
+                bytes+=96+textBytes(include.includingFile())+textBytes(include.requestedName())+textBytes(include.includedFile());
+                if(bytes>CAPACITY)return CAPACITY+1;
+            }
+            return bytes;
+        }
+        private static long payload(Object value) {
+            if(value instanceof UnitId unit)return unitBytes(unit);
+            if(value instanceof Provenance provenance)return provenanceBytes(provenance);
+            if(value instanceof NativeFileName name) {
+                long bytes=128+unitBytes(name.owner())+textBytes(name.declaration())+textBytes(name.logicalFile())+textBytes(name.rawValue());
+                for(var provenance:name.declarationOrigins()){bytes+=16+provenanceBytes(provenance);if(bytes>CAPACITY)return CAPACITY+1;}
+                return bytes;
+            }
+            throw new IllegalArgumentException("unsupported source metadata cache key");
+        }
+        @Override public void close(){values.clear();used=0;if(capacity!=null)capacity.close();}
+    }
     /** Invocation-local field mapping. Progress never escapes into the codec or evidence. */
     private static final class SourceAdmissionReader {
         private final Runnable progress;
-        SourceAdmissionReader(Runnable progress){this.progress=Objects.requireNonNull(progress);}
+        private final SourceMetadataCache metadata;
+        SourceAdmissionReader(Runnable progress){this(progress,null);}
+        SourceAdmissionReader(Runnable progress,SourceMetadataCache metadata){this.progress=Objects.requireNonNull(progress);this.metadata=metadata;}
+        private <T> T canonical(T value){return metadata==null?value:metadata.canonical(value);}
         private <T> List<T> list(JsonNode n,java.util.function.Function<JsonNode,T> mapping) {
             if(n==null||!n.isArray())throw new IllegalArgumentException("array required");
             var result=new ArrayList<T>();for(var element:n){progress.run();result.add(mapping.apply(element));}
@@ -201,12 +264,12 @@ public final class QualifiedSourceJson {
         private QualifiedSourceDependencies readQualifiedSourceDependencies(JsonNode n) {keys(n, "schema", "version", "producer", "source", "air", "units");return new QualifiedSourceDependencies(text(n.get("schema")), text(n.get("version")), text(n.get("producer")), readDocument(n.get("source")), list(n.get("air"), this::readAirCorrelation), list(n.get("units"), this::readUnitEvidence));}
         private Document readDocument(JsonNode n) {keys(n, "schema", "version", "sha256");return new Document(text(n.get("schema")), text(n.get("version")), text(n.get("sha256")));}
         private AirCorrelation readAirCorrelation(JsonNode n) {keys(n, "publication", "sha256");return new AirCorrelation(text(n.get("publication")), text(n.get("sha256")));}
-        private UnitId readUnitId(JsonNode n) {keys(n, "compilationUnitId", "structuralPath", "canonicalProgramName");return new UnitId(text(n.get("compilationUnitId")), list(n.get("structuralPath"), QualifiedSourceJson::integer), text(n.get("canonicalProgramName")));}
+        private UnitId readUnitId(JsonNode n) {keys(n, "compilationUnitId", "structuralPath", "canonicalProgramName");return canonical(new UnitId(text(n.get("compilationUnitId")), list(n.get("structuralPath"), QualifiedSourceJson::integer), text(n.get("canonicalProgramName"))));}
         private StatementId readStatementId(JsonNode n) {keys(n, "unit", "handle");return new StatementId(readUnitId(n.get("unit")), text(n.get("handle")));}
         private OperandId readOperandId(JsonNode n) {keys(n, "statement", "handle");return new OperandId(readStatementId(n.get("statement")), text(n.get("handle")));}
         private Location readLocation(JsonNode n) {keys(n, "file", "startLine", "startColumn", "endLine", "endColumn");return new Location(text(n.get("file")), integer(n.get("startLine")), integer(n.get("startColumn")), integer(n.get("endLine")), integer(n.get("endColumn")));}
         private Include readInclude(JsonNode n) {keys(n, "includingFile", "requestedName", "includedFile", "includeLine");return new Include(text(n.get("includingFile")), text(n.get("requestedName")), text(n.get("includedFile")), integer(n.get("includeLine")));}
-        private Provenance readProvenance(JsonNode n) {keys(n, "expanded", "original", "includeChain", "exact");return new Provenance(readLocation(n.get("expanded")), readLocation(n.get("original")), list(n.get("includeChain"), this::readInclude), bool(n.get("exact")));}
+        private Provenance readProvenance(JsonNode n) {keys(n, "expanded", "original", "includeChain", "exact");return canonical(new Provenance(readLocation(n.get("expanded")), readLocation(n.get("original")), list(n.get("includeChain"), this::readInclude), bool(n.get("exact"))));}
         private Statement readStatement(JsonNode n) {keys(n, "id", "provenance");return new Statement(readStatementId(n.get("id")), readProvenance(n.get("provenance")));}
         private Operand readOperand(JsonNode n) {keys(n, "id", "provenance");return new Operand(readOperandId(n.get("id")), readProvenance(n.get("provenance")));}
         private Value readValue(JsonNode n) {keys(n, "logicalDomain", "value", "logicalExtent");return new Value(text(n.get("logicalDomain")), text(n.get("value")), integer(n.get("logicalExtent")));}
@@ -223,7 +286,7 @@ public final class QualifiedSourceJson {
         private Derivation readDerivation(JsonNode n) {keys(n, "id", "source", "destination", "callerPremise", "authority", "proofs", "selection");return new Derivation(text(n.get("id")), list(n.get("source"), QualifiedSourceJson::text), text(n.get("destination")), list(n.get("callerPremise"), QualifiedSourceJson::text), text(n.get("authority")), list(n.get("proofs"), QualifiedSourceJson::text), list(n.get("selection"), QualifiedSourceJson::text));}
         private Frontier readFrontier(JsonNode n) {keys(n, "source", "authority", "reference", "proofs");return new Frontier(text(n.get("source")), text(n.get("authority")), text(n.get("reference")), list(n.get("proofs"), QualifiedSourceJson::text));}
         private UnitEvidence readUnitEvidence(JsonNode n) {var expected=new ArrayList<>(List.of("unit","controlAvailable","statements","occurrences","targets","nodes","derivations","selections","events","guards","proofs","frontiers"));for(String optional:List.of("nominalValues","nativeFiles"))if(n.has(optional))expected.add(optional);keys(n,expected.toArray(String[]::new));return new UnitEvidence(readUnitId(n.get("unit")), bool(n.get("controlAvailable")), list(n.get("statements"), this::readStatement), list(n.get("occurrences"), this::readOccurrence), list(n.get("targets"), this::readTarget), list(n.get("nodes"), this::readNode), list(n.get("derivations"), this::readDerivation), list(n.get("selections"), this::readSelection), list(n.get("events"), this::readEvent), list(n.get("guards"), this::readGuard), list(n.get("proofs"), this::readProof), list(n.get("frontiers"), this::readFrontier),n.has("nominalValues")?Optional.of(readNominalValueEvidence(n.get("nominalValues"))):Optional.empty(),n.has("nativeFiles")?list(n.get("nativeFiles"),this::readNativeFile):List.of());}
-        private NativeFileUse readNativeFile(JsonNode n){keys(n,"statement","ordinal","controlLocation","command","local","names","provenance","qualifications","gaps");return new NativeFileUse(readStatementId(n.get("statement")),integer(n.get("ordinal")),text(n.get("controlLocation")),text(n.get("command")),bool(n.get("local")),list(n.get("names"),d->{keys(d,"declaration","owner","logicalFile","rawValue","declarationOrigins");return new NativeFileName(text(d.get("declaration")),readUnitId(d.get("owner")),text(d.get("logicalFile")),text(d.get("rawValue")),list(d.get("declarationOrigins"),this::readProvenance));}),readProvenance(n.get("provenance")),list(n.get("qualifications"),QualifiedSourceJson::text),list(n.get("gaps"),QualifiedSourceJson::text));}
+        private NativeFileUse readNativeFile(JsonNode n){keys(n,"statement","ordinal","controlLocation","command","local","names","provenance","qualifications","gaps");return new NativeFileUse(readStatementId(n.get("statement")),integer(n.get("ordinal")),text(n.get("controlLocation")),text(n.get("command")),bool(n.get("local")),list(n.get("names"),d->{keys(d,"declaration","owner","logicalFile","rawValue","declarationOrigins");return canonical(new NativeFileName(text(d.get("declaration")),readUnitId(d.get("owner")),text(d.get("logicalFile")),text(d.get("rawValue")),list(d.get("declarationOrigins"),this::readProvenance)));}),readProvenance(n.get("provenance")),list(n.get("qualifications"),QualifiedSourceJson::text),list(n.get("gaps"),QualifiedSourceJson::text));}
         private NominalValueEvidence readNominalValueEvidence(JsonNode n){return readNominalValueEvidence(n,()->{});}
         private NominalValueEvidence readNominalValueEvidence(JsonNode n,Runnable validation){keys(n,"facts","declarations","seeds","branches","uncertainties");return new NominalValueEvidence(readNominalValues(n.get("facts"),validation),list(n.get("declarations"),d->{validation.run();keys(d,"node","provenance");return new NominalValueEvidence.Declaration(text(d.get("node")),readProvenance(d.get("provenance")));}),list(n.get("seeds"),d->{validation.run();keys(d,"node","value","authority","provenance");return new NominalValueEvidence.Seed(text(d.get("node")),text(d.get("value")),text(d.get("authority")),readProvenance(d.get("provenance")));}),list(n.get("branches"),d->{validation.run();keys(d,"derivation","whenTrue");return new NominalValueEvidence.Branch(text(d.get("derivation")),bool(d.get("whenTrue")));}),list(n.get("uncertainties"),d->{validation.run();keys(d,"id","kind","provenance");return new NominalValueEvidence.Uncertainty(text(d.get("id")),text(d.get("kind")),readProvenance(d.get("provenance")));}),validation);}
         private NominalValues readNominalValues(JsonNode n,Runnable validation){boolean tables=n.path("authority").asText().equals("NOMINAL_TEXT_SOURCE_V4");if(tables)keys(n,"authority","symbols","assignments","conditions","queries","tableFields");else keys(n,"authority","symbols","assignments","conditions","queries");return new NominalValues(text(n.get("authority")),list(n.get("symbols"),d->{validation.run();boolean model=!n.path("authority").asText().equals("NOMINAL_TEXT_SOURCE_V1");if(model)keys(d,"node","extent","modelAssumed");else keys(d,"node","extent");return new NominalValues.Symbol(text(d.get("node")),integer(d.get("extent")),model&&bool(d.get("modelAssumed")));}),list(n.get("assignments"),d->{validation.run();keys(d,"statement","target","source");return new NominalValues.Assignment(text(d.get("statement")),text(d.get("target")),readNominalTerm(d.get("source"),validation));}),list(n.get("conditions"),d->{validation.run();keys(d,"statement","predicate");return new NominalValues.Condition(text(d.get("statement")),readNominalPredicate(d.get("predicate"),validation));}),list(n.get("queries"),d->{validation.run();keys(d,"statement","node");return new NominalValues.Query(text(d.get("statement")),text(d.get("node")));}),tables?list(n.get("tableFields"),f->{validation.run();keys(f,"node","initial");return new NominalValues.TableField(text(f.get("node")),list(f.get("initial"),i->{validation.run();keys(i,"origin","value");return new NominalValues.Initial(text(i.get("origin")),text(i.get("value")));}));}):List.of(),validation);}

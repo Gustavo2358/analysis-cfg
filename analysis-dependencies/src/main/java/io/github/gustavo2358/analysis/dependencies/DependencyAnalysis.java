@@ -138,7 +138,7 @@ public final class DependencyAnalysis {
             for(var batch:result.results())if(batch.batchId().analysisKey().implementation().equals("Reachability"))
                 for(var observation:batch.observations())if(observation.status()==ObservationBatch.QueryStatus.VALUE&&observation.value() instanceof ReachabilityProvider.Fact fact)
                     reachability.put(new SiteKey(observation.query().point().entry(),observation.query().point().operation()),fact);
-            for(var site:inventory(publication)) {
+            for(var site:inventory(publication,session)) {
                 var key=new SiteKey(site.entry(),site.operationId());
                 if(!retained.containsKey(key))retained.put(key,CallDependencyConsumer.partial(site,Optional.ofNullable(reachability.get(key)),
                     List.copyOf(entryReasons.getOrDefault(site.entry(),Set.of("DEPENDENCY_PREPARATION_INCOMPLETE")))));
@@ -208,6 +208,25 @@ public final class DependencyAnalysis {
         for(var unit:publication.units())for(var entry:unit.entryViews())for(var sequence:unit.sequences())
             if(sequence.terminator() instanceof Operations.Invoke invoke&&CallDependencyPlan.selected(invoke))
                 result.add(new SiteView(entry.id(),sequence.label(),sequence.instructions().size(),invoke));
+        return List.copyOf(result);
+    }
+    /** The admitted index is exhaustive, including cold/unreachable operations.
+     * Selecting CALL handles once per Unit does not filter by reachability. */
+    private static List<SiteView> inventory(ProgramStore.Structural publication,AnalysisSession session) {
+        var result=new ArrayList<SiteView>();var resources=AnalysisResources.executionFor(publication);
+        for(var unit:publication.units())try(var selectedCapacity=resources.reserve(AnalysisResources.Pool.SCRATCH,1024,AnalysisResources.Phase.DEMAND)) {
+            var calls=new ArrayList<io.github.gustavo2358.analysis.structure.ProgramIndex.Site>();
+            for(var site:session.index().sites(Operations.Invoke.class,unit.id())) {
+                publication.progress(ProgramStore.ExecutionPhase.DEMAND);
+                if(!CallDependencyPlan.selected((Operations.Invoke)site.operation()))continue;
+                selectedCapacity.grow(128,AnalysisResources.Phase.DEMAND);calls.add(site);
+            }
+            if(calls.isEmpty())continue;
+            for(var entry:unit.entryViews())for(var site:calls) {
+                publication.progress(ProgramStore.ExecutionPhase.DEMAND);
+                result.add(new SiteView(entry.id(),site.sequence().label(),site.offset(),site.operation()));
+            }
+        }
         return List.copyOf(result);
     }
     private DependencyResult partialInventory(Publication publication,String reason) {

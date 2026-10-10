@@ -24,12 +24,15 @@ public final class AnalysisDependencies {
     static int run(String[] args,PrintStream err,DataflowAirReader reader,AnalysisResources resources) {
         if(args.length!=2||args[0].isBlank()||args[1].isBlank()){err.println("usage: analysis-dependencies <input.air.json> <output.dependencies.json>");return 2;}
         Path input,output;try{input=Path.of(args[0]);output=Path.of(args[1]);}catch(InvalidPathException failure){err.println("INVALID_PATH");return 2;}
-        try(var read=reader.readSnapshot(input,resources)) {
+        try(var admitted=new DependencyInputJson().readSnapshot(input,reader,resources)) {
+            var read=admitted.air();
             var validation=read.checked().result();
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID){err.println("INPUT_VALIDATION: "+validation.status());return validation.status()==ValidationResult.Status.INVALID_IR?3:7;}
             try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),resources)) {
                 var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
-                var result=new DependencyAnalysis().prepare(program,cfg);
+                var analysis=new DependencyAnalysis();
+                var result=admitted.source().isEmpty()?analysis.prepareLeased(program,cfg):analysis.prepareLeased(program,cfg,
+                    admitted.source().orElseThrow(),admitted.correlations(),read.borrowedPages(),resources);
                 try{new SnapshotDependencyFileWriter().write(result,program,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
             }
             return 0;

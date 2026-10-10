@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "fb4fce8056e685183ccde052c23026205daf4036",
+    "commit": "0ab2ef8e0abbf17f63477a178adb5a21025aa565",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -268,9 +268,9 @@
       "context": "PR30 exact producer9da08d5; remote contracts jobs114079325310/114079308588 (runs38007423531/38007418347) both completed SUCCESS,observed2026-10-10T00:06:38Z. Local FAST282/145 PASS29.983s. Prior650 remote runs37969756139/37969748975 SUCCESS remain historical,not the verdict for this pin. Consumer physical repeat,coherent FAST and human review pending;no merge."
     },
     "ci": {
-      "checked_commit": "fb4fce8056e685183ccde052c23026205daf4036",
+      "checked_commit": "0ab2ef8e0abbf17f63477a178adb5a21025aa565",
       "status": "NOT_RUN",
-      "context": "Exact producer SHAfb4fce8 is local only;remote publication authorization remains pending. Producer local original FAST282/145/44 PASS29.467s after individual initial-candidate validation. Current consumer integration and FAST remain pending. native_initial_cell_consistency_checkpoint preserves the prior complete consumer FAST1204/zero skips PASS777.095s on producer8b. Earlier failures/evidence remain historical,not relabeled. No remote CI or merge is claimed."
+      "context": "Exact producer0ab2ef8 is local only;remote publication authorization pending. Native CopyBytes common fallback Continue classification matches pinned AIR I-60;focused1/4/16 copies plus rejecting indirect terminator PASS. Original producer FAST282/145/44 PASS30.223s with workspace TMPDIR after shared /tmp quota failure. Prior consumer55b5e067 native possible-candidate checkpoint FAST1204/zero skips PASS771.540s on fb4,strict general v3 and real closed/open W2D separately qualified. Current source-bundle integration,pin and FILE matrix qualification remain pending. Earlier failures/evidence remain historical,not relabeled. No remote CI or merge is claimed."
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

@@ -54,6 +54,7 @@ class QualifiedSourceContractTest {
     private ObjectNode first(ObjectNode unit,String name){return (ObjectNode)unit.path(name).get(0);}
     private void reject(ObjectNode value){assertThrows(IllegalArgumentException.class,()->codec.decode(json.writeValueAsBytes(value)));}
     @Test void producerRoundtripAndCandidateOccurrenceSelectionCorrelation()throws Exception {
+        exactMetadataCanonicalizationKeepsEveryOccurrenceAndInvocationSeparate();
         for(var name:List.of("ordinary","explicit","conditional","canceled","gap","alter","replacement","deactivated","computed","alternatives","registration")) {
             var evidence=read(name);assertEquals(evidence,codec.decode(codec.encode(evidence)));
             var input=new ByteArrayInputStream(codec.encode(evidence)) {public void close(){throw new AssertionError("caller input closed");}};
@@ -74,6 +75,64 @@ class QualifiedSourceContractTest {
             if(name.equals("replacement"))assertEquals(List.of("NEWPGM"),names);
             if(Set.of("canceled","deactivated","computed","registration").contains(name))assertTrue(names.isEmpty(),name);
         }
+    }
+    private void exactMetadataCanonicalizationKeepsEveryOccurrenceAndInvocationSeparate()throws Exception {
+        for(int count:new int[]{1,4,16}) {
+            var wire=possibility("unknown-native");var files=(ArrayNode)unit(wire).path("nativeFiles");
+            var first=files.get(0).deepCopy();files.removeAll();
+            for(int i=0;i<count;i++){var copy=(ObjectNode)first.deepCopy();copy.put("ordinal",i);files.add(copy);}
+            var bytes=json.writeValueAsBytes(wire);var decoded=codec.decode(bytes);var evidence=decoded.units().getFirst();
+            assertEquals(count,evidence.nativeFiles().size());
+            for(int i=0;i<count;i++) {
+                var use=evidence.nativeFiles().get(i);assertEquals(i,use.ordinal());
+                assertSame(evidence.unit(),use.statement().unit(),"equal unit descriptors must not be duplicated per occurrence");
+                assertSame(evidence.nativeFiles().getFirst().provenance(),use.provenance());
+                assertSame(evidence.nativeFiles().getFirst().names().getFirst(),use.names().getFirst());
+            }
+            assertEquals(wire,json.readTree(codec.encode(decoded)),"all source fields,identities and provenance remain exact");
+            assertNotSame(evidence.unit(),codec.decode(bytes).units().getFirst().unit(),"metadata is invocation-local,not global interning");
+            if(count>1) {
+                var other=(ObjectNode)files.get(1);((ObjectNode)other.path("names").get(0)).put("rawValue","OTHERDD");
+                ((ObjectNode)other.path("provenance").path("original")).put("file","other.synthetic.cbl");
+                var distinct=codec.decode(json.writeValueAsBytes(wire)).units().getFirst().nativeFiles();
+                assertNotEquals(distinct.getFirst().names(),distinct.get(1).names());
+                assertNotSame(distinct.getFirst().names().getFirst(),distinct.get(1).names().getFirst());
+                assertNotEquals(distinct.getFirst().provenance(),distinct.get(1).provenance());
+                assertEquals(wire,json.readTree(codec.encode(codec.decode(json.writeValueAsBytes(wire)))));
+            }
+        }
+        var wire=possibility("unknown-native");var files=(ArrayNode)unit(wire).path("nativeFiles");
+        var prototype=files.get(0).deepCopy();files.removeAll();
+        for(int i=0;i<512;i++) {
+            var copy=(ObjectNode)prototype.deepCopy();copy.put("ordinal",i);
+            ((ObjectNode)copy.path("provenance").path("original")).put("file","origin-"+i+".synthetic.cbl");
+            // Equal hash is not equal metadata; cache eviction must not merge or lose these names.
+            ((ObjectNode)copy.path("names").get(0)).put("rawValue",i%2==0?"Aa":"BB");files.add(copy);
+        }
+        assertEquals("Aa".hashCode(),"BB".hashCode());
+        var bytes=json.writeValueAsBytes(wire);var owner=sourceCacheResources(1_000_000,Long.MAX_VALUE);
+        var input=new ByteArrayInputStream(bytes){@Override public void close(){fail("metadata cache closed caller input");}};
+        var evidence=codec.decode(input,owner);
+        assertEquals(wire,json.readTree(codec.encode(evidence)),"eviction preserves every identity,name,include and provenance");
+        assertEquals(64L*1024,owner.peak(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT));
+        assertEquals(0,owner.heapUsed());
+        var denied=sourceCacheResources(64L*1024-1,Long.MAX_VALUE);int[] reads={0};
+        var unread=new ByteArrayInputStream(bytes){@Override public int read(byte[] buffer,int offset,int length){reads[0]++;return super.read(buffer,offset,length);}};
+        var failure=assertThrows(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted.class,()->codec.decode(unread,denied));
+        assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Resource.HEAP,failure.resource());
+        assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE,failure.phase());
+        assertEquals(0,reads[0]);assertEquals(0,denied.heapUsed());
+        var stopped=sourceCacheResources(1_000_000,1);
+        assertThrows(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted.class,
+            ()->codec.decode(new ByteArrayInputStream(bytes),stopped));assertEquals(0,stopped.heapUsed());
+        ((ObjectNode)files.get(0)).put("ordinal",-1);var invalid=json.writeValueAsBytes(wire);
+        var rejected=sourceCacheResources(1_000_000,Long.MAX_VALUE);
+        assertThrows(IllegalArgumentException.class,()->codec.decode(new ByteArrayInputStream(invalid),rejected));
+        assertEquals(0,rejected.heapUsed());
+    }
+    private static io.github.gustavo2358.analysis.solver.AnalysisResources sourceCacheResources(long heap,long work) {
+        return new io.github.gustavo2358.analysis.solver.AnalysisResources(
+            new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(heap,0,0,0,0,work,Long.MAX_VALUE));
     }
     @Test void ordinaryAndConditionalAlternativesKeepGuardsSeparate()throws Exception {
         var q=read("alternatives").units().getFirst();

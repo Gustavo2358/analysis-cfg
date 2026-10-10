@@ -36,6 +36,20 @@ class OpenLabelIndexTest {
                 }
                 assertEquals(expected,actual,"symbolic edges must retain CFG encounter order");
                 assertEquals(actual.size()+stored,cursor.edgesVisited());
+                var splitKnown=context.knownSuccessors(source);int knownCount=0;
+                while(splitKnown.advance()) {
+                    assertNotEquals(CfgTransition.Kind.OPAQUE_UNKNOWN,splitKnown.transition().kind());
+                    assertEquals(context.entryView().id(),splitKnown.transition().activationEntry());knownCount++;
+                }
+                assertEquals(stored,knownCount,"partition cannot drop stored edges of Opaque");
+                var splitUnknown=context.unknownSuccessors(source);var splitTargets=new ArrayList<ProgramIndex.Node>();
+                while(splitUnknown.advance()) {
+                    assertEquals(CfgTransition.Kind.OPAQUE_UNKNOWN,splitUnknown.transition().kind());
+                    assertEquals(context.entryView().id(),splitUnknown.transition().activationEntry());splitTargets.add(splitUnknown.target());
+                }
+                assertEquals(expected,splitTargets,"partition preserves full Labels/Union/Unit/All bounds and encounter order");
+                if(context.entryView().id().unit().equals(u))assertEquals(new Scopes.WithinControl(scope),context.unknownControl(source));
+                else assertThrows(IllegalArgumentException.class,()->context.unknownControl(source));
                 for(var target:actual) {
                     var backward=context.predecessors(target);boolean found=false;
                     while(backward.advance())if(backward.transition().kind()==CfgTransition.Kind.OPAQUE_UNKNOWN&&backward.source()==source)found=true;
