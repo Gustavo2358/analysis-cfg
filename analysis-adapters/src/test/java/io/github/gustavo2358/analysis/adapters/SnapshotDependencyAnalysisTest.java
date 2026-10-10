@@ -610,6 +610,16 @@ final class SnapshotDependencyAnalysisTest {
                 var residentEffects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(resident));
                 var expectedDefinitions=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(residentEffects).analysis().orElseThrow().execute().observeStorage(List.of(query));
                 assertEquals(expectedDefinitions.observations(),rd.execute().observeStorage(List.of(query)).observations());
+                var objectQuery=new io.github.gustavo2358.analysis.query.PointQuery<ObjectId>(query.point(),place.object());
+                try(var scalar=io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.prepare(session,io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.EFFECTS_PROFILE).analysis().orElseThrow();
+                    var residentScalar=io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.prepare(resident,io.github.gustavo2358.analysis.values.PossibleValuesAnalysis.EFFECTS_PROFILE).analysis().orElseThrow()) {
+                    assertEquals(0,retainedDormantTexts(scalar),"native scalar preparation must not own decoded initial bodies");
+                    try(var actualExecution=scalar.execute();var expectedExecution=residentScalar.execute()) {
+                        assertEquals(expectedExecution.observe(List.of(objectQuery)).batch().observations(),actualExecution.observe(List.of(objectQuery)).batch().observations(),"scalar initial candidates/supports/premises/origins/remainder match the resident route");
+                        assertEquals(0,retainedDormantTexts(actualExecution));
+                    }
+                    assertEquals(0,retainedDormantTexts(scalar));
+                }
                 assertEquals(0,retainedDormantTexts(session.index()));assertEquals(0,retainedDormantTexts(regional));
             }
             var expired=borrowed;assertThrows(IllegalStateException.class,expired::size);assertThrows(IllegalStateException.class,()->expired.identity(0));assertThrows(IllegalStateException.class,()->expired.ordinal(place.header().id()));assertThrows(IllegalStateException.class,()->expired.at(0));

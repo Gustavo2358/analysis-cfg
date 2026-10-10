@@ -119,7 +119,7 @@ final class TextProfile {
         relations=ScalarRelations.create(this.selected,preparedWrites,subjects,cells.size(),()->store.progress(ProgramStore.ExecutionPhase.DOMAIN));
         for(var context:session.contexts()) {
             if(!context.entryView().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entryView().id());
-            var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
+            var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,ProgramStore.InitialConditionView>();var initialized=new HashSet<Integer>();
             for(var condition:context.entryView().state().conditions().stream().sorted(Comparator.comparingInt(c->c.literal()?0:1)).toList()) {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
                 var location=subjects.get(object.object());
@@ -137,8 +137,11 @@ final class TextProfile {
                 if(!selected(location))continue;
                 if(condition.value() instanceof Entries.LiteralInitial literal) {
                     if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
-                    var previous=initial.putIfAbsent(location.ordinal(),text);
-                    if(previous!=null&&!previous.equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
+                    // Retain the canonical condition address,not every decoded text
+                    // body. A previous condition was already admitted as TEXT here;
+                    // only a second strong fact for the same Cell needs its value.
+                    var previous=initial.putIfAbsent(location.ordinal(),condition);
+                    if(previous!=null&&!((Entries.LiteralInitial)previous.value()).value().value().equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
                     if(!selected(location))continue;
                     var value=universe.supported(text,condition.place().header().id(),condition.origin(),condition.premises(),preparation);
                     // Simultaneous support is unioned; only the first strong fact can

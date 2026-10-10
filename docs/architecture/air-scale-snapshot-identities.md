@@ -949,3 +949,40 @@ causing OOM93.17s. Its before-correction small reference includes all original17
 CALL sites and the complete new cold-sequence CFG. These diagnostic timings overlap
 FAST. Header borrowing is qualified locally,not a complete AS-W09/W10 spill claim.
 Remote publication/CI and human review remain pending;no merge.
+
+## Strong initial Cell consistency without a text-body catalogue
+
+The per-Entry TextProfile consistency map now retains InitialConditionView source
+addresses rather than decoded TextValue bodies. A second strong fact for the same
+Cell alone rereads the previous value for exact comparison;simultaneous supports,
+aliases,contradictions,possible alternatives and remainders keep their existing laws.
+The existing native Entry test additionally compares complete PossibleValues initial
+facts with the resident route and checks no dormant text body is retained.
+
+Producer8b596372e7ba712de3a186b64200be94d7b4481a and unchanged IR4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e
+remain pinned. Clean build9.929s;25 Entry/coexistence laws,2 native Entry laws and
+all seven original compiled guards pass without new inventory capture. The latest
+original full FAST command passes1204 required methods,zero skips,777.095s,including
+all subsequent contracts. This qualifies the current code;the earlier Entry wave's
+W5-inventory FAST failure remains recorded separately,not rewritten as PASS.
+
+Same admitted InitialCell512156064090B originally OOM93.17s now passes actual
+isolated Java21/Xmx128m/default-quota CLI106.78/106.32/106.69s,median106.69s;
+small2480474B30.84s. The immutable pre-fix oracle checks20 semantic fields and
+complete CFG. Stronger raw evidence:all three complete large products are identical
+to the pre-fix small products,including metrics: CFGc89f8ec59385f05531766c28bf8da3493f04cda93bc25f2fa5299f30a1669a4e,
+dependenciesab1356c2236eae2905d41f470aba9def261dd0309867646bdf4b6db16954ad3a.
+
+Because these added Cells only feed unreachable cold copies,a separate independent
+boundary oracle also observes ALL512 initial Cells,one at a time. Each full300000-
+character value,CellId,producer OperandId,candidate-specific support,origin,premise
+and remainder is checked manually. Large PASS95.91s,small PASS23.63s;all resource
+pools release. An isolated classpath mutant that drops strong initials fails on the
+first Cell's full value in23.39s,without modifying production sources/classes.
+
+Post-FAST1364 runtime hashes,2175 consumer/649 producer tracked files,21 historical
+plus4 Entry/4 Cell material inputs,4 immutable references,15 historical/14 newly
+frozen installed libraries and supplementary oracle source/class match before C0
+documentation edits. This removes the demonstrated strong-initial payload retention,
+not all possible-candidate aggregates,state/index stores or AS-W09/W10 obligations.
+Publication,remote CI,global qualification and human review remain pending;no merge.
