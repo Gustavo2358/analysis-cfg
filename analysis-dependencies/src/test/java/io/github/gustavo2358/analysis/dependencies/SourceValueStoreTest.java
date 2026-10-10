@@ -32,6 +32,10 @@ final class SourceValueStoreTest {
             assertEquals(7, values.flags(joined));
             assertEquals(joined, values.join(a, values.join(c, b))); assertEquals(joined, values.join(c, values.join(b, a)));
             assertEquals(joined, values.join(joined, joined)); assertEquals(0, resources.used(AnalysisResources.Pool.SCRATCH));
+            for(var field:SourceValueStore.class.getDeclaredFields()) {
+                assertFalse(Map.class.isAssignableFrom(field.getType()),"resident per-text index: "+field.getName());
+                assertFalse(List.class.isAssignableFrom(field.getType()),"resident per-text catalogue: "+field.getName());
+            }
         }
         assertEquals(0, resources.heapUsed());
     }
@@ -73,6 +77,87 @@ final class SourceValueStoreTest {
             values.release(b); values.collect(); assertEquals(0, values.records());
         }
         assertEquals(0, resources.heapUsed());
+        textProjectionLifetime();
+        textOperationalFailures();
+    }
+
+    private static void textOperationalFailures() {
+        // Constructor denial must return already acquired control reservations.
+        var denied=new AnalysisResources(new AnalysisResources.Limits(4096,1024,0,0,0,1000000,0));
+        try(var pages=new ResidentPageStore(512,denied)) {
+            assertThrows(AnalysisResources.Exhausted.class,()->new SourceTextDictionary(pages,denied));
+            assertEquals(0,pages.statistics().livePages());
+        }
+        assertEquals(0,denied.heapUsed());
+        for(boolean scratchDenial:new boolean[]{false,true}) {
+            var limited=new AnalysisResources(new AnalysisResources.Limits(1000000,scratchDenial?0:1024,0,0,0,scratchDenial?1000000:0,0));
+            try(var pages=new ResidentPageStore(512,limited);var dictionary=new SourceTextDictionary(pages,limited)) {
+                var failure=assertThrows(AnalysisResources.Exhausted.class,()->{
+                    long id=dictionary.intern("cancel-or-deny");dictionary.project(id);
+                });
+                assertEquals(scratchDenial?AnalysisResources.Resource.SCRATCH:AnalysisResources.Resource.WORK,failure.resource());
+                assertEquals(AnalysisResources.Phase.DOMAIN,failure.phase());
+                assertThrows(IllegalStateException.class,()->dictionary.intern("must-not-publish"));
+                assertThrows(IllegalStateException.class,dictionary::size);
+            }
+            assertEquals(0,limited.heapUsed());
+        }
+        for(boolean failWrite:new boolean[]{false,true}) {
+            var resources=resources();
+            try(var backing=new ResidentPageStore(512,resources)) {
+                var pages=new FailingTextPages(backing);var dictionary=new SourceTextDictionary(pages,resources);
+                long id=dictionary.intern("retained-projection");var live=dictionary.project(id);
+                pages.failRead=!failWrite;pages.failWrite=failWrite;
+                var failure=assertThrows(PageStore.Failure.class,()->{
+                    if(failWrite)dictionary.intern("new-text");else dictionary.project(id);
+                });
+                assertEquals(PageStore.Reason.IO,failure.reason());
+                assertThrows(IllegalStateException.class,live::value);
+                assertThrows(IllegalStateException.class,()->dictionary.intern("must-not-publish"));
+                dictionary.close();dictionary.close();live.close();
+                assertEquals(0,resources.used(AnalysisResources.Pool.SCRATCH));
+                assertEquals(0,backing.statistics().livePages());
+                long borrowed=backing.allocate();backing.release(borrowed);
+            }
+            assertEquals(0,resources.heapUsed());
+        }
+    }
+
+    private static final class FailingTextPages implements PageStore {
+        private final PageStore backing;
+        private boolean failRead,failWrite;
+        private FailingTextPages(PageStore backing){this.backing=backing;}
+        @Override public int pageBytes(){return backing.pageBytes();}
+        @Override public long allocate(){return backing.allocate();}
+        @Override public void read(long page,int offset,byte[] target,int at,int length){if(failRead)throw new Failure(Reason.IO,"injected text read");backing.read(page,offset,target,at,length);}
+        @Override public void write(long page,int offset,byte[] source,int at,int length){if(failWrite)throw new Failure(Reason.IO,"injected text write");backing.write(page,offset,source,at,length);}
+        @Override public void release(long page){backing.release(page);}
+        @Override public void readForCleanup(long page,int offset,byte[] target,int at,int length){backing.readForCleanup(page,offset,target,at,length);}
+        @Override public void releaseForCleanup(long page){backing.releaseForCleanup(page);}
+        @Override public void flush(){backing.flush();}
+        @Override public Statistics statistics(){return backing.statistics();}
+        @Override public void close(){backing.close();}
+    }
+
+    private static void textProjectionLifetime() {
+        var resources=resources();
+        try(var pages=new ResidentPageStore(512,resources)) {
+            var dictionary=new SourceTextDictionary(pages,resources);
+            long a=dictionary.intern("Aa"),b=dictionary.intern("BB");
+            assertEquals("Aa".hashCode(),"BB".hashCode());assertNotEquals(a,b);
+            var first=dictionary.project(a);var second=dictionary.project(b);
+            assertEquals("Aa",first.value());assertEquals("BB",second.value());
+            assertEquals(2*(192+6*2),resources.used(AnalysisResources.Pool.SCRATCH));
+            first.close();first.close();assertThrows(IllegalStateException.class,first::value);
+            assertEquals(192+6*2,resources.used(AnalysisResources.Pool.SCRATCH));
+            dictionary.close();dictionary.close();
+            assertThrows(IllegalStateException.class,second::value);second.close();
+            assertThrows(IllegalStateException.class,()->dictionary.intern("late"));
+            assertEquals(0,resources.used(AnalysisResources.Pool.SCRATCH));
+            assertEquals(0,pages.statistics().livePages());
+            long borrowed=pages.allocate();pages.release(borrowed);
+        }
+        assertEquals(0,resources.heapUsed());
     }
     @Test void sparseReachableStatesJoinMissingValuesWithDefaultsWithoutInventingKnownFacts() {
         var resources = resources();

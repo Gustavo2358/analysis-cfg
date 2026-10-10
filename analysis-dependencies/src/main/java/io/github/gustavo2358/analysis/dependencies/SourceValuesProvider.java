@@ -219,9 +219,11 @@ public final class SourceValuesProvider {
         long assigned=values.emptyValue(flags);
         try(var candidates=values.candidates(input)) {
             while(candidates.advance()) {
-                String text=values.text(candidates.key());long support=candidates.value();
+                try(var projection=values.projectText(candidates.key())) {
+                String text=projection.value();long support=candidates.value();
                 assigned=values.addCandidate(assigned,TextPredicate.fit(text,extents.get(a.target())),support);
                 if(model)assigned=values.addCandidate(assigned,text,support);
+                }
             }
         }
         return model||summarySymbols.contains(a.target())?values.join(get(state,a.target()),assigned):assigned;
@@ -300,7 +302,8 @@ public final class SourceValuesProvider {
             int flags=values.flags(input);long result=values.emptyValue(flags);
             try(var candidates=values.candidates(input)) {
                 while(candidates.advance()) {
-                    transformedCandidates++;String text=values.text(candidates.key());
+                    try(var projection=values.projectText(candidates.key())) {
+                    transformedCandidates++;String text=projection.value();
                     int start=0,end=text.length();
                     if((mask&SourceExpressions.LEADING)!=0)while(start<end&&text.charAt(start)==' ')start++;
                     if((mask&SourceExpressions.TRAILING)!=0)while(end>start&&text.charAt(end-1)==' ')end--;
@@ -312,6 +315,7 @@ public final class SourceValuesProvider {
                         for(int i=0;i<transformed.length();i++){char c=transformed.charAt(i);builder.append(c>='a'&&c<='z'?(char)(c-'a'+'A'):c);}transformed=builder.toString();
                     }
                     result=values.addCandidate(result,transformed,candidates.value());
+                    }
                 }
             }
             return values.withFlags(result,flags);
@@ -360,7 +364,7 @@ public final class SourceValuesProvider {
                         long snapshot=put(state,symbol,values.oneCandidate(old,candidates.key(),candidates.value()));
                         boolean allowed=snapshot==state;
                         if(!allowed)try(var evaluator=new Evaluator(snapshot,baseline)){allowed=(evaluator.truth(predicate)&wanted)!=0;}
-                        if(allowed){kept=values.addCandidate(kept,values.text(candidates.key()),candidates.value());any=true;}
+                        if(allowed)try(var projection=values.projectText(candidates.key())){kept=values.addCandidate(kept,projection.value(),candidates.value());any=true;}
                     }
                 }
                 if(!any&&(values.flags(old)&SourceValueStore.OPEN)==0)return 0;

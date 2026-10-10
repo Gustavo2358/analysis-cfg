@@ -2,9 +2,6 @@ package io.github.gustavo2358.analysis.dependencies;
 
 import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.values.TextPredicate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.LongBinaryOperator;
 
@@ -12,36 +9,35 @@ import java.util.function.LongBinaryOperator;
  * Source nominal value/support DAG in primitive paged records. Candidate maps reference support
  * sets; value records retain every flag and candidate root. This is not executable AIR control.
  * The supplied store is borrowed. Callers retain live values explicitly across collect safepoints.
- * The current String bridge is an explicitly resident dictionary, capacity charged conservatively;
- * it is not the managed large-text decoder/dictionary promised by the complete architecture.
+ * Canonical source text is paged with a paged exact index and scoped String projections.
+ * Detached final List output and source input inventories remain explicit resident boundaries;
+ * this store alone does not qualify complete input/output funding or spill.
  */
 final class SourceValueStore implements AutoCloseable {
     static final int OPEN = 1, MODEL = 2, TABLE = 4;
     private static final long VALUE = 4, STATE = 5;
-    private final AnalysisResources resources;
-    private final AnalysisResources.Reservation textsCapacity;
+    private final AnalysisResources.Reservation controlCapacity;
     private final CanonicalTupleArena arena;
     private final PersistentLongMap maps;
-    private Map<String, Long> textIds;
-    private ArrayList<String> texts;
+    private final SourceTextDictionary texts;
     private final LongBinaryOperator supportUnion, valueUnion;
     private boolean closed;
     private long predicateClassVisits;
     private final long[] joinLeft,joinRight,joinResult;
 
     SourceValueStore(PageStore pages, AnalysisResources resources) {
-        this.resources = Objects.requireNonNull(resources); Objects.requireNonNull(pages);
-        textsCapacity = resources.reserve(AnalysisResources.Pool.RESIDENT, 2560, AnalysisResources.Phase.DOMAIN);
-        CanonicalTupleArena records = null; PersistentLongMap index = null;
+        Objects.requireNonNull(resources); Objects.requireNonNull(pages);
+        controlCapacity = resources.reserve(AnalysisResources.Pool.RESIDENT, 2560, AnalysisResources.Phase.DOMAIN);
+        CanonicalTupleArena records = null; PersistentLongMap index = null;SourceTextDictionary dictionary=null;
         try {
             records = new CanonicalTupleArena(pages, resources, AnalysisResources.Phase.DOMAIN, 6, new int[]{2, 4, 5});
             index = new PersistentLongMap(records, resources, AnalysisResources.Phase.DOMAIN);
-            textIds = new HashMap<>(); texts = new ArrayList<>();
+            dictionary=new SourceTextDictionary(pages,resources);
             joinLeft = new long[64]; joinRight = new long[64]; joinResult = new long[64];
         } catch (RuntimeException | Error exception) {
-            suppress(index, exception); suppress(records, exception); textsCapacity.close(); throw exception;
+            suppress(dictionary,exception);suppress(index, exception); suppress(records, exception); controlCapacity.close(); throw exception;
         }
-        arena = records; maps = index;
+        arena = records; maps = index;texts=dictionary;
         supportUnion = (a, b) -> maps.join(a, b, false, Math::max);
         valueUnion = this::join;
     }
@@ -109,15 +105,16 @@ final class SourceValueStore implements AutoCloseable {
             maps.put(arena.field(source,4),textId(normalized(text)),1));
     }
     long oneCandidate(long source, long text, long support) {
-        String raw=text(text);
+        try(var projection=projectText(text)) {
+        String raw=projection.value();
         return value(flags(source)&~OPEN,maps.putReference(0,text,support),figure(raw),maps.put(0,textId(normalized(raw)),1));
+        }
     }
     PersistentLongMap.Cursor candidates(long value) { open(); return maps.cursor(candidatesRoot(value)); }
     PersistentLongMap.Cursor supports(long root) { open(); return maps.cursor(root); }
-    String text(long id) {
-        open(); if (id < 1 || id > texts.size()) throw new IllegalArgumentException("unknown source text ID");
-        return texts.get((int) id - 1);
-    }
+    SourceTextDictionary.Projection projectText(long id){open();return texts.project(id);}
+    /** Explicit detached String for legacy final List output; not a managed output guarantee. */
+    String text(long id) {try(var projection=projectText(id)){return projection.value();}}
     long retain(long root) { open(); return arena.retain(root); }
     void release(long token) { open(); arena.release(token); }
     long collect() {
@@ -161,11 +158,7 @@ final class SourceValueStore implements AutoCloseable {
         return TextPredicate.BOTH;
     }
     private long textId(String text) {
-        Objects.requireNonNull(text); Long old = textIds.get(text); if (old != null) return old;
-        // Funds entries, boxing, resident text and old-plus-new array/hash-table growth peaks.
-        // Existing source APIs are int-sized; do not reinterpret that as an AIR cardinality rule.
-        textsCapacity.grow(192 + 2L * text.length(), AnalysisResources.Phase.DOMAIN);
-        long id = texts.size() + 1L; texts.add(text); textIds.put(text, id); return id;
+        return texts.intern(text);
     }
     private void requireValue(long value) {
         if (value <= 0 || arena.field(value, 0) != VALUE) throw new IllegalArgumentException("source value record required");
@@ -182,7 +175,8 @@ final class SourceValueStore implements AutoCloseable {
         try { arena.close(); } catch (RuntimeException | Error exception) {
             if (failure == null) failure = exception; else if (failure != exception) failure.addSuppressed(exception);
         }
-        textIds = null; texts = null; textsCapacity.close();
+        try{texts.close();}catch(RuntimeException|Error exception){if(failure==null)failure=exception;else if(failure!=exception)failure.addSuppressed(exception);}
+        controlCapacity.close();
         if (failure instanceof RuntimeException exception) throw exception;
         if (failure instanceof Error error) throw error;
     }
