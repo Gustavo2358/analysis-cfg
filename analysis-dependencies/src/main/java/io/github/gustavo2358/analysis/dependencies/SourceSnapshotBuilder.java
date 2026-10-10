@@ -125,6 +125,14 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
             snapshot.admission=Objects.requireNonNull(admission);
         }
     }
+    static void requireAdmissionContext(SourceSnapshot source,SourceAdmissionSnapshot admission,PageStore pages,AnalysisResources resources) {
+        if(!(source instanceof Snapshot snapshot))throw new IllegalArgumentException("immutable source owner required");
+        synchronized(snapshot) {
+            snapshot.open();
+            if(snapshot.admission!=admission||snapshot.pages!=pages||snapshot.resources!=resources)
+                throw new IllegalArgumentException("source consumer owner/backend/resources mismatch");
+        }
+    }
 
     /** One fixed cleanup action follows transfer; explicit builder close cannot expire its result. */
     private static final class Expiry {

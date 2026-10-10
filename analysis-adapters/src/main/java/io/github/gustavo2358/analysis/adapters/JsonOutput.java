@@ -10,6 +10,8 @@ final class JsonOutput {
     private final byte[] buffer=new byte[64*1024];
     private int used;
     JsonOutput(OutputStream output) { this.output=Objects.requireNonNull(output); }
+    /** Explicit package-owned mapping into this buffer, not a detached value tree. */
+    @FunctionalInterface interface EncodedValue {void write(JsonOutput output)throws IOException;}
     void finish() throws IOException { octet('\n');flush();output.flush(); }
     private void flush() throws IOException { output.write(buffer,0,used);used=0; }
     private void octet(int value) throws IOException { if(used==buffer.length)flush();buffer[used++]=(byte)value; }
@@ -47,6 +49,7 @@ final class JsonOutput {
         else if(value instanceof Boolean bool)ascii(bool?"true":"false");
         else if(value instanceof Long number)ascii(Long.toString(number));
         else if(value instanceof Integer number)ascii(Integer.toString(number));
+        else if(value instanceof EncodedValue encoded)encoded.write(this);
         else if(value instanceof Fields fields)fields.write(this);
         else if(value instanceof Map<?,?> map) {
             octet('{');boolean first=true;
@@ -61,7 +64,47 @@ final class JsonOutput {
         octet('[');boolean first=true;
         while(items.hasNext()){if(!first)octet(',');first=false;value(items.next());}octet(']');
     }
-    private void string(String text) throws IOException {
+    void symbol(char value)throws IOException {
+        if("{}[],:".indexOf(value)<0)throw new IllegalArgumentException("JSON structural symbol");octet(value);
+    }
+    /** Borrowed fixed UTF16 block; SOURCE permits escaped isolated code units. */
+    void sourceText(io.github.gustavo2358.analysis.dependencies.source.SourceSnapshot source,long reference,char[] block)throws IOException {
+        sourceText(source,reference,source.characterCount(reference),block);
+    }
+    /** Exact interpreted prefix, leaving the arbitrarily large raw value in managed SOURCE. */
+    void sourceText(io.github.gustavo2358.analysis.dependencies.source.SourceSnapshot source,long reference,long length,char[] block)throws IOException {
+        if(length<0||length>source.characterCount(reference)||block.length==0)throw new IllegalArgumentException("SOURCE text prefix");
+        octet('"');char pending=0;
+        for(long at=0;at<length;) {
+            int count=(int)Math.min(block.length,length-at);source.readCharacters(reference,at,block,0,count);at+=count;
+            for(int i=0;i<count;i++) {
+                char c=block[i];
+                if(pending!=0) {
+                    if(Character.isLowSurrogate(c)) {
+                        int cp=Character.toCodePoint(pending,c);octet(0xf0|(cp>>>18));octet(0x80|((cp>>>12)&63));octet(0x80|((cp>>>6)&63));octet(0x80|(cp&63));pending=0;continue;
+                    }
+                    escapedUnit(pending);pending=0;
+                }
+                if(Character.isHighSurrogate(c)){pending=c;continue;}
+                if(Character.isLowSurrogate(c)){escapedUnit(c);continue;}
+                switch(c) {
+                    case '"' -> ascii("\\\"");case '\\' -> ascii("\\\\");
+                    case '\b' -> ascii("\\b");case '\f' -> ascii("\\f");case '\n' -> ascii("\\n");case '\r' -> ascii("\\r");case '\t' -> ascii("\\t");
+                    default -> {
+                        if(c<32)escapedUnit(c);
+                        else if(c<128)octet(c);
+                        else if(c<0x800){octet(0xc0|(c>>>6));octet(0x80|(c&63));}
+                        else{octet(0xe0|(c>>>12));octet(0x80|((c>>>6)&63));octet(0x80|(c&63));}
+                    }
+                }
+            }
+        }
+        if(pending!=0)escapedUnit(pending);octet('"');
+    }
+    private void escapedUnit(char value)throws IOException {
+        ascii("\\u");for(int shift=12;shift>=0;shift-=4)octet(Character.forDigit((value>>>shift)&15,16));
+    }
+    void string(String text) throws IOException {
         octet('"');
         for(int i=0;i<text.length();i++) {
             char c=text.charAt(i);

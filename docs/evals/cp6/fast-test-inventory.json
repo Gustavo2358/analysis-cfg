@@ -516,6 +516,49 @@
       "semanticRejectionExpiresTheClaimedSourceWithoutLeakingPartialCertificate",
       "everyPrimitiveFaultDuringAdmissionAndReadFaultAfterAdmissionRetireAllOwners"
     ],
+    "io.github.gustavo2358.analysis.dependencies.SourceControlSnapshotTest": [
+      "allExistingLiteralsPreserveTheThreeDistinctControlFacts",
+      "independentAndOrGroundedCycleAndSharedUnitIdsRemainExact",
+      "reverseProofChainsSpillWithoutRetainingNoSeedIndexes",
+      "closingConsumerBorrowsAndParentExpiryRetiresEveryIssuedConsumerImmediately",
+      "nativeCommonOwnerExpiryRetiresConsumerWithoutAnotherQuery",
+      "foreignContextAndFundedControlDenialDoNotStealAdmission",
+      "everyPrimitiveFaultPreservesPrimaryAndRetiresDerivedOwnership",
+      "invalidOrdinalsAbortOnlyTheConsumerNotItsCertificate"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceConsumerLeaseTest": [
+      "fundedOpaqueLeaseCannotBeForgedAndClosingItBorrowsAdmission",
+      "contextAndControlDenialsNeverClaimAnUnrelatedDependent",
+      "failingAndReentrantCleanupCannotPreventSiblingOrStorageRetirement"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceSnapshotWriterTest": [
+      "allHistoricalLiteralsAndSupplementKeepCanonicalValuesAndEveryShape",
+      "sourceUtf16KeepsCrossBlockPairsIsolatedUnitsEscapesAndEmptyDefaults",
+      "twoThousandNestedTermsUsePagedFramesWithoutARecursiveWriter",
+      "foreignContextAndPreAllocationDenialNeverTouchBorrowedOutput",
+      "borrowedOutputFailureKeepsPrimaryAndRetiresOnlyWriterResources",
+      "parentExpiryDuringFlushRetiresFramesBeforeQueryAndCannotReturnSuccess",
+      "outputQuotaIsEnforcedBeforeBorrowedBytesAndDoesNotExpireAdmission"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceSnapshotCompositionTest": [
+      "all53LiteralsComposeCompleteEvidenceOccurrencesAndFilesInOneRootBuffer",
+      "sharedEmitterNeverChargesTheExistingRootMeterTwice",
+      "sharedRootQuotaDenialPreservesBorrowedSourceAndPrimaryFailure",
+      "qualifiedResultCannotBeCombinedWithAnotherLegitimateAdmission",
+      "resultExpiryDuringFinalRootFlushCannotCertifySuccess",
+      "nativeUtf16AndProgramTrimmedPrefixesNeverMaterializeResidentNames"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceQualifiedSnapshotTest": [
+      "all53HistoricalLiteralsMatchCompleteResidentCandidatesAndRemainders",
+      "nativeRawUtf16IsExactOrderedAndDuplicatePreservingWithoutCallPolicy",
+      "programProfilesAndLongCicsPaddingMatchIndependentNames",
+      "duplicateNativeCandidatesSpillWithFixedResidentControls",
+      "parentExpiryImmediatelyRetiresCandidatePagesWhileExplicitCloseBorrows",
+      "exactContextAndPreallocationDenialNeverStealAdmittedSource",
+      "invalidCandidateOrdinalPoisonsOnlyDerivedResult",
+      "primitiveFailuresKeepPrimaryAndRetireCandidateOwnership",
+      "nativeCommonOwnerExpiryRetiresCandidatesBeforeAnyFurtherQuery"
+    ],
     "io.github.gustavo2358.analysis.adapters.SourceSnapshotJsonTest": [
       "physicalWireMapsCompleteMetadataAndDuplicateOrdinalsWithoutResidentModel",
       "closedMappingRejectsFractionExponentOverflowWrongShapeAndNull",

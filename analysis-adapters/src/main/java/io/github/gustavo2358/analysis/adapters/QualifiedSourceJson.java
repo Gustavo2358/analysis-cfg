@@ -11,6 +11,11 @@ import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDepende
 import io.github.gustavo2358.analysis.solver.AnalysisResources;
 /** Closed v1 codec with explicit field mapping; no polymorphic/bean deserialization. */
 public final class QualifiedSourceJson {
+    /** Complete canonical SOURCE wire from legitimate managed admission; output/backend remain borrowed. */
+    public void writeSnapshot(io.github.gustavo2358.analysis.dependencies.SourceAdmissionSnapshot source,OutputStream output,
+            io.github.gustavo2358.analysis.solver.PageStore pages,AnalysisResources resources)throws IOException {
+        SourceSnapshotWriter.write(source,output,pages,resources);
+    }
     /**
      * Closed physical-to-typed storage mapping, NOT semantic admission. The caller owns
      * input and pages; the returned snapshot owns only its allocated storage. Analysis
