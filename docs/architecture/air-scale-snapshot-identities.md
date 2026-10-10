@@ -878,3 +878,31 @@ Working tables,plans,initial-state bodies,solver states and result relations sti
 have resident/input-cardinality components; AS-W09/W10 remain PARTIAL. This is a
 specific removal of demonstrated duplicate identity payloads,not a complete global
 funding or spill claim.
+
+## Physical initial codec pin qualified locally
+
+Producer7315f75ff5c468e62fd7237ad98bbb86206e2313 and consumer4afc9a6ef8847556d7a6b8e32e26cb581c1b2d39
+are coherently qualified locally,with analysis-ir4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e
+unchanged. Producer FAST282 model/145 transport/44 harness PASS29.409s;
+consumer dependency/build,9 admission/native-byte laws,5 RegionalInitial tests
+and original compiled architecture guards PASS. The final original consumer
+FAST is PASS1204 required methods,zero skips,777.356s (not the earlier1197 run).
+
+The admitted Initial16 input24440175bytes previously failed OOM13.10s in codec
+validation. Isolated final physical CLI Java21/Xmx128m/original quotas passes
+22.88/22.67/22.89s,median22.88s;small442727bytes passes2.44s. The unchanged
+independent oracle verifies21 semantic fields,83 origins,67 operations,input-derived
+CALL offset16 and complete CFG. All three large products are byte-identical:
+CFG2498cb07246bcbd658ea975722a318e86127455bb3c055fff1b26bc8e6622df0 and
+dependenciesf46d1170b517a1ab3d3dfb5f843361ff3e9ea73877b94043ca719366d582c2b6.
+Original cold144490643bytes passes106.60s with both complete historical products
+unchanged. After FAST,1348 runtime classes and complete path inventory,2175 consumer
+and649 producer tracked files,21 inputs and15 libraries match frozen hashes.
+This final paragraph is C0 evidence only; no production classes changed afterwards.
+
+No remote CI or publication of7315 is claimed. InitialCatalogue512 is a separate
+admitted173757655-byte counterexample:128MiB CLI fails OOM43.55s while reading
+all Entry condition bodies for ReferenceChecks. Its small control and unchanged
+full oracle pass. These diagnostic timings ran concurrently with FAST,not isolated
+G4. Entry headers and retained initial value bodies remain the next demonstrated
+gap; AS-W09/W10 remain PARTIAL,not a global bounded-memory claim.
