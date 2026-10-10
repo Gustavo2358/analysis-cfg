@@ -33,6 +33,63 @@ final class PagedJsonInputStorageTest {
         assertEquals(expected.publication(),actual.publication());assertEquals(expected.result(),actual.checked().orElseThrow().result());assertEquals(raw.length,actual.airBytesObserved());assertEquals(1,actual.airReads());assertEquals(HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(raw)),actual.sha256());
         assertTrue(r.heapPeak()<=65536);assertTrue(r.peak(AnalysisResources.Pool.TEMPORARY)>65536);zero(r);
     }
+    @Test void officialPhysicalProfileReadsEveryColdSourceMetadataUnitWithoutResidentTree()throws Exception {
+        // Physical contract only: complete literal wire and independent fields, not source admission.
+        for(int n:new int[]{1,4,16,64,256}) {
+            var wire=directory.resolve("metadata-"+n+".json");
+            try(var writer=Files.newBufferedWriter(wire,java.nio.charset.StandardCharsets.UTF_8)) {
+                writer.write("{\"locations\":[");
+                for(int i=0;i<n;i++) {if(i!=0)writer.write(',');writer.write("{\"file\":\""+metadataPath(n,i)+"\",\"startLine\":"+(i+1)+",\"startColumn\":0,\"endLine\":"+(i+2)+",\"endColumn\":13}");}
+                writer.write("],\"unicode\":\"\\u0000\\uD800x\\uDC00\\uD83D\\uDE00\",\"number\":-0.25e+10}");
+            }
+            var r=new AnalysisResources(new AnalysisResources.Limits(65536,16384,0,64L*1024*1024,4,Long.MAX_VALUE,0));
+            try(var pages=new FilePageStore(directory,4096,4,r,AnalysisResources.Phase.DECODE);
+                var bufferCapacity=r.reserve(AnalysisResources.Pool.SCRATCH,1024,AnalysisResources.Phase.DECODE);
+                var stream=Files.newInputStream(wire);
+                var input=new AirJson().stageInput(stream,new PagedJsonInputStorage(pages,r),AirJson.PhysicalProfile.UTF16_JSON)) {
+                assertEquals(1024,bufferCapacity.amount());char[] buffer=new char[256];long rows=input.child(input.root(),0);
+                assertEquals(n,input.childCount(rows));long heap=r.heapUsed();
+                for(int i=n-1;i>=0;i--) {
+                    long row=input.child(rows,i),file=input.child(row,0);String expected=metadataPath(n,i);
+                    assertTrue(input.matches(input.name(file),"file"));assertEquals(expected.length(),input.characterCount(file));
+                    for(int at=0;at<expected.length();at+=buffer.length) {
+                        int count=Math.min(buffer.length,expected.length()-at);input.readCharacters(file,at,buffer,0,count);
+                        for(int offset=0;offset<count;offset++)assertEquals(expected.charAt(at+offset),buffer[offset],"complete path N="+n+" row="+i+" unit="+(at+offset));
+                    }
+                    for(int field=1;field<5;field++) {
+                        long value=input.child(row,field);assertEquals(AirJson.PhysicalKind.NUMBER,input.kind(value));
+                        assertTrue(input.matches(value,switch(field){case 1->Integer.toString(i+1);case 2->"0";case 3->Integer.toString(i+2);case 4->"13";default->throw new AssertionError();}));
+                    }
+                }
+                assertEquals(heap,r.heapUsed());
+                try(var unicode=input.project(input.child(input.root(),1));var numeric=input.project(input.child(input.root(),2))) {
+                    assertEquals("\u0000\uD800x\uDC00😀",unicode.value());assertEquals("-0.25e+10",numeric.value());
+                }
+                assertEquals(heap,r.heapUsed());assertTrue(r.heapPeak()<=65536);
+                if(n>=16)assertTrue(r.peak(AnalysisResources.Pool.TEMPORARY)>r.limits().heapBytes());
+                System.out.println("PHYSICAL_SOURCE_METADATA rows="+n+" heapPeak="+r.heapPeak()+" temporaryPeak="+r.peak(AnalysisResources.Pool.TEMPORARY)+" bytesRead="+pages.statistics().bytesRead());
+                expire(input);assertThrows(IllegalStateException.class,input::root);assertEquals(0,pages.statistics().livePages());
+                long borrowed=pages.allocate();pages.release(borrowed);
+            }
+            zero(r);
+        }
+    }
+    @Test void physicalProfileProjectionDenialExpiresOwnerAndKeepsBorrowedStore()throws Exception {
+        var r=new AnalysisResources(new AnalysisResources.Limits(65536,16384,0,64L*1024*1024,4,Long.MAX_VALUE,0));
+        try(var pages=new FilePageStore(directory,4096,4,r,AnalysisResources.Phase.DECODE)) {
+            String raw="{\"large\":\""+"x".repeat(4096)+"\",\"small\":\"live\"}";
+            var input=new AirJson().stageInput(new ByteArrayInputStream(raw.getBytes(java.nio.charset.StandardCharsets.UTF_8)),new PagedJsonInputStorage(pages,r),AirJson.PhysicalProfile.UTF16_JSON);
+            var live=input.project(input.child(input.root(),1));
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->input.project(input.child(input.root(),0)));
+            assertEquals(AnalysisResources.Resource.SCRATCH,failure.resource());assertEquals(AnalysisResources.Phase.DECODE,failure.phase());
+            assertThrows(IllegalStateException.class,live::value);assertThrows(IllegalStateException.class,input::root);
+            live.close();input.close();assertEquals(0,pages.statistics().livePages());
+            long borrowed=pages.allocate();pages.release(borrowed);
+        }
+        zero(r);
+    }
+    private static String metadataPath(int n,int row){return "synthetic-"+n+"-"+row+"-"+"x".repeat(4096)+"-"+(n-row)+".cbl";}
+    private static void expire(AirJson.StagedInput input){input.close();}
     @Test void everyPrimitiveWorkFailureReleasesTransferredStorage() {
         var measured=resources(Long.MAX_VALUE);long calls;
         try(var pages=new MemoryPageStore(128,measured);var storage=new PagedJsonInputStorage(pages,measured)){sequence(storage);calls=measured.workUsed();}

@@ -5,28 +5,32 @@ import java.util.Objects;
 
 /** Exact owner-local UTF-16 text; payload and canonical index both spill. */
 final class SourceTextDictionary implements AutoCloseable {
-    private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DOMAIN;
+    private final AnalysisResources.Phase phase;
     private static final int WIDTH=2;
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation control;
     private PagedLongArray metadata,words;
     private PagedLongIndex index;
-    private String probe;
+    private CharSequence probe;
     private int probeHash;
     private Projection projections;
     private long issued,nextWord,comparisons,codeUnits;
     private boolean closed,failed;
 
     SourceTextDictionary(PageStore pages,AnalysisResources resources) {
+        this(pages,resources,AnalysisResources.Phase.DOMAIN);
+    }
+    SourceTextDictionary(PageStore pages,AnalysisResources resources,AnalysisResources.Phase phase) {
         Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);
-        control=resources.reserve(AnalysisResources.Pool.RESIDENT,384,PHASE);
+        this.phase=Objects.requireNonNull(phase);control=resources.reserve(AnalysisResources.Pool.RESIDENT,384,phase);
         try {
-            metadata=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
-            words=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
-            index=new PagedLongIndex(pages,resources,PHASE,this::compare);
+            metadata=new PagedLongArray(pages,Long.MAX_VALUE,resources,phase);
+            words=new PagedLongArray(pages,Long.MAX_VALUE,resources,phase);
+            index=new PagedLongIndex(pages,resources,phase,this::compare);
         }catch(RuntimeException|Error failure){suppress(this,failure);throw failure;}
     }
-    synchronized long intern(String text) {
+    /** Borrows a sequence stable for this call only; no reference survives the finally block. */
+    synchronized long intern(CharSequence text) {
         open();Objects.requireNonNull(text);probe=text;
         try {
             probeHash=hashText(text);
@@ -48,7 +52,7 @@ final class SourceTextDictionary implements AutoCloseable {
     synchronized long size(){open();return index.size();}
     synchronized long comparisons(){open();return comparisons;}
     synchronized long codeUnitsRead(){open();return codeUnits;}
-    private int hashText(String text){int value=0;for(int at=0;at<text.length();at++){if((at&255)==0)resources.work(1,PHASE);value=31*value+text.charAt(at);}return value;}
+    private int hashText(CharSequence text){int value=0;for(int at=0;at<text.length();at++){if((at&255)==0)resources.work(1,phase);value=31*value+text.charAt(at);}return value;}
     private int hash(long id){return id==0?probeHash:(int)(metadata.get((id-1)*WIDTH+1)>>>32);}
     private int length(long id){return id==0?probe.length():Math.toIntExact(metadata.get((id-1)*WIDTH+1)&0xffffffffL);}
     private long packed(long id,long start,int at,int count) {
@@ -79,13 +83,31 @@ final class SourceTextDictionary implements AutoCloseable {
         AnalysisResources.Reservation scratch=null;
         try {
             int length=length(id);
-            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,192+6L*length,PHASE);
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,192+6L*length,phase);
             char[] data=new char[length];long start=metadata.get((id-1)*WIDTH);
             for(int at=0;at<length;){int count=Math.min(4,length-at);long word=packed(id,start,at,count);for(int part=0;part<count;part++)data[at++]=(char)(word>>>(part*16));}
             var result=new Projection(this,new String(data),scratch);scratch=null;
             result.next=projections;if(projections!=null)projections.previous=result;projections=result;
             return result;
         }catch(RuntimeException|Error failure){failed=true;if(scratch!=null)scratch.close();throw failure;}
+    }
+    synchronized int characterCount(long id) {
+        open();if(id<=0||id>issued)throw new IllegalArgumentException("unknown source text identity");
+        try{return length(id);}catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
+    synchronized void readCharacters(long id,long offset,char[] destination,int at,int count) {
+        int length=characterCount(id);Objects.checkFromIndexSize(at,count,destination.length);
+        if(offset<0||offset>length||count>length-offset)throw new IndexOutOfBoundsException("source character range");
+        try {
+            long start=metadata.get((id-1)*WIDTH),cached=-1,word=0;
+            for(int i=0;i<count;i++){long unit=offset+i,index=unit>>>2;if(index!=cached){word=words.get(start+index);cached=index;}destination[at+i]=(char)(word>>>((unit&3)*16));}
+        }catch(RuntimeException|Error failure){failed=true;throw failure;}
+    }
+    synchronized boolean matches(long id,String value) {
+        int length=characterCount(id);Objects.requireNonNull(value);if(length!=value.length())return false;
+        try {
+            long start=metadata.get((id-1)*WIDTH);for(int at=0;at<length;){int count=Math.min(4,length-at);long word=packed(id,start,at,count);for(int part=0;part<count;part++,at++)if((char)(word>>>(part*16))!=value.charAt(at))return false;}return true;
+        }catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     static final class Projection implements AutoCloseable {
         private SourceTextDictionary owner;

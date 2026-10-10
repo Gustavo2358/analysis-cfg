@@ -11,6 +11,16 @@ import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDepende
 import io.github.gustavo2358.analysis.solver.AnalysisResources;
 /** Closed v1 codec with explicit field mapping; no polymorphic/bean deserialization. */
 public final class QualifiedSourceJson {
+    /**
+     * Closed physical-to-typed storage mapping, NOT semantic admission. The caller owns
+     * input and pages; the returned snapshot owns only its allocated storage. Analysis
+     * must not consume this storage before all source admission rules are validated.
+     */
+    public io.github.gustavo2358.analysis.dependencies.source.SourceSnapshot decodeSnapshot(
+            InputStream input,io.github.gustavo2358.analysis.solver.PageStore pages,
+            AnalysisResources resources) throws IOException {
+        return SourceSnapshotJson.decode(input,pages,resources);
+    }
     private final ObjectMapper mapper=JsonMapper.builder(JsonFactory.builder().enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION).build()).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS).build();
     private final ObjectReader elementReader=mapper.reader().without(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
     public QualifiedSourceDependencies decode(byte[] bytes) throws IOException {

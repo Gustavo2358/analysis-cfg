@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "0ab2ef8e0abbf17f63477a178adb5a21025aa565",
+    "commit": "a0aeb827ef53765815aa501c4687f197be77ac73",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -267,10 +267,18 @@
       "status": "PASS",
       "context": "PR30 exact producer9da08d5; remote contracts jobs114079325310/114079308588 (runs38007423531/38007418347) both completed SUCCESS,observed2026-10-10T00:06:38Z. Local FAST282/145 PASS29.983s. Prior650 remote runs37969756139/37969748975 SUCCESS remain historical,not the verdict for this pin. Consumer physical repeat,coherent FAST and human review pending;no merge."
     },
+    "physical_json_access_checkpoint": {
+      "producer_commit": "a0aeb827ef53765815aa501c4687f197be77ac73",
+      "previous_commit": "0ab2ef8e0abbf17f63477a178adb5a21025aa565",
+      "api_impact": "COMPATIBLE / additive physical owner-bound staging port; AIR grammar and model/wire unchanged",
+      "validation": "Original producer FAST PASS43.149s:282 model/147 transport/44 harness;498 classfiles/7945 dependencies. Literal-wire numeric lexemes,escaped UTF16,strict raw UTF8,decoded duplicate names,20000depth,short/zero reads,all primitive storage faults,simultaneous funded projections,double close and expiry PASS. Existing AIR entrypoints continue selecting BINDING.",
+      "integration": "Actual consumer physical class8 PASS;typed builder/binder14 plus physical8 PASS22;53 independent historical source fixtures+one literal supplement coverall45shapes;2048nestedterms/fullUTF16/numericintbounds/duplicateordinals/failurecleanup PASS. Real31word fingerprint collision distinguishesall30fields;hash-only mutant RED. Original818022612B source typed metadata storage passes128m/default quotas after nativeexpiry fix:170.047s JVM-only/allpools0. Original consumer FAST02 PASS817.192s/1220mandatory/zero skips/all compiled guards. Strict complete-class-path/source-hash audit confirms final capacity bytes match both changed consumer modules. Nine new core/three adapterclasses reviewed;no Maven DAG or existingresidentcodec descriptor change. Physical/typed storage is NOT source or AIR admission. FAST01 preflight rejected stale workflow pin before tests;local workflowref nowmatchesa0. Prior checkpoints remain historical.",
+      "limits": "Typed SOURCE storage/mapping qualified locally only. Paged mandatory admission/certificates and managed SOURCE CLI output remain pending. Resident source API unchanged. Original distinct metadata CLI OOM remainsRED. No remote publication or merge."
+    },
     "ci": {
-      "checked_commit": "0ab2ef8e0abbf17f63477a178adb5a21025aa565",
+      "checked_commit": "a0aeb827ef53765815aa501c4687f197be77ac73",
       "status": "NOT_RUN",
-      "context": "Exact producer0ab2ef8 is local only;remote publication authorization pending. Native CopyBytes common fallback Continue classification matches pinned AIR I-60;focused1/4/16 copies plus rejecting indirect terminator PASS. Original producer FAST282/145/44 PASS30.223s with workspace TMPDIR after shared /tmp quota failure. Prior consumer55b5e067 native possible-candidate checkpoint FAST1204/zero skips PASS771.540s on fb4,strict general v3 and real closed/open W2D separately qualified. Current source-bundle integration,pin and FILE matrix qualification remain pending. Earlier failures/evidence remain historical,not relabeled. No remote CI or merge is claimed."
+      "context": "Exact producera0aeb827 is local only;remote publication authorization pending. Original producer FAST282/147/44 PASS43.149s qualifies explicit physical JSON access;AIR grammar defaults unchanged. Consumer original local FAST02 PASS817.192s/1220mandatory/all compiled guards for typed storage foundation;SOURCE admission/CLI stillpending. Previous0ab CopyBytes FAST30.223s and earlier remote CI remain historical. No remote CI or merge is claimed."
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

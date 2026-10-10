@@ -468,8 +468,28 @@
     "io.github.gustavo2358.analysis.adapters.PagedJsonInputStorageTest": [
       "coldOrdinalsAndDecodedNameEqualityAreExactWithoutQueryInsertion",
       "officialReaderUsesColdPagesAndPreservesFullAdmissionAndDigest",
+      "officialPhysicalProfileReadsEveryColdSourceMetadataUnitWithoutResidentTree",
+      "physicalProfileProjectionDenialExpiresOwnerAndKeepsBorrowedStore",
       "everyPrimitiveWorkFailureReleasesTransferredStorage",
       "deniedConstructionUnknownChildrenAndRepeatedOrdinalsFailClosed"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceSnapshotBuilderTest": [
+      "completeMetadataAndOccurrencesSpillWithFixedResidentControls",
+      "canonicalListsPreserveDuplicateOrdinalsAndFullElementNamespace",
+      "projectionsRemainFundedUntilScopeCloseAndOwnerExpiry",
+      "wrongShapesAndIncompleteConstructionNeverBecomeSuccessfulStorage",
+      "allThirtyFieldsResolveRealFingerprintCollisionAndSealRejectsMutation",
+      "ordinalLookupKeepsOrderAtEveryLeafAndCarryBoundary",
+      "nativeCommonOwnerExpiryRetiresConstructionAndTransferredLiveProjections"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceSnapshotJsonTest": [
+      "physicalWireMapsCompleteMetadataAndDuplicateOrdinalsWithoutResidentModel",
+      "closedMappingRejectsFractionExponentOverflowWrongShapeAndNull",
+      "recursiveTermsUsePagedFramesAndRetainEveryLevel",
+      "existingLiteralWireFixturesKeepEveryFieldAndOccurrence",
+      "interruptedBorrowedInputPreservesFailureAndReclaimsPartialOwners",
+      "deniedConstructionAndDecodeBudgetsNeverReturnPartialStorage",
+      "eachPagePrimitiveFailureReclaimsOwnersWithoutClosingBorrowedBackend"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotValidationStorageTest": [
       "validTypedSnapshotHasIdenticalManagedAdmissionPrefixAcrossBackends"
