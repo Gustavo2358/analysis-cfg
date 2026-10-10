@@ -478,6 +478,15 @@
       "expiryInsideNativeObservationTransferCannotPublishACompleteBatch",
       "expiryInsideTransferNeverPublishesEitherDirectionAndReleasesInput"
     ],
+    "io.github.gustavo2358.analysis.values.NativeBytePayloadStorageTest": [
+      "allPinnedOctetsAndPartialWordsHaveExactResidentBytesAndStructuralHash",
+      "failuresPreservePriorWordsAndNeverPublishUnsupportedOrPartialEncoding",
+      "geometricDenseBytesPackEightOctetsPerWordInTheExistingTwoPageBackend",
+      "slicingCopyingWritesAndProvenanceMatchTheResidentOracle",
+      "explicitAndNativeOwnerClosureExpireBorrowedBytesButLeaveInputAndHashReadable",
+      "refusedHeaderAndPartialConstructorReturnCapacityWithoutMutatingLiveImage",
+      "explicitResidentCompatibilityIsNotReclassifiedAsNativeStorage"
+    ],
     "io.github.gustavo2358.analysis.values.NativeLogicalTextStorageTest": [
       "nativeCanonicalRunsMatchDenseUnicodeAndResidentHashOracles",
       "geometricNonRepeatingTextsHaveOnePagedWordPerRunAndBoundedResidentControls",

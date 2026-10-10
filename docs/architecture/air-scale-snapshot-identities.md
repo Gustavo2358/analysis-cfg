@@ -158,6 +158,66 @@ Per-subject preparation still scans common inventories; interner controls are
 funded but resident, not fully externally indexed. Generic domain/state stores,
 byte-image conversion and large explicit output remain AS-W09/W10 obligations.
 
+## Native physical literal octets (2026-10-10)
+
+The next real physical CLI counterexample on consumer c0cde299 converts only the
+unqueried synthetic sink from Cell to an exact IBM1047 Region/View. All64 writes
+(16 reached,48 cold),67 operations,140 operands and337 entities remain. Its
+small width32 control passes2.33s with the complete historical product oracle.
+The19623859-byte width300000 input fails14.25s at Integer.valueOf inside the
+resident MemoryCodecs.encodeText payload, with unchanged Java21/Xmx128m,
+admission, quotas and eight-minute application deadline.
+
+BytePayloadArena now packs eight exact octets per word in the already admitted
+program's ordinal-column backend. Native ByteImage borrows a private immutable
+list view rather than copying a boxed payload catalogue; public/resident values
+retain their defensive copies. The exact pinned IBM1047 repertoire is derived
+through MemoryCodecs for256 individual characters in a funded1040-byte lookup
+table. Arena controls reserve256 resident/96 scratch bytes, plus96 per published
+payload header. No separate cache, hard-coded codec copy, quota increase or fallback is
+introduced. Invalid repertoire/extent/codec cannot publish a partial value.
+Close detaches the lookup table and native column before returning capacity;
+both payload arenas weakly expire Regional executions on native owner closure.
+
+Seven new native laws cover every256 IBM1047/128 ASCII character prefix, partial
+packed words, exact bytes/hash, immutable views, cropping/writes/capture/support
+metadata, explicit/owner lifetime, partial-construction cleanup and common-budget
+header refusal. Five geometric dense widths4096–65536 force real eviction through
+the existing two-page4096-byte FilePageStore. Words grow512/1024/2048/4096/8192,
+resident header growth96/192/288/384/480bytes; cumulative reads128000 and
+writes388032bytes at the last width. This is measured bounded-backend behavior,
+not a claim about every domain or I/O pattern. The seven laws plus16 native
+text/capacity laws,69 value neighbors and31 CALL/FILE/source/lifetime/deadline
+regressions pass without skips. Original W1/W2/W3/W4/W1D/storage compiled guards
+pass after refreshing only the current W3 compiled inventory and adding the new
+source name to its exact inventory; forbidden edges and gates are unchanged.
+
+The first assembled physical large CLI passes19.67s; its complete independent
+oracle preserves21 fields,83 origins,67 operations,input-derived CALL offset16
+and all CFG facts except operational metrics. The corrected small repeat
+passes2.30s and the same oracle. The initial small attempt lacked its output
+directory and failed CFG_OUTPUT_IO; its failed log is preserved, not a semantic
+RED. Frozen repetitions pass19.26/19.92/19.63s (median19.63s),small2.31s;
+all three large raw products are byte-identical,CFG2498cb07246bcbd658ea975722a318e86127455bb3c055fff1b26bc8e6622df0
+and dependencies5d59261a6a65fd3eb6c19086406c1af35ad79221628f3190c65c33649f2d53ad.
+The frozen1345 runtime classes,24 sources/configs,17 inputs/references and
+unchanged libraries match after these selected runs. Original cold144MB repeat
+passes105.46s and the complete21-field/83-origin/CFG oracle;both original cold
+products remain byte-identical. The coherent mandatory FAST passes1197 required
+methods,zero skips,in773.221s. All1345 class hashes and complete paths,24 sources,
+17 material inputs and libraries match afterwards. A subsequent C1-only additive
+registration puts the seven already executed byte laws in the fixed Fast selector;
+their focused repetition passes7 methods in0.998s and the combined nominal-report
+check passes1204 required methods from1197 gate reports+7 focused reports. These
+are separate from the1197-method wrapper run,not relabelled as a newly executed
+1204-method wrapper. All1345 runtime hashes still match after this C1 extension.
+No production source changed after the frozen CLI or during qualification.
+Producer9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae, pins and wire are unchanged.
+
+Logical-to-physical run conversion, resident byte-valued input materialization,
+large explicit output, arbitrary state/interner stores and shared preparation
+remain separate AS-W09/W10 obligations. Global campaign status remains PARTIAL.
+
 AS-W02 / IN_PROGRESS. Producer pin: air-java
 `5c41a64a9838bb934218f918fe7bd8d0f4325c7a`; normative AIR
 `4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e`, identity §2, I-01/I-02.

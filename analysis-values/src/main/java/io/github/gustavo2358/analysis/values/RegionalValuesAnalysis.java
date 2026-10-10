@@ -415,7 +415,19 @@ public final class RegionalValuesAnalysis {
         return unknown(partition.segments().get(ordinal).location(),reason);
     }
     final class Engine implements AnalysisDefinition<State> {
-        private final LogicalTextArena texts=new LogicalTextArena(session.index().store());
+        private final LogicalTextArena texts;
+        private final BytePayloadArena bytePayloads;
+        Engine(){
+            texts=new LogicalTextArena(session.index().store());
+            try{bytePayloads=new BytePayloadArena(session.index().store());}
+            catch(RuntimeException|Error failure){try{texts.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        void closePayloads(){
+            Throwable failure=null;for(var owned:new AutoCloseable[]{bytePayloads,texts})try{owned.close();}
+            catch(Exception|Error error){if(failure==null)failure=error;else if(failure!=error)failure.addSuppressed(error);}
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
+            if(failure!=null)throw new IllegalStateException("domain payload cleanup failed",failure);
+        }
         long contentReads,contentUpdates,alternativeVisits,physicalGroupsApplied,physicalWritesApplied,maxLogicalCells,maxLogicalValues;
         @Override public Direction direction(){return Direction.FORWARD;}
         @Override public State bottom(){return BOTTOM;}
@@ -707,8 +719,8 @@ public final class RegionalValuesAnalysis {
                 if(v instanceof Values.TextValue text&&extent.isPresent()) {
                     var codecs=plan.write.destination().candidates().stream().filter(c->c.location().equals(target)).map(StorageIndex.Candidate::codec).distinct().toList();
                     if(codecs.size()==1&&codecs.getFirst().isPresent()) {
-                        var encoded=MemoryCodecs.encodeText(codecs.getFirst().get(),text,extent.get());
-                        if(encoded.value().isPresent())return Set.of(new Bytes(ByteImage.literal(encoded.value().get(),plan.event)));
+                        var encoded=bytePayloads.encode(text,codecs.getFirst().get(),extent.get(),plan.event);
+                        if(encoded.isPresent())return Set.of(new Bytes(encoded.get()));
                     }
                 }
                 return Set.of(unknown(target,"UNINTERPRETED_LITERAL_REPRESENTATION",plan.event));
@@ -800,7 +812,7 @@ public final class RegionalValuesAnalysis {
     public Execution execute(){
         var engine=new Engine();
         try{return new Execution(engine,DataflowSolver.solve(session,engine));}
-        catch(RuntimeException|Error failure){try{engine.texts.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        catch(RuntimeException|Error failure){try{engine.closePayloads();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
     }
     public final class Execution implements AutoCloseable {
         private Engine engine;private final DataflowResult<State> stable;private final Map<String,Long> solveMetrics;
@@ -808,19 +820,20 @@ public final class RegionalValuesAnalysis {
         private Execution(Engine engine,DataflowResult<State> stable){
             this.engine=engine;this.stable=stable;solveMetrics=engine.metrics();
             var observer=new java.lang.ref.WeakReference<>(this);
-            engine.texts.onOwnerClose(()->{var execution=observer.get();if(execution!=null)execution.close();});
+            Runnable expiry=()->{var execution=observer.get();if(execution!=null)execution.close();};
+            engine.texts.onOwnerClose(expiry);engine.bytePayloads.onOwnerClose(expiry);
         }
         public DataflowResult<State> dataflow(){return stable;}
         public Map<String,Long> solveMetrics(){return solveMetrics;}
         /** Cumulative domain work, including observed replay; no semantic budget. */
         public Map<String,Long> metrics(){var active=engine;return active==null?closedMetrics:active.metrics();}
         public Map<String,Long> preparationMetrics(){var result=new TreeMap<>(effects.preparationMetrics());result.putAll(effects.storage().preparationMetrics());result.put("partitionSegments",(long)partition.segments().size());result.put("eventsPrepared",(long)events.size());result.put("physicalPlansPrepared",eventDetails.stream().filter(e->e.logical()==null).count());result.put("logicalPlansPrepared",eventDetails.stream().filter(e->e.logical()!=null).count());result.put("correlationGroups",(long)groups.size());result.put("maxGroupBases",groups.stream().mapToLong(List::size).max().orElse(0));return Map.copyOf(result);}
-        /** Close execution-owned text payloads as well as the stable solver roots. */
+        /** Close execution-owned text/byte payloads as well as the stable solver roots. */
         @Override public void close(){
             var owned=engine;if(owned==null)return;
             closedMetrics=owned.metrics();engine=null;
             Throwable failure=null;try{stable.close();}catch(RuntimeException|Error error){failure=error;}
-            try{owned.texts.close();}catch(RuntimeException|Error error){if(failure==null)failure=error;else if(failure!=error)failure.addSuppressed(error);}
+            try{owned.closePayloads();}catch(RuntimeException|Error error){if(failure==null)failure=error;else if(failure!=error)failure.addSuppressed(error);}
             if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
         }
         public ObservationBatch<ObjectId,RegionalValueFact> observe(Iterable<PointQuery<ObjectId>> requests) {
