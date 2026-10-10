@@ -45,7 +45,7 @@ final class TextExpressions {
         for(var location:varying)for(var value:inputs.get(location)){var snapshot=new HashMap<>(fixed);snapshot.put(location,value);snapshots.add(snapshot);}
         Candidates result=null;
         for(var snapshot:snapshots){
-            var value=evaluate(operation.value(),o->snapshot.get(subjects.get(o)));
+            var value=evaluate(operation.value(),o->snapshot.get(subjects.get(o)),universe);
             var candidate=value==null?Candidates.UNKNOWN:universe.supported(value,operation.header().id(),operation.header().origin(),List.of(),work);
             if(value!=null)for(var input:snapshot.entrySet())if(input.getValue()!=null)
                 candidate=universe.derived(candidate,value,input.getValue(),captured.get(input.getKey()),work);
@@ -75,7 +75,7 @@ final class TextExpressions {
         }
         Candidates result=null;
         for(var snapshot:snapshots) {
-            var value=evaluate(operation.value(),object->snapshot.get(subjects.get(object)));
+            var value=evaluate(operation.value(),object->snapshot.get(subjects.get(object)),universe);
             var candidate=value==null?Candidates.UNKNOWN:universe.supported(value,operation.header().id(),operation.header().origin(),List.of(),work);
             if(value!=null)for(var input:snapshot.entrySet())if(input.getValue()!=null)
                 candidate=universe.derived(candidate,value,input.getValue(),inputs.get(input.getKey()),work);
@@ -84,7 +84,7 @@ final class TextExpressions {
         return result==null?Candidates.UNKNOWN:result;
     }
     private record Frame(Expression expression,boolean expanded) { }
-    private static LogicalText evaluate(Expression expression,java.util.function.Function<ObjectId,LogicalText> input){
+    private static LogicalText evaluate(Expression expression,java.util.function.Function<ObjectId,LogicalText> input,ValueUniverse universe){
         var pending=new ArrayDeque<Frame>();var values=new IdentityHashMap<Expression,LogicalText>();pending.push(new Frame(expression,false));
         while(!pending.isEmpty()) {
             var frame=pending.pop();var e=frame.expression();
@@ -98,7 +98,7 @@ final class TextExpressions {
             }
             LogicalText result;
             if(e instanceof Expressions.Read r)result=input.apply(((Places.ObjectPlace)r.place()).object());
-            else if(e instanceof Expressions.Literal l)result=LogicalText.of(((Values.TextValue)l.value()).value());
+            else if(e instanceof Expressions.Literal l)result=universe.literal(((Values.TextValue)l.value()).value());
             else if(e instanceof Expressions.Unknown)result=null;
             else if(e instanceof Expressions.FillText f){var value=values.get(f.character());int length=f.length().intValueExact();result=value==null||value.length()!=1?LogicalText.unknown(length):value.fill(length);}
             else if(e instanceof Expressions.FitText f){var value=values.get(f.value());int length=f.length().intValueExact();result=value==null?LogicalText.unknown(length):value.fit(length,f.pad().codePointAt(0));}

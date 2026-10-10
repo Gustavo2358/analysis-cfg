@@ -63,4 +63,52 @@ class PlanningLifetimeTest {
         }
         assertEquals(1,provider.closes);
     }
+    @Test void failedPreparationCloseRetiresStartedRunAndNeverCachesIt() {
+        var p=vertical();var key=key(p);var retired=new int[2];
+        var cleanup=new IllegalStateException("preparation cleanup");var runCleanup=new IllegalArgumentException("run cleanup");
+        var provider=new ProviderWrapper(){
+            @Override public Prepared<ObjectId,ValueFact> prepare(io.github.gustavo2358.analysis.structure.AnalysisSession session,AnalysisKey requested) {
+                var owned=delegate.prepare(session,requested);
+                return new Prepared<>() {
+                    public AnalysisKey key(){return requested;}public AnalysisOutcome refusal(){return owned.refusal();}
+                    public Run<ObjectId,ValueFact> execute(){var run=owned.execute();return new Run<>() {
+                        public AnalysisOutcome outcome(){return run.outcome();}
+                        public Materialized<ObjectId,ValueFact> observe(List<io.github.gustavo2358.analysis.query.PointQuery<ObjectId>> queries){return run.observe(queries);}
+                        public void close(){retired[1]++;run.close();throw runCleanup;}
+                    };}
+                    public void close(){retired[0]++;owned.close();throw cleanup;}
+                };
+            }
+        };
+        try(var runtime=new PlanningExecution(session(p),new AnalysisRegistry(List.of(provider)))) {
+            var failure=assertThrows(IllegalStateException.class,()->runtime.execute("close-failure",runtime.plan(List.of(analysisOnly("A",key)))));
+            assertSame(cleanup,failure);assertArrayEquals(new Throwable[]{runCleanup},failure.getSuppressed());
+            assertArrayEquals(new int[]{1,1},retired,"unsuccessful ownership handoff must retire preparation and run");
+        }
+        assertArrayEquals(new int[]{1,1},retired,"failed handoff must never enter the runtime cache");
+    }
+    @Test void preparationClosesOnRefusalBindingFailureAndFailedExecute() {
+        var p=vertical();var key=key(p);var other=PossibleValuesProvider.key(key.entry(),PossibleValuesAnalysis.EFFECTS_PROFILE);
+        for(int mode=0;mode<3;mode++) {
+            int selected=mode;var retired=new int[1];var failure=new IllegalStateException("execute failure");var cleanup=new IllegalArgumentException("preparation close failure");
+            var provider=new ProviderWrapper(){
+                @Override public Prepared<ObjectId,ValueFact> prepare(io.github.gustavo2358.analysis.structure.AnalysisSession session,AnalysisKey requested) {
+                    return new Prepared<>() {
+                        public AnalysisKey key(){return selected==0?other:requested;}
+                        public AnalysisOutcome refusal(){return selected==1?new AnalysisOutcome(requested,AnalysisOutcome.Status.UNSUPPORTED,"synthetic refusal",java.util.Map.of()):null;}
+                        public Run<ObjectId,ValueFact> execute(){throw failure;}
+                        public void close(){retired[0]++;if(selected==2)throw cleanup;}
+                    };
+                }
+            };
+            try(var runtime=new PlanningExecution(session(p),new AnalysisRegistry(List.of(provider)))) {
+                var plan=runtime.plan(List.of(analysisOnly("A",key)));
+                if(mode==0)assertThrows(IllegalArgumentException.class,()->runtime.execute("wrong-key",plan));
+                else if(mode==1)assertEquals(PreparationStatus.INCOMPLETE,runtime.execute("refused",plan).preparationStatus());
+                else {var actual=assertThrows(IllegalStateException.class,()->runtime.execute("failed-execute",plan));assertSame(failure,actual);assertArrayEquals(new Throwable[]{cleanup},actual.getSuppressed());}
+                assertEquals(1,retired[0]);
+            }
+            assertEquals(1,retired[0]);
+        }
+    }
 }

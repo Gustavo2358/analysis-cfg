@@ -94,6 +94,8 @@ public final class PlanningExecution implements AutoCloseable {
     }
     private <T,V> CachedRun start(AnalysisProvider<T,V> provider, AnalysisKey key, Counts counts) {
         var prepared = Objects.requireNonNull(provider.prepare(session,key));
+        AnalysisProvider.Run<T,V> run=null;
+        try(prepared) {
         if (!key.equals(prepared.key())) throw new IllegalArgumentException("provider prepared wrong AnalysisKey");
         var refusal = prepared.refusal();
         if (refusal != null) {
@@ -103,13 +105,12 @@ public final class PlanningExecution implements AutoCloseable {
                 public BatchResult observe(ExecutionPlan.BatchPlan batch) { throw new IllegalStateException("refused run"); }
             };
         }
-        counts.add("analysisRuns",1); var run = Objects.requireNonNull(prepared.execute());
-        try {
+        counts.add("analysisRuns",1); run = Objects.requireNonNull(prepared.execute());
             var outcome = Objects.requireNonNull(run.outcome());
             if (!key.equals(outcome.key()) || outcome.status() != AnalysisOutcome.Status.STABLE) throw new IllegalArgumentException("provider execution binding mismatch");
             return new BoundRun<>(provider.subjectType(),provider.factType(),key,outcome,run);
         } catch (RuntimeException | Error failure) {
-            try { run.close(); } catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+            if(run!=null)try { run.close(); } catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
             throw failure;
         }
     }

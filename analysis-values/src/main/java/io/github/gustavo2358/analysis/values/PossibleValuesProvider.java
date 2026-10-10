@@ -58,6 +58,7 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
         var scoped = owner.selectEntries(List.of(key.entry()));
         var admission = PossibleValuesAnalysis.prepare(scoped,key.profile(),demand(key));
         return new Prepared<>() {
+            public void close(){admission.analysis().ifPresent(PossibleValuesAnalysis::close);}
             public AnalysisKey key() { return key; }
             public AnalysisOutcome refusal() {
                 return admission.status() == PossibleValuesAnalysis.Status.ACCEPTED ? null : new AnalysisOutcome(key,
@@ -109,6 +110,6 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
             observations.stateMetrics().forEach((k,v)->work.put("replay_"+k,v));
             return new Materialized<>(observations.batch(),work);
         }
-        public void close(){var owned=execution;execution=null;if(owned!=null)owned.dataflow().close();}
+        public void close(){var owned=execution;execution=null;if(owned!=null)owned.close();}
     }
 }

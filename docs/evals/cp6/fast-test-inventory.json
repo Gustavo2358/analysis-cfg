@@ -478,6 +478,17 @@
       "expiryInsideNativeObservationTransferCannotPublishACompleteBatch",
       "expiryInsideTransferNeverPublishesEitherDirectionAndReleasesInput"
     ],
+    "io.github.gustavo2358.analysis.values.NativeLogicalTextStorageTest": [
+      "nativeCanonicalRunsMatchDenseUnicodeAndResidentHashOracles",
+      "geometricNonRepeatingTextsHaveOnePagedWordPerRunAndBoundedResidentControls",
+      "billionExtentPaddingAndUnknownProjectionKeepCanonicalCompressedRuns",
+      "textCapacityIsCommonAndExplicitOrOwnerCloseExpiresRunsWithoutClosingInput",
+      "deniedTextHeaderCapacityCannotPublishOrPartiallyChargeNativeResult",
+      "closedRegionalExecutionsReleaseTextRootsOnExplicitOrNativeOwnerClose",
+      "scalarPreparedOwnershipAndTwoLiveExecutionsShareNativeTextLifetime",
+      "scalarNativeOwnerExpiryClearsPreparedTextInternersAndRejectsReplay",
+      "scalarPreparationChargesCommonCapacityAndAtomicRefusalReleasesPartialOwners"
+    ],
     "io.github.gustavo2358.analysis.solver.NativeActivationLifetimeTest": [
       "nativeActivationReferenceArraysStayFundedUntilResultClose",
       "nativeActivationOwnerExpiryClearsStateSlotsAndPreservesBorrowedInput"
@@ -1141,7 +1152,9 @@
     "io.github.gustavo2358.analysis.values.PlanningLifetimeTest": [
       "executionClosesEveryCachedRunOnceDespiteCleanupFailure",
       "rejectedExecutionClosesItsRunAndPreservesBindingFailure",
-      "closedProviderHandlesDiscardEnginesWithoutErasingDeliveredFacts"
+      "closedProviderHandlesDiscardEnginesWithoutErasingDeliveredFacts",
+      "failedPreparationCloseRetiresStartedRunAndNeverCachesIt",
+      "preparationClosesOnRefusalBindingFailureAndFailedExecute"
     ],
     "io.github.gustavo2358.analysis.values.PlanningRuntimeTest": [
       "realVerticalSharesRunQueryReplayAndProducerSupport",

@@ -88,9 +88,11 @@ public final class CallDependencyPlan {
                         boolean accepted=admission.computeIfAbsent(object.object(),subject->{
                             metrics.merge("scalarAdmissionAttempts",1L,Long::sum);
                             var probe=PossibleValuesAnalysis.prepare(scoped,PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(subject));
+                            try {
                             if(probe.status()==PossibleValuesAnalysis.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,probe.reason());
                             boolean ok=probe.status()==PossibleValuesAnalysis.Status.ACCEPTED;
                             metrics.merge(ok?"scalarAdmissionAccepted":"scalarAdmissionRefused",1L,Long::sum);return ok;
+                            } finally{probe.analysis().ifPresent(PossibleValuesAnalysis::close);}
                         });
                         provider=accepted?Provider.SCALAR:Provider.REGIONAL;
                         if(accepted)demand.add(object.object());

@@ -415,6 +415,7 @@ public final class RegionalValuesAnalysis {
         return unknown(partition.segments().get(ordinal).location(),reason);
     }
     final class Engine implements AnalysisDefinition<State> {
+        private final LogicalTextArena texts=new LogicalTextArena(session.index().store());
         long contentReads,contentUpdates,alternativeVisits,physicalGroupsApplied,physicalWritesApplied,maxLogicalCells,maxLogicalValues;
         @Override public Direction direction(){return Direction.FORWARD;}
         @Override public State bottom(){return BOTTOM;}
@@ -583,7 +584,7 @@ public final class RegionalValuesAnalysis {
                 return Set.copyOf(result);
             }
             if(expression instanceof Expressions.Literal literal&&literal.value() instanceof Values.TextValue text)
-                return Set.of(new LogicalValue(text,plan.event));
+                return Set.of(new LogicalValue(texts.of(text.value()),plan.event));
             if(expression instanceof Expressions.Read read) {
                 var result=new HashSet<LogicalValue>();
                 for(var object:effects.storage().explicitObjects(read.place()))result.addAll(captured.logical.getOrDefault(object,Set.of()));
@@ -698,7 +699,7 @@ public final class RegionalValuesAnalysis {
             if(expression instanceof Expressions.Literal literal) {
                 var v=literal.value();
                 if(target.range().isEmpty())return Set.of(v instanceof Values.TextValue t
-                    ?new Scalar(Optional.of(LogicalText.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(reference(target),Optional.empty(),plan.event,Optional.of(reference(target)),Map.of(),Set.of(),Set.of())))
+                    ?new Scalar(Optional.of(texts.of(t.value())),Set.of(plan.event),Set.of(),Set.of(),List.of(new Trace(reference(target),Optional.empty(),plan.event,Optional.of(reference(target)),Map.of(),Set.of(),Set.of())))
                     :unknown(target,"NON_TEXT_LOGICAL_VALUE",plan.event));
                 var range=target.range().get();var extent=range.end().map(e->e.subtract(range.start()));
                 if(v instanceof Values.BytesValue bytes&&extent.equals(Optional.of(BigInteger.valueOf(bytes.octets().size()))))
@@ -796,15 +797,32 @@ public final class RegionalValuesAnalysis {
         }
         return new Trace(reference(observed),bytes,part.producer(),original,captures,part.sourceGaps(),part.reasons(),part.logicalSupports());
     }
-    public Execution execute(){var engine=new Engine();return new Execution(engine,DataflowSolver.solve(session,engine));}
-    public final class Execution {
-        private final Engine engine;private final DataflowResult<State> stable;private final Map<String,Long> solveMetrics;
-        private Execution(Engine engine,DataflowResult<State> stable){this.engine=engine;this.stable=stable;solveMetrics=engine.metrics();}
+    public Execution execute(){
+        var engine=new Engine();
+        try{return new Execution(engine,DataflowSolver.solve(session,engine));}
+        catch(RuntimeException|Error failure){try{engine.texts.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    public final class Execution implements AutoCloseable {
+        private Engine engine;private final DataflowResult<State> stable;private final Map<String,Long> solveMetrics;
+        private Map<String,Long> closedMetrics;
+        private Execution(Engine engine,DataflowResult<State> stable){
+            this.engine=engine;this.stable=stable;solveMetrics=engine.metrics();
+            var observer=new java.lang.ref.WeakReference<>(this);
+            engine.texts.onOwnerClose(()->{var execution=observer.get();if(execution!=null)execution.close();});
+        }
         public DataflowResult<State> dataflow(){return stable;}
         public Map<String,Long> solveMetrics(){return solveMetrics;}
         /** Cumulative domain work, including observed replay; no semantic budget. */
-        public Map<String,Long> metrics(){return engine.metrics();}
+        public Map<String,Long> metrics(){var active=engine;return active==null?closedMetrics:active.metrics();}
         public Map<String,Long> preparationMetrics(){var result=new TreeMap<>(effects.preparationMetrics());result.putAll(effects.storage().preparationMetrics());result.put("partitionSegments",(long)partition.segments().size());result.put("eventsPrepared",(long)events.size());result.put("physicalPlansPrepared",eventDetails.stream().filter(e->e.logical()==null).count());result.put("logicalPlansPrepared",eventDetails.stream().filter(e->e.logical()!=null).count());result.put("correlationGroups",(long)groups.size());result.put("maxGroupBases",groups.stream().mapToLong(List::size).max().orElse(0));return Map.copyOf(result);}
+        /** Close execution-owned text payloads as well as the stable solver roots. */
+        @Override public void close(){
+            var owned=engine;if(owned==null)return;
+            closedMetrics=owned.metrics();engine=null;
+            Throwable failure=null;try{stable.close();}catch(RuntimeException|Error error){failure=error;}
+            try{owned.texts.close();}catch(RuntimeException|Error error){if(failure==null)failure=error;else if(failure!=error)failure.addSuppressed(error);}
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
+        }
         public ObservationBatch<ObjectId,RegionalValueFact> observe(Iterable<PointQuery<ObjectId>> requests) {
             return observe(requests,OBJECT_ORDER,StorageSubject.NamedObject::new,StorageValueFact::asObjectFact,true);
         }
@@ -813,6 +831,7 @@ public final class RegionalValuesAnalysis {
         }
         private <T,V> ObservationBatch<T,V> observe(Iterable<PointQuery<T>> requests,Comparator<T> order,
                 java.util.function.Function<T,StorageSubject> subject,java.util.function.Function<StorageValueFact,V> projection,boolean textOnly) {
+            var engine=this.engine;if(engine==null)throw new IllegalStateException("closed regional execution");
             return BatchReplayer.materialize(session,stable,Direction.FORWARD,BOTTOM,requests,order,engine::operation,new BatchReplayer.Projection<State,T,V>() {
                 @Override public State mergeStates(State a,State b){return engine.joinInto(a,b,new DomainWork()).state();}
                 @Override public boolean supports(PointQuery<T> query) {

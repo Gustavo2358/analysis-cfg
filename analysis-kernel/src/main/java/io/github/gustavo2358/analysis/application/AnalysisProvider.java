@@ -17,11 +17,14 @@ public interface AnalysisProvider<T,V> {
     Class<V> factType();
     Comparator<T> subjectOrder();
     Prepared<T,V> prepare(AnalysisSession session, AnalysisKey key);
-    interface Prepared<T,V> {
+    interface Prepared<T,V> extends AutoCloseable {
         AnalysisKey key();
         /** Null means admitted. Refusal must be detached and never starts a solver. */
         AnalysisOutcome refusal();
         Run<T,V> execute();
+        /** Retire preparation-owned resources. Already started runs own their
+         * independent execution lease; they remain valid until Run.close(). */
+        @Override default void close() { }
     }
     interface Run<T,V> extends AutoCloseable {
         AnalysisOutcome outcome();

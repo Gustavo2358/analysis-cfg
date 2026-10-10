@@ -56,6 +56,108 @@ Global AS-W09/AS-W10 qualification is still incomplete: native scalar preparatio
 retains actual cells, writes, values and producers without additional common
 capacity in the demonstrated next counterexample.
 
+## Native executed logical text runs (2026-10-09)
+
+Regional executions now own a LogicalTextArena. Native canonical runs use one
+packed scalar/extent word per run in the admitted program's existing paged
+ordinal column. Construction keeps only a scalar pending run, a canonical hash
+and fixed workspace; it never creates or copies an input-sized list of Run
+objects. Published immutable run views, text headers and workspace use the same
+capacity ledger. Padding/fill remain compressed, including billion-position
+extents; slice/concat preserve canonical run equality and the resident hash.
+The caller-managed compatibility representation remains explicit, not a silent
+native fallback. No AIR or dependency wire contract is changed.
+
+The provider closes its entire execution, including text pages and solver roots.
+Failure before publication closes partial ownership; program expiry also closes
+the column and capacities without pinning an Engine or closing the borrowed
+AIR. Direct callers can close the AutoCloseable regional Execution. Closing only
+its dataflow result releases solver roots, not the separately owned text arena.
+Failed header growth cannot publish a text or partially charge the common ledger.
+
+The actual Java 21 CLI reproduced OOM in LogicalText/List.copyOf on 16 executed
+non-repeating literals of width300000 (5421762-byte AIR), at Xmx128m. With the
+same input, default quotas and eight-minute application deadline, paged runs
+completed in14.59s initially. The coherent runtime's three isolated repeats
+completed in13.96/13.62/13.77s (median13.77s). An independent oracle reads the untouched
+historical reference and derives the deliberately moved CALL's offset16 from
+the input: all21 product fields,83 original origins, candidates, supports,
+premises, remainders and complete CFG agree except operational metrics. The
+earlier strict-offset FAIL is preserved, not relabelled as a semantic pass.
+
+Five new native laws cover dense Unicode/resident equality and hash, compressed
+extents, lifecycle, atomic refusal and five geometric widths4096–65536. The
+forced two-page file cache really evicts and writes payload; resident growth is
+96bytes per published header/view, not proportional to run count. At65536 the
+two-page cache has substantial directory/payload thrashing (765739936bytes read,
+256427232bytes written cumulatively): this is a reported limit, not a qualified
+linear-I/O claim. No CLI cache or quota was enlarged to obtain the14.59s result.
+Focused19 native and68 value/planning regressions passed; that coherent wave's
+FAST passed1191 methods in775.133s. Producer9da and all wire/pins remain unchanged.
+The subsequent direct-Execution ownership audit found64 retained text roots after
+close despite returning their capacity. Execution now detaches its Engine; a weak
+owner-expiry observer does the same on program expiry. Six native laws pass,
+including actual stored-root inspection and preserved detached metrics. This
+lifecycle delta still requires the next coherent FAST; the prior PASS is not its
+qualification. Stored-root inspection does not iterate unmodifiable wrappers of
+native views, which would decode new bodies or attempt access to expired owners.
+
+AS-W09/AS-W10 remain PARTIAL. General scalar preparation structures, general
+resident state/interner containers, byte-image conversion, full output and live
+activation stores still need their own funding/spill work. This fixes the
+integrated non-repeating logical-text OOM, not all possible text/state pressure.
+
+## Native scalar literal payload and prepared ownership (2026-10-10)
+
+The real CLI then reproduced another OOM in ValueUniverse.supported/TextProfile
+on16 distinct non-repeating scalar assignments of width300000 (4903767-byte AIR,
+36 operations). The small width32 control passed1.49s; the large input failed
+7.92s. Scalar literals and expression literals now use the same native paged
+LogicalTextArena, with512 fixed control bytes,160 per interned value control and
+256 per distinct producer/support control plus16 per premise reference. Text
+headers remain96 each; payload uses the admitted program's native column. These
+are explicit representation capacities, not JVM heap measurements or a complete
+funding claim for TextProfile, state/proof payloads or output materialization.
+The mutable universe drops its actual maps/lists and backing capacity on closure,
+rather than retaining empty backing arrays after returning the lease.
+
+AnalysisProvider.Prepared has idempotent close with a stateless default. The
+planner closes preparation on success, refusal and failure, and retires a started
+run if preparation cleanup prevents ownership handoff. Primary/suppressed errors
+are preserved. Scalar preparation and each started execution independently own
+the shared universe; retiring a preparation does not invalidate existing runs.
+Discarded per-subject admission probes now retire their accepted preparations.
+Program expiry weakly invalidates the universe and removes text/interner roots;
+the callback does not pin semantic owners. The resident compatibility path is
+explicit. No admission, name interpretation, candidate or wire rule is relaxed.
+
+The first assembled scalar CLI now passes11.30s at unchanged Java21/Xmx128m,
+quotas and eight-minute deadline. An independent literal-only delta oracle
+compares the entire input against the preserved pre-fix small input except the
+sixteen assigned texts, then checks21 product fields and complete CFG. All16
+long raw values, exact producers/supports/origins and explicit name-interpretation
+remainders survive. These deliberately noncanonical names do not become valid
+CALL names. The final frozen runtime passes three isolated large scalar runs in
+11.11/10.98/10.92s (median10.98s); small/control pass1.51/1.53s. The original
+control retains17 resolved SYNPROG CALLs with exact producers/supports and no
+remainder. Nine native text/storage/lifetime laws and93 value/planning neighbors
+pass;47 native/CALL/FILE/source checks and all original compiled guards pass.
+The extra pressure law derives admitted preparation capacity in addition to the
+unchanged4096-byte decode workspace and preserves the separate600-byte atomic
+refusal witness. The first overconstrained4096-total attempt is preserved as
+HEAP/DECODE failure, not an application regression or a global quota change.
+The earlier Regional hot case repeats13.49s; the original144490643-byte cold case
+passes108.13s and the complete independent21-field/83-origin/CFG oracle. All1342
+runtime classes,21 sources/configs,14 inputs/references and libraries remain
+identical afterwards. Final coherent FAST1197 passes in774.801s for this combined
+lifecycle/scalar delta. All1342 class hashes and the complete1342-path inventory,
+21 sources/configs,14 material inputs and libraries match after the clean gate.
+No production source changed between the frozen CLI and qualification.
+
+Per-subject preparation still scans common inventories; interner controls are
+funded but resident, not fully externally indexed. Generic domain/state stores,
+byte-image conversion and large explicit output remain AS-W09/W10 obligations.
+
 AS-W02 / IN_PROGRESS. Producer pin: air-java
 `5c41a64a9838bb934218f918fe7bd8d0f4325c7a`; normative AIR
 `4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e`, identity §2, I-01/I-02.

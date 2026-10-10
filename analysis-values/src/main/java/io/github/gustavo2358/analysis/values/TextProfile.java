@@ -32,13 +32,13 @@ final class TextProfile {
     final Map<UnitId,Boolean> sourceOpen=new HashMap<>();
     private final Set<Integer> sourceOpenCells=new HashSet<>();
     private final Set<EntryId> sourceOpenEntries=new HashSet<>();
-    final ValueUniverse universe=new ValueUniverse();
+    final ValueUniverse universe;
     final List<PremiseId> premises=new ArrayList<>();
     final ValuesWork preparation=new ValuesWork();
     final ScalarRelations relations;
     private final Set<OperationId> admitted=new HashSet<>();
-    TextProfile(AnalysisSession session,boolean effectAware) {this(session,effectAware,null);}
-    TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand) {
+    TextProfile(AnalysisSession session,boolean effectAware,Set<ObjectId> demand,ValueUniverse universe) {
+        this.universe=Objects.requireNonNull(universe);
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var store=index.store();

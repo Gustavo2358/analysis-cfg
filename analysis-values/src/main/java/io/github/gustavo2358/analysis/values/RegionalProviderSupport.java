@@ -79,6 +79,6 @@ final class RegionalProviderSupport {
             }
             return new AnalysisProvider.Materialized<>(observations,metrics);
         }
-        public void close(){var owned=execution;execution=null;if(owned!=null)owned.dataflow().close();}
+        public void close(){var owned=execution;execution=null;if(owned!=null)owned.close();}
     }
 }
