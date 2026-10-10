@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 import sys
 
-from dependency_wire import read, require
+from dependency_wire import read, require, execution_metrics
 from cfg_wire_contract import verify as verify_cfg_wire
 from e2e_w2d import statement_operation, locked_sp, open_call_model, execute, runtime, source_spans
 from prepare_w2d_producers import ROOT, git, require_local
@@ -166,9 +166,10 @@ def dependency_oracle(result, air, sp, case, source):
                 require(raw['supports'] == support, 'raw/interpreted support identity')
     require(program_candidates(result) == sorted(GLOBAL[case]), 'exact global distinct reachable candidate set')
     dynamic = sum(links[c['header']['id']][2]['target']['kind'] == 'computed' for c in calls)
-    require(result['metrics']['possibleValuesRuns'] == 1 and result['metrics']['possibleValuesPreparations'] == 1, 'one PossibleValues run/preparation per entry')
-    require(result['metrics']['reachabilityRuns'] == 1, 'one shared reachability run')
-    require(result['metrics']['planning.uniqueQueries'] == len(calls) + dynamic, 'N reach queries plus D point queries, none for literals')
+    metrics = execution_metrics(result)
+    require(metrics['possibleValuesRuns'] == 1 and metrics['possibleValuesPreparations'] == 1, 'one PossibleValues run/preparation per entry')
+    require(metrics['reachabilityRuns'] == 1, 'one shared reachability run')
+    require(metrics['planning.uniqueQueries'] == len(calls) + dynamic, 'N reach queries plus D point queries, none for literals')
     return [by_operation[links[c['header']['id']][2]['header']['id']['localId']] for c in calls]
 
 
@@ -196,7 +197,7 @@ def w1_regressions(work, producer, config, cp):
             require(program_candidates(result) == expected and [c['referenceName'] for c in site['candidates']] == expected, 'W1 known target/open empty regression')
             open_call_model(invoke, site, model_open=name == 'dynamic-no-move')
             require(site['sourceValueRemainder'] and site['interpretationUnknownRemainder'] and site['effectiveUnknownRemainder'], 'W1 remainders retained')
-            require(result['metrics']['possibleValuesRuns'] == (0 if name == 'literal' else 1), 'W1 literal zero values analyses')
+            require(execution_metrics(result)['possibleValuesRuns'] == (0 if name == 'literal' else 1), 'W1 literal zero values analyses')
             if name == 'dynamic-x8':
                 assign = next(i for s in unit['sequences'] for i in s['instructions'] if i['kind'] == 'assign'); candidate = site['candidates'][0]
                 require(candidate['rawValue'] == 'PROGA   ' and candidate['supports'][0]['producer'] == assign['header']['id'], 'W1 padded value and original producer')

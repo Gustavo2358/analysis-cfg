@@ -614,7 +614,23 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         public List<PremiseId> premises(){return borrowed(field(handle,3),IDS_PREMISE_ID,PremiseId.class);}
         public boolean literal(){borrowedOpen();return snapshot.shape(field(handle,1))==ENTRIES_LITERAL_INITIAL;}
         public boolean possible(){borrowedOpen();return snapshot.shape(field(handle,1))==ENTRIES_POSSIBLE_LITERALS;}
+        public ProgramStore.InitialKind kind(){borrowedOpen();return switch(snapshot.shape(field(handle,1))) {
+            case ENTRIES_LITERAL_INITIAL -> ProgramStore.InitialKind.LITERAL;
+            case ENTRIES_POSSIBLE_LITERALS -> ProgramStore.InitialKind.POSSIBLE;
+            case ENTRIES_PARAMETER_INITIAL -> ProgramStore.InitialKind.PARAMETER;
+            case ENTRIES_PRESERVE -> ProgramStore.InitialKind.PRESERVE;
+            case ENTRIES_EXTERNAL_UNKNOWN -> ProgramStore.InitialKind.EXTERNAL_UNKNOWN;
+            case ENTRIES_UNINITIALIZED -> ProgramStore.InitialKind.UNINITIALIZED;
+            default -> throw new IllegalStateException("admitted initial value required");
+        };}
+        public int candidateCount(){borrowedOpen();return literal()?1:possible()?Math.toIntExact(snapshot.size(field(field(handle,1),0))):0;}
+        public UncertaintyId reason(){int at=switch(kind()) {
+            case POSSIBLE -> 1;
+            case EXTERNAL_UNKNOWN,UNINITIALIZED -> 0;
+            default -> throw new IllegalStateException("initial value has no uncertainty reason");
+        };return occurrence(field(field(handle,1),at),UncertaintyId.class);}
         public Expressions.Literal candidate(int at){
+            Objects.checkIndex(at,candidateCount());
             long value=field(handle,1);
             if(literal()){Objects.checkIndex(at,1);return occurrence(field(value,0),Expressions.Literal.class);}
             return occurrence(snapshot.element(field(value,0),EXPRESSIONS_LITERAL,at),Expressions.Literal.class);

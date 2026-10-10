@@ -176,10 +176,26 @@ public interface ProgramStore {
     interface EntryStateView {
         List<InitialConditionView> conditions(); List<UncertaintyId> uncertainties();
     }
+    enum InitialKind { LITERAL, POSSIBLE, PARAMETER, PRESERVE, EXTERNAL_UNKNOWN, UNINITIALIZED }
     interface InitialConditionView {
         Place place(); Entries.InitialValue value(); OriginId origin(); List<PremiseId> premises();
         default boolean literal(){return value() instanceof Entries.LiteralInitial;}
         default boolean possible(){return value() instanceof Entries.PossibleLiterals;}
+        default InitialKind kind(){return switch(value()) {
+            case Entries.LiteralInitial ignored -> InitialKind.LITERAL;
+            case Entries.PossibleLiterals ignored -> InitialKind.POSSIBLE;
+            case Entries.ParameterInitial ignored -> InitialKind.PARAMETER;
+            case Entries.Preserve ignored -> InitialKind.PRESERVE;
+            case Entries.ExternalUnknown ignored -> InitialKind.EXTERNAL_UNKNOWN;
+            case Entries.Uninitialized ignored -> InitialKind.UNINITIALIZED;
+        };}
+        default int candidateCount(){return literal()?1:possible()?((Entries.PossibleLiterals)value()).candidates().size():0;}
+        default UncertaintyId reason(){return switch(value()) {
+            case Entries.PossibleLiterals possible -> possible.remainder();
+            case Entries.ExternalUnknown external -> external.reason();
+            case Entries.Uninitialized uninitialized -> uninitialized.reason();
+            default -> throw new IllegalStateException("initial value has no uncertainty reason");
+        };}
         default Expressions.Literal candidate(int at){
             var value=value();
             if(value instanceof Entries.LiteralInitial exact){Objects.checkIndex(at,1);return exact.value();}

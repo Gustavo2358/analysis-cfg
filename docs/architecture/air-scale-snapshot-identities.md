@@ -986,3 +986,46 @@ frozen installed libraries and supplementary oracle source/class match before C0
 documentation edits. This removes the demonstrated strong-initial payload retention,
 not all possible-candidate aggregates,state/index stores or AS-W09/W10 obligations.
 Publication,remote CI,global qualification and human review remain pending;no merge.
+
+## Borrowing each possible initial candidate without retaining the catalogue
+
+Producerfb4fce8056e685183ccde052c23026205daf4036 exposes internal initial-condition
+metadata and individual candidate views. Native consumer validation,indexing,RD,
+Regional and Scalar initial facts use these views rather than materializing one
+PossibleInitial aggregate. Public resident InitialCondition records and explicit
+materialization remain complete; no candidate,producer,support or remainder is cut.
+IR4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e remains unchanged.
+
+The unchanged156249033-byte witness contains512 possible candidates of300000
+characters in one condition,511 other strong Cells and549 operations. Original
+Java21/Xmx128m CLI OOM50.05s now passes96.32/98.64/99.02s isolated,median98.64s,
+with the original owner/quotas/eight-minute deadline. Three complete large product
+pairs are byte-identical. Independent reference checks preserve all20 semantic
+fields and complete CFG. Boundary oracle87.45s checks all512 complete producers,
+candidate-specific supports,full values and explicit VALUES remainder,plus all511
+unchanged strong Cells. An isolated transfer mutant dropping candidates>0 fails
+on producer completeness;production classes are never modified by that mutant.
+
+Producer original FAST282 model/145 transport/44 harness PASS29.467s. Consumer
+original FAST1204 required methods/zero skips/all contracts and seven compiled
+guards PASS771.540s. Post-FAST1371 complete class hashes and paths,2175 consumer
+sources,649 producer sources,14 frozen libraries and3 input hashes match. The first
+path-check script omitted two modules;independent complete enumeration corrected
+that inspection,not production or evidence. Subsequent Python-only wire adaptation
+is separately qualified:25 reader laws and20 actual native wire mutants pass.
+
+Fresh exact-pin frontend/lowering W2D closed/open A/B and physical permutations
+pass,including raw padding,per-candidate MOVE producers and exact source spans.
+Four real AnalysisPipeline products at128MiB/defaults match complete public CFG
+and dependency semantics. General native wire v3 retains the general profiles,
+adds original site coverage and separates execution counters from projection
+counts. The strict independent reader accepts this specific shape,not the
+different restricted snapshot-text-relations@2 direct projection. Historical
+wire versions retain their strict checks. Shared /tmp quota exhaustion is preserved
+as a failed run;relocating temporary files changes no application quota.
+
+The next original FILE composite gate confirms dependency-input@1 is rejected by
+the native CLI (INPUT_CODEC:INPUT_ERROR),after frontend/lowering/CFG succeed.
+Restoring this source-qualified input boundary without rebuilding resident AIR is
+the next integrated capability. This checkpoint does not qualify the whole FILE
+matrix,all-store funding/spill or global AS-W09/W10. No publication/merge performed.

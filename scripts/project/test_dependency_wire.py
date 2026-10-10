@@ -2,7 +2,7 @@
 """Adversarial tests of the independent dependency reader, including actual Java bytes."""
 import copy,json,tempfile,unittest
 from pathlib import Path
-from dependency_wire import read,validate,encode,candidate
+from dependency_wire import read,validate,encode,candidate,execution_metrics
 ROOT=Path(__file__).resolve().parents[2]
 class DependencyWireTests(unittest.TestCase):
     def setUp(self):self.path=ROOT/'analysis-adapters/target/w1d/dynamic-x8.json';self.d=read(self.path)
@@ -39,6 +39,63 @@ class DependencyWireTests(unittest.TestCase):
             for malformed in (b'{"schema":"duplicate",'+raw[1:],raw+b'\n',raw.replace(b'"schema":',b'"schema" :',1),b'\xff'):
                 p.write_bytes(malformed)
                 with self.assertRaises((ValueError,UnicodeError)):read(p)
+
+class GeneralSnapshotWireTests(unittest.TestCase):
+    def setUp(self):
+        # Explicit envelope mapping, independent of the native production writer.
+        self.resident=read(ROOT/'analysis-adapters/target/w1d/dynamic-x8.json')
+        self.d=copy.deepcopy(self.resident)
+        self.d.update(version='3.0.0',modelScope='VALIDATED_SNAPSHOT_DEPENDENCY')
+        self.d['generalAnalysisMetrics']=self.d['metrics']
+        self.d['metrics']=dict(sites=len(self.d['sites']),candidates=sum(len(s['candidates']) for s in self.d['sites']))
+        for site in self.d['sites']:site['coverage']='ABSTRACTED'
+        if self.d['publicationInventory']!='COMPLETE':self.d['analysisStatus']='PARTIAL'
+    def test_complete_semantics_and_execution_counters_keep_their_identity(self):
+        self.assertIs(self.d,validate(self.d))
+        self.assertEqual(self.resident['sites'][0]['candidates'],self.d['sites'][0]['candidates'])
+        self.assertEqual(self.resident['edges'],self.d['edges'])
+        self.assertEqual(self.resident['dependencies'],self.d['dependencies'])
+        self.assertEqual(execution_metrics(self.resident),execution_metrics(self.d))
+        self.assertIs(self.d['generalAnalysisMetrics'],execution_metrics(self.d))
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/'general.json';path.write_bytes(encode(self.d))
+            self.assertEqual(self.d,read(path))
+    def test_native_closed_fields_coverage_counts_counters_and_evidence_rejections(self):
+        changes=[
+            lambda d:d.__setitem__('modelScope','KNOWN_GRAPH_ENTRY'),
+            lambda d:d.__setitem__('version','3.1.0'),
+            lambda d:d.__setitem__('unknown',0),
+            lambda d:d.pop('dependencies'),
+            lambda d:d.pop('generalAnalysisMetrics'),
+            lambda d:d['generalAnalysisMetrics'].pop('possibleValuesRuns'),
+            lambda d:d['generalAnalysisMetrics'].__setitem__('possibleValuesRuns',True),
+            lambda d:d['metrics'].__setitem__('sites',len(d['sites'])+1),
+            lambda d:d['metrics'].__setitem__('candidates',0),
+            lambda d:d['metrics'].__setitem__('possibleValuesRuns',1),
+            lambda d:d['sites'][0].pop('coverage'),
+            lambda d:d['sites'][0].__setitem__('coverage','EXACT'),
+            lambda d:d['sites'][0].__setitem__('unknown',0),
+            lambda d:d['sites'][0]['candidates'][0].__setitem__('supports',[]),
+            lambda d:d.__setitem__('edges',[]),
+            lambda d:d.__setitem__('origins',[]),
+        ]
+        for change in changes:
+            with self.subTest(change=change):
+                bad=copy.deepcopy(self.d);change(bad)
+                with self.assertRaises((ValueError,KeyError,TypeError)):validate(bad)
+    def test_inventory_partial_status_cannot_be_hidden_or_invented(self):
+        self.d['publicationInventory']='PARTIAL';self.d['analysisStatus']='PARTIAL'
+        validate(self.d)
+        self.d['analysisStatus']='COMPLETE'
+        with self.assertRaises(ValueError):validate(self.d)
+        self.d['publicationInventory']='COMPLETE';self.d['analysisReasons']=[]
+        for site in self.d['sites']:site['analysisStatus']='COMPLETE';site['analysisReasons']=[]
+        self.d['sourceDependencies']['available']=True
+        self.d['sourceDependencies']['remainder']=False
+        self.d['sourceDependencies']['gapCodes']=[]
+        validate(self.d)
+        self.d['analysisStatus']='PARTIAL'
+        with self.assertRaises(ValueError):validate(self.d)
 
 class FileEpR2CompositionWireTests(unittest.TestCase):
     def test_cross_contract_entry_factorization_and_dollar_documents(self):

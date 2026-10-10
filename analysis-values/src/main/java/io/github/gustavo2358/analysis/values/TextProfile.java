@@ -128,30 +128,31 @@ final class TextProfile {
                 // unknown contributes no initial text value; Boolean reads keep
                 // the existing conservative BOTH image and entry uncertainty.
                 // Do not extend this to known values, regions or unknown domains.
-                if(location==null&&demand!=null&&condition.value() instanceof Entries.ExternalUnknown) {
+                if(location==null&&demand!=null&&condition.kind()==ProgramStore.InitialKind.EXTERNAL_UNKNOWN) {
                     var declaration=index.object(object.object());var cell=index.directCell(object.object());
                     if(declaration!=null&&declaration.storage() instanceof Memory.CellBinding&&cell!=null
                         &&bool(declaration.typeRef())&&bool(cell.typeRef()))continue;
                 }
                 if(location==null)throw new Refusal(false,"UNSUPPORTED_INITIAL_STORAGE");
                 if(!selected(location))continue;
-                if(condition.value() instanceof Entries.LiteralInitial literal) {
-                    if(!(literal.value().value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
+                if(condition.literal()) {
+                    if(!(condition.candidate(0).value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                     // Retain the canonical condition address,not every decoded text
                     // body. A previous condition was already admitted as TEXT here;
                     // only a second strong fact for the same Cell needs its value.
                     var previous=initial.putIfAbsent(location.ordinal(),condition);
-                    if(previous!=null&&!((Entries.LiteralInitial)previous.value()).value().value().equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
+                    if(previous!=null&&!previous.candidate(0).value().equals(text))throw new Refusal(true,"CONTRADICTORY_INITIAL_VALUES");
                     if(!selected(location))continue;
                     var value=universe.supported(text,condition.place().header().id(),condition.origin(),condition.premises(),preparation);
                     // Simultaneous support is unioned; only the first strong fact can
                     // replace unspecified default content at the invocation boundary.
                     if(!initialized.add(location.ordinal()))value=seed.value(location.ordinal(),preparation).join(value,preparation);
                     seed=seed.initialize(location.ordinal(),value,preparation);
-                } else if(condition.value() instanceof Entries.PossibleLiterals possible) {
+                } else if(condition.possible()) {
                     if(!selected(location))continue;
                     var value=Candidates.UNKNOWN;
-                    for(var literal:possible.candidates()) {
+                    for(int candidate=0;candidate<condition.candidateCount();candidate++) {
+                        var literal=condition.candidate(candidate);
                         if(!(literal.value() instanceof Values.TextValue text))throw new Refusal(false,"UNSUPPORTED_INITIAL_VALUE");
                         value=value.join(universe.supported(text,literal.header().id(),condition.origin(),condition.premises(),preparation),preparation);
                     }

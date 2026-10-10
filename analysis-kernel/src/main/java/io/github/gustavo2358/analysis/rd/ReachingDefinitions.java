@@ -55,7 +55,7 @@ public final class ReachingDefinitions {
             var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();int slot=0;
             for(var fact:EntryFacts.admitted(effects.storage(),context.entryView())) {
                 var condition=fact.conditionView();var resolution=fact.resolution();
-                if(condition.value() instanceof Entries.PossibleLiterals&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
+                if(condition.possible()&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
                     logicalSeeds.add(new LogicalInitial(slot++,condition,object.object(),resolution));continue;
                 }
                 for(var target:effects.targets(resolution,fact.strength())) {

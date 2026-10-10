@@ -170,8 +170,8 @@ public final class RegionalValuesAnalysis {
                 var condition=fact.conditionView();var resolution=fact.resolution();
                 var sources=new ArrayList<StatementEffects.Source>();
                 boolean possible=condition.possible();
-                if(condition.value() instanceof Entries.PossibleLiterals p)
-                    for(int candidate=0;candidate<p.candidates().size();candidate++)sources.add(StatementEffects.ExpressionSource.initial(condition,candidate));
+                if(possible)
+                    for(int candidate=0;candidate<condition.candidateCount();candidate++)sources.add(StatementEffects.ExpressionSource.initial(condition,candidate));
                 else if(condition.literal())sources.add(StatementEffects.ExpressionSource.initial(condition,0));
                 else sources.add(new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
                 var strength=fact.strength();

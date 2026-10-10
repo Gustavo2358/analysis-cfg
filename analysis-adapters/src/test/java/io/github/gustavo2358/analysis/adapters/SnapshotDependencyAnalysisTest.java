@@ -589,6 +589,11 @@ final class SnapshotDependencyAnalysisTest {
                 borrowedCondition=borrowedEntry.state().conditions().getFirst();
                 assertEquals(changedEntry,borrowedEntry.materialize());assertEquals(initial,borrowedCondition.materialize());
                 assertEquals(possible,borrowedCondition.possible());assertEquals(!possible,borrowedCondition.literal());
+                assertEquals(possible?ProgramStore.InitialKind.POSSIBLE:ProgramStore.InitialKind.LITERAL,borrowedCondition.kind());
+                assertEquals(possible?2:1,borrowedCondition.candidateCount());
+                if(possible)assertEquals(gap,borrowedCondition.reason());
+                assertEquals(first,borrowedCondition.candidate(0));
+                assertThrows(IndexOutOfBoundsException.class,()->borrowedCondition.candidate(possible?2:1));
                 borrowedSource=io.github.gustavo2358.analysis.storage.StatementEffects.ExpressionSource.initial(borrowedCondition,possible?1:0);
                 assertEquals(possible?second:first,borrowedSource.value());
                 var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
@@ -624,6 +629,8 @@ final class SnapshotDependencyAnalysisTest {
             }
             var expired=borrowed;assertThrows(IllegalStateException.class,expired::size);assertThrows(IllegalStateException.class,()->expired.identity(0));assertThrows(IllegalStateException.class,()->expired.ordinal(place.header().id()));assertThrows(IllegalStateException.class,()->expired.at(0));
             assertThrows(IllegalStateException.class,borrowedEntry::id);assertThrows(IllegalStateException.class,borrowedCondition::value);assertThrows(IllegalStateException.class,borrowedSource::value);
+            assertThrows(IllegalStateException.class,borrowedCondition::kind);assertThrows(IllegalStateException.class,borrowedCondition::candidateCount);
+            if(possible)assertThrows(IllegalStateException.class,borrowedCondition::reason);
             for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
         }
     }

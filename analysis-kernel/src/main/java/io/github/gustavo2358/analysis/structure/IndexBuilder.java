@@ -204,10 +204,8 @@ final class IndexBuilder {
                 for (var condition : entry.state().conditions()) {
                     count.visit("entry.conditions");
                     operands(List.of(condition.place()), new EntryOwner(entry.id()));
-                    if (condition.value() instanceof Entries.LiteralInitial initial)
-                        operands(List.of(initial.value()), new EntryOwner(entry.id()));
-                    if (condition.value() instanceof Entries.PossibleLiterals possible)
-                        operands(new ArrayList<Operand>(possible.candidates()), new EntryOwner(entry.id()));
+                    for(int candidate=0;candidate<condition.candidateCount();candidate++)
+                        operands(List.of(condition.candidate(candidate)), new EntryOwner(entry.id()));
                 }
             }
             // Expected cardinality plus unique valid roles proves completeness without constructing
