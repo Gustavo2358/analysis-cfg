@@ -33,7 +33,8 @@ Producer a0aeb827ef53765815aa501c4687f197be77ac73 exposes official physical stag
 with explicitUTF16_JSON profile. The new binder must map that access into the closed
 typed source catalogue without retaining JsonNode/whole Pojo products. It must not
 reuse AIR semantics for source fields or relax any AIR entrypoint default.
-Source mapping/admission/CLI consumers and cursor output are still pending; no
+Source mapping and complete admission now have local implementations and direct
+witnesses; production CLI consumers and cursor output are still pending. No
 global memory/performance/AS-W09/AS-W10 completion claim from this foundation.
 
 ## Physical mapping implementation (local qualified foundation; global PARTIAL)
@@ -118,3 +119,85 @@ Closed raw foundation:130files/5031702B,including failures,captures and producer
 logs;final FAST XML and integrity manifests are archived separately. Binaries,
 toolchains,caches and reusable builds remain ignored,not versioned.
 Campaign-level admission/certificate/CLI and global qualification remain pending.
+
+## Complete admission implementation (working delta; global PARTIAL)
+
+SourceAdmissionSnapshot.admit is the only legitimate certificate factory. It
+accepts only the private sealed SourceSnapshotBuilder storage implementation,
+with the exact borrowed PageStore and AnalysisResources identities used in its
+construction. A successful claim transfers storage on both success and semantic,
+resource or operational rejection. Forged/mismatched ports and duplicate claims
+cannot steal an existing owner. The constructor is private; no incomplete result
+escapes a check or its teardown. This is SOURCE admission, not an AIR publication
+correlation decision or evidence that downstream analysis/CLI has migrated.
+
+SourceSnapshotConstraints walks reachable records/lists using paged work and
+exact (canonical reference, nominal authority) visited keys. Every existing local
+record law, full Java UTF16 code-point extent, conditional physical presence and
+nominal term/predicate arity is checked without resident trees. Shared canonical
+terms must be checked separately under V3 and V4 in either unit order. Empty
+literal/seed/initializer payloads remain permitted; blank identities do not.
+
+SourceSnapshotRelations indexes complete typed (unit, namespace, first, second)
+keys in SourceAdmissionDirectory. Full canonical owner-local handles, not hash
+or concatenated spellings, define equality. Payload ordinals and two paged state
+words are excluded from key comparison. A dedicated row-zero lookup probe is
+never retained. Directories and work/edge queues spill through existing ports;
+there is no per-input resident Map/List/Pojo/JsonNode bridge or alternate AIR parser.
+Checks cover inventory uniqueness, references/ownership, registration origins,
+event/guard/selection/derivation correlations, all version gates, nominal
+declarations/readers/writers/tables/branches/queries and complete native/occurrence
+alternatives. Per-location node counts plus unique, existing, same-location
+qualification references prove exact alternative-set coverage.
+
+All proofs, including unused proofs, use a dependency-indegree ready worklist to
+reject cycles. Qualification grounding uses one pending count per derivation:
+source and distinct caller prerequisites are AND, incoming derivations are OR,
+and a node is queued only on its first reach. Equal source/caller counts once;
+grounded cycles are allowed. These finite logical traversals are O(V+E), in
+addition to paged index comparison/ordinal lookup and physical I/O costs, not a
+universal linear-runtime or no-thrashing claim. Algorithm references:
+[Cornell graph traversal](https://www.cs.cornell.edu/courses/cs4120/2016sp/lectures/lec_traversals/)
+and [Waterloo topological worklist](https://student.cs.uwaterloo.ca/~cs341/lectures/lec12.graphs3.dark.1up.pdf).
+
+The existing funded storage cleanup link also expires the certificate. Explicit
+certificate/storage close and native common-owner expiry clear it before another
+query and retire all owned pages; the backend remains borrowed. Close detaches
+storage before invoking its dependent, and the certificate holds no monitor while
+calling storage close, preventing callback recursion/lock-order inversion.
+
+Observed current focused evidence:26 new methods in four classes;53 independent
+literal inputs accepted by both local and global checks;counterexamples cover
+duplicate/foreign identities, unused proof cycles, ungrounded nodes, missing or
+duplicate alternatives and AND-versus-OR bootstrapping. The frozen factory witness
+passed53 originals and seven independent negatives in10.480s JVM-only. Owner tests
+also cover private construction, forged ports, exact resource/backend identity,
+duplicate claim, denial, primitive faults and live post-admission read failure.
+Directory8192 passed with11904B fixed resident usage including its backend controls,
+1659232B temporary and2528978752B reads;this is not an I/O complexity claim.
+
+The original818022612B input and unchanged SHA256/quotas/cache/watchdog passed actual
+factory admission and the complete selected metadata oracle:ready169.690s,
+oracle173.148s,JVM-only174.342s,heapPeak17493632B,temp4426570016B,
+read8533310144B/write4723565408B,all pools0. The16-row control passed0.414s.
+Neither witness executes analysis or production CLI, and neither is an isolated
+campaign curve. The original production CLI OOM remains RED until its actual
+input/consumer/output route is migrated and independently requalified.
+
+Current boundary capture adds five core classfiles (four authored types and the
+compiler's enum-switch helper), changes only two existing private inward dependency
+sets, and preserves all existing public descriptors, Maven DAG and outer W5
+inventory. Historical W1D source evidence is READ_ONLY. Current inventory refresh
+is limited to that exact reviewed delta;26 new methods are mandatory in FAST.
+Family73/core47 neighbors passed without failures/errors/skips. The current
+original FAST passed871.569s:1246 mandatory methods,zero failures/errors/skips,
+all original compiled guards and contracts. Exact post-FAST audit records1408
+complete project production class paths,2192 consumer files,651 producer tracked
+files and15 runtime jars. Every production class in the frozen literal and capacity
+runtime is byte-identical to the final FAST,including unchanged upstream modules;
+all532 frozen Java sources and original fixtures are unchanged. Helpers shadow no
+production class. Raw logs,commands,source hashes and478 final FAST/audit/XML files
+are preserved in the campaign archive,without binaries or caches. This qualifies
+complete SOURCE admission locally,not the still-resident production SOURCE
+consumer/CLI/output route or the campaign-wide obligations. Earlier foundation
+FAST remains historical and is not relabeled as this delta's FAST.

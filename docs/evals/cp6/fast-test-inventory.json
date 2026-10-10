@@ -482,6 +482,40 @@
       "ordinalLookupKeepsOrderAtEveryLeafAndCarryBoundary",
       "nativeCommonOwnerExpiryRetiresConstructionAndTransferredLiveProjections"
     ],
+    "io.github.gustavo2358.analysis.dependencies.SourceSnapshotConstraintsTest": [
+      "scalarConstraintsRejectInvalidMetadataEvenWhenNoConsumerDemandsIt",
+      "fullUtf16CodePointExtentIncludesUnpairedSurrogatesAndEmptyLiterals",
+      "conditionalPhysicalPresenceAndExpressionAuthorityAreNotOptionalDefaults",
+      "recursiveTermsUsePagedWorkAndCheckTheDeepestInvalidPayload",
+      "sharedCanonicalTermsMustBeCheckedInEveryAuthorityInEitherUnitOrder",
+      "initializerUniquenessUsesTheCompleteOriginAndValueNotOneField",
+      "existingLiteralResidentContractsPassLocalChecksWithoutReconstruction",
+      "deniedCheckerControlLeavesNoAdditionalPagesOrSuccessfulAdmission"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceAdmissionDirectoryTest": [
+      "everyKeyComponentAndNamespaceParticipatesInExactIdentity",
+      "ordinalPayloadAndStateSpillWithoutResidentGrowthOrLookupInsertion",
+      "constructorDenialAndExplicitCloseReleaseOnlyOwnedPages",
+      "primitiveFailurePoisonsTheDirectoryPreservingPrimaryFailureAndBorrowedBackend",
+      "nativeCommonOwnerExpiryImmediatelyRetiresAllDirectoryPagesAndState"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceSnapshotRelationsTest": [
+      "everyExistingLiteralPassesTheGlobalRelationChecker",
+      "duplicateInventoryAndForeignStatementOwnershipAreRejected",
+      "unusedProofCyclesAndUngroundedQualificationNodesAreRejected",
+      "missingAndDuplicateAlternativesCannotProduceSuccess",
+      "callerAndSourceRemainAndWhileIncomingDerivationsRemainOr"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceAdmissionSnapshotTest": [
+      "legitimateFactoryBindsAllUnitOrdinalsAndCannotBeConstructedOrClaimedTwice",
+      "foreignResourcesAndForeignBackendCannotStealOrCertifyTheOwner",
+      "controlDenialAfterOwnershipClaimRetiresTheStorageBeforeAnotherQuery",
+      "explicitStorageCloseExpiresTheIssuedCertificateBeforeTheNextQuery",
+      "nativeCommonOwnerCloseImmediatelyExpiresStorageAndCertificate",
+      "arbitrarySourcePortCannotManufactureAdmissionEvenWithoutAnObservableMethodCall",
+      "semanticRejectionExpiresTheClaimedSourceWithoutLeakingPartialCertificate",
+      "everyPrimitiveFaultDuringAdmissionAndReadFaultAfterAdmissionRetireAllOwners"
+    ],
     "io.github.gustavo2358.analysis.adapters.SourceSnapshotJsonTest": [
       "physicalWireMapsCompleteMetadataAndDuplicateOrdinalsWithoutResidentModel",
       "closedMappingRejectsFractionExponentOverflowWrongShapeAndNull",

@@ -9,6 +9,7 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.INDEX;
     private static final int LEAF=100,BRANCH=101,LIST_WIDTH=96;
     private final AnalysisResources resources;
+    private final PageStore pages;
     private final AnalysisResources.Reservation control;
     private SourceTextDictionary texts;
     private SourceRecordStore records;
@@ -18,7 +19,7 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
     private long issuedLists,activeLists;
     private boolean closed;
     public SourceSnapshotBuilder(PageStore pages,AnalysisResources resources) {
-        this.resources=Objects.requireNonNull(resources);Objects.requireNonNull(pages);
+        this.resources=Objects.requireNonNull(resources);this.pages=Objects.requireNonNull(pages);
         control=resources.reserve(AnalysisResources.Pool.RESIDENT,1024,PHASE);
         try {recipe=new long[SourceRecordStore.FIELDS];texts=new SourceTextDictionary(pages,resources,PHASE);records=new SourceRecordStore(pages,resources);lists=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);expiry=new Expiry(this);control.onOwnerClose(expiry::expire);}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
@@ -95,7 +96,7 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
             if(shape(root)!=SourceShape.ROOT)throw new IllegalArgumentException("source root required");
             if(activeLists!=0)throw new IllegalStateException("unfinished source inventory");
             records.seal();lists.close();lists=null;open();recipe=null;
-            var snapshot=new Snapshot(root,resources,control,texts,records,expiry);expiry.owner=snapshot;expiry=null;closed=true;texts=null;records=null;return snapshot;
+            var snapshot=new Snapshot(root,pages,resources,control,texts,records,expiry);expiry.owner=snapshot;expiry=null;closed=true;texts=null;records=null;return snapshot;
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     private void abort(Throwable failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}}
@@ -107,6 +108,24 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
     private static Throwable add(Throwable first,Throwable next){if(first==null)return next;if(first!=next)first.addSuppressed(next);return first;}
     private static void rethrow(Throwable failure){if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("source snapshot cleanup",failure);}
 
+    /** Only the sealed implementation can transfer into the legitimate factory. */
+    static void claimAdmission(SourceSnapshot source,PageStore pages,AnalysisResources resources) {
+        if(!(source instanceof Snapshot snapshot))throw new IllegalArgumentException("immutable source owner required");
+        synchronized(snapshot) {
+            snapshot.open();
+            if(snapshot.pages!=pages||snapshot.resources!=resources)throw new IllegalArgumentException("source admission owner/backend/resources mismatch");
+            if(snapshot.admissionClaimed)throw new IllegalStateException("source admission already claimed");
+            snapshot.admissionClaimed=true;
+        }
+    }
+    static void attachAdmission(SourceSnapshot source,SourceAdmissionSnapshot admission) {
+        var snapshot=(Snapshot)source;
+        synchronized(snapshot) {
+            snapshot.open();if(!snapshot.admissionClaimed||snapshot.admission!=null)throw new IllegalStateException("source admission attachment");
+            snapshot.admission=Objects.requireNonNull(admission);
+        }
+    }
+
     /** One fixed cleanup action follows transfer; explicit builder close cannot expire its result. */
     private static final class Expiry {
         private AutoCloseable owner;
@@ -116,13 +135,16 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
 
     private static final class Snapshot implements SourceSnapshot {
         private long root;
+        private final PageStore pages;
         private final AnalysisResources resources;
         private AnalysisResources.Reservation control;
         private SourceTextDictionary texts;
         private SourceRecordStore records;
         private Expiry expiry;
         private Projection projections;
-        private Snapshot(long root,AnalysisResources resources,AnalysisResources.Reservation control,SourceTextDictionary texts,SourceRecordStore records,Expiry expiry){this.root=root;this.resources=resources;this.control=control;this.texts=texts;this.records=records;this.expiry=expiry;}
+        private SourceAdmissionSnapshot admission;
+        private boolean admissionClaimed;
+        private Snapshot(long root,PageStore pages,AnalysisResources resources,AnalysisResources.Reservation control,SourceTextDictionary texts,SourceRecordStore records,Expiry expiry){this.root=root;this.pages=pages;this.resources=resources;this.control=control;this.texts=texts;this.records=records;this.expiry=expiry;}
         private void open(){if(records==null)throw new IllegalStateException("source snapshot expired");}
         private void abort(Throwable failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}}
         private long word(long ref,int field){if(ref<=0||(ref&3)!=2)throw new IllegalArgumentException("source record reference required");return records.field(ref>>>2,field);}
@@ -159,8 +181,9 @@ public final class SourceSnapshotBuilder implements AutoCloseable {
         @Override public synchronized void close() {
             if(records==null)return;expiry.owner=null;expiry=null;Throwable failure=null;
             while(projections!=null)try{release(projections);}catch(RuntimeException|Error cleanup){failure=add(failure,cleanup);}
-            var rows=records;records=null;var text=texts;texts=null;var lease=control;control=null;root=0;
-            for(AutoCloseable owner:new AutoCloseable[]{rows,text,lease})try{owner.close();}catch(Exception|Error cleanup){failure=add(failure,cleanup);}rethrow(failure);
+            var rows=records;records=null;var text=texts;texts=null;var lease=control;control=null;var dependent=admission;admission=null;root=0;
+            // Detach storage first: admission close may re-enter this owner.
+            for(AutoCloseable owner:new AutoCloseable[]{dependent,rows,text,lease})if(owner!=null)try{owner.close();}catch(Exception|Error cleanup){failure=add(failure,cleanup);}rethrow(failure);
         }
     }
     private static final class Projection implements SourceSnapshot.TextProjection {
