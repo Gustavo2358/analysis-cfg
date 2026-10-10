@@ -261,7 +261,19 @@ public record QualifiedSourceDependencies(String schema, String version, String 
             var sourceStatements=unique(statements,Statement::id);var sourceNodes=unique(nodes,Node::id);var uses=new HashSet<String>();
             // Exact alternative sets shared by all uses at a location; no files × nodes scan.
             var nodesByLocation=new HashMap<String,Set<String>>();
-            for(var node:nodes)nodesByLocation.computeIfAbsent(node.location(),ignored->new HashSet<>()).add(node.id());
+            for(var node:nodes) {
+                var alternatives=nodesByLocation.get(node.location());
+                if(alternatives==null)nodesByLocation.put(node.location(),Set.of(node.id()));
+                else if(!alternatives.contains(node.id())) {
+                    // Most locations have one node. A mutable table is needed only
+                    // after a second distinct ID; exact full alternatives still win.
+                    if(!(alternatives instanceof HashSet<String>)) {
+                        alternatives=new HashSet<>(alternatives);
+                        nodesByLocation.put(node.location(),alternatives);
+                    }
+                    alternatives.add(node.id());
+                }
+            }
             for(var f:nativeFiles) {
                 require(f.statement().unit().equals(unit)&&sourceStatements.containsKey(f.statement()),"native file statement");
                 require(uses.add(f.statement().handle()+"/"+f.ordinal()),"duplicate native file use");refs(f.qualifications(),sourceNodes,progress);
