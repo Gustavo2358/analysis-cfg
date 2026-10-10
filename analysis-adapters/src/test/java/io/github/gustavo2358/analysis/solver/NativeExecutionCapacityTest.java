@@ -24,7 +24,7 @@ final class NativeExecutionCapacityTest {
     /** Stored reference slots only,not decoded projections or measured heap bytes. */
     private static int retainedStates(DataflowResult<?> result) throws ReflectiveOperationException {
         int held=0;
-        for(String name:List.of("in","out")){var field=DataflowResult.class.getDeclaredField(name);field.setAccessible(true);for(Object value:(Object[])field.get(result))if(value!=null)held++;}
+        for(String name:List.of("in","out")){var field=DataflowResult.class.getDeclaredField(name);field.setAccessible(true);var states=(Object[])field.get(result);if(states!=null)for(Object value:states)if(value!=null)held++;}
         return held;
     }
 

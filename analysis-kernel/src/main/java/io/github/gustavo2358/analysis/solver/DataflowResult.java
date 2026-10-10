@@ -9,8 +9,8 @@ import java.lang.ref.WeakReference;
 
 /** Constructed only after convergence. Roots obey the definition's isolation contract. */
 public final class DataflowResult<S> implements AutoCloseable {
-    private final IdentityHashMap<ContextView, IdentityHashMap<ProgramIndex.Node, List<AnalysisPoint>>> lookup;
-    private final Object[] in, out;
+    private IdentityHashMap<ContextView, Map<ProgramIndex.Node, List<AnalysisPoint>>> lookup;
+    private Object[] in, out;
     private final SolverMetrics metrics;
     private ProgramStore program;
     private AnalysisResources.Reservation retainedCapacity,statesCapacity;
@@ -24,7 +24,7 @@ public final class DataflowResult<S> implements AutoCloseable {
         retainedCapacity=topology.retainedCapacity();this.statesCapacity=statesCapacity;
         registerExpiry(this,statesCapacity,retainedCapacity);
     }
-    private DataflowResult(IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>> lookup,Object[] in,Object[] out,SolverMetrics metrics,
+    private DataflowResult(IdentityHashMap<ContextView,Map<ProgramIndex.Node,List<AnalysisPoint>>> lookup,Object[] in,Object[] out,SolverMetrics metrics,
             ProgramStore owner,AnalysisResources.Reservation retained,AnalysisResources.Reservation states) {
         this.lookup=lookup;this.in=in;this.out=out;this.metrics=metrics;
         program=owner.executionBudget().isPresent()?owner:null;retainedCapacity=retained;statesCapacity=states;
@@ -44,7 +44,7 @@ public final class DataflowResult<S> implements AutoCloseable {
     static final class Builder<S> implements AutoCloseable {
         private final ProgramStore program;
         private final AnalysisResources resources;
-        private IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>> lookup;
+        private IdentityHashMap<ContextView,Map<ProgramIndex.Node,List<AnalysisPoint>>> lookup;
         private List<S> ins,outs;
         private AnalysisResources.Reservation retained,working,states;
         Builder(ProgramStore program,AnalysisResources resources) {
@@ -128,6 +128,7 @@ public final class DataflowResult<S> implements AutoCloseable {
     private void open(){if(closed)throw new IllegalStateException("dataflow result is closed");if(program!=null)program.progress(ProgramStore.ExecutionPhase.DOMAIN);}
     /** Stable status/metrics are detached history; state roots expire with this lease. */
     @Override public void close(){if(closed)return;closed=true;Arrays.fill(in,null);Arrays.fill(out,null);lookup.clear();
+        in=null;out=null;lookup=null;
         var states=statesCapacity;var retained=retainedCapacity;statesCapacity=null;retainedCapacity=null;program=null;
         AnalysisResources.closeCapacities(states,retained);}
 }

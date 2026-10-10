@@ -31,6 +31,42 @@ public final class ContextView {
         if(node.identity!=index.identity||!node.owner().id().equals(entry.id().unit()))throw new IllegalArgumentException("foreign node");
         return OpenControl.bound(node,index.policy);
     }
+    /** Opaque exact destination-group identity for ordinary structural discovery only. */
+    public OpenGroup unknownGroup(ProgramIndex.Node node) {
+        var bound=unknownControl(node);
+        return bound instanceof io.github.gustavo2358.air.model.Scopes.WithinControl within
+            ?new OpenGroup(index.identity,entry.id(),within.scope()):null;
+    }
+    /** Immutable snapshot/owner/full-scope key; never a license to group edge transfers. */
+    public static final class OpenGroup {
+        private final Object indexIdentity;
+        private final io.github.gustavo2358.air.model.Ids.EntryId activation;
+        private final io.github.gustavo2358.air.model.Scopes.ControlScope scope;
+        private OpenGroup(Object indexIdentity,io.github.gustavo2358.air.model.Ids.EntryId activation,
+                io.github.gustavo2358.air.model.Scopes.ControlScope scope){this.indexIdentity=indexIdentity;this.activation=activation;this.scope=scope;}
+        @Override public int hashCode(){return 31*(31*System.identityHashCode(indexIdentity)+activation.hashCode())+scope.hashCode();}
+        @Override public boolean equals(Object other){return other instanceof OpenGroup group
+            &&indexIdentity==group.indexIdentity&&activation.equals(group.activation)&&scope.equals(group.scope);}
+        /** Conservative key capacity, charging temporary traversal before allocation. */
+        public long keyBytes(java.util.function.LongConsumer reserveScratch) {
+            Objects.requireNonNull(reserveScratch);reserveScratch.accept(128);
+            long bytes=512;var pending=new java.util.ArrayDeque<io.github.gustavo2358.air.model.Scopes.ControlScope>();pending.add(scope);
+            while(!pending.isEmpty()) {
+                reserveScratch.accept(0);
+                var current=pending.removeLast();bytes=Math.addExact(bytes,96);
+                if(current instanceof io.github.gustavo2358.air.model.Scopes.UnitControl unit)bytes=Math.addExact(bytes,unitBytes(unit.unit()));
+                else if(current instanceof io.github.gustavo2358.air.model.Scopes.LabelsControl labels)for(var label:labels.labels()) {
+                    reserveScratch.accept(0);bytes=Math.addExact(bytes,96+unitBytes(label.unit())+textBytes(label.localId()));
+                }
+                else if(current instanceof io.github.gustavo2358.air.model.Scopes.ControlUnion union) {
+                    reserveScratch.accept(64L*union.members().size());pending.addAll(union.members());
+                }
+            }
+            return bytes;
+        }
+        private static long textBytes(String text){return 32+2L*text.length();}
+        private static long unitBytes(io.github.gustavo2358.air.model.Ids.UnitId unit){return 96+textBytes(unit.publication().localId())+textBytes(unit.localId());}
+    }
 
     private void requireOrdinary() {
         if(!index.localRules.isEmpty())throw new IllegalArgumentException("local control requires a traversal point with its stack");

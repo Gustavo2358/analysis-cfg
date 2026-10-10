@@ -61,9 +61,13 @@ final class NativeActivationLifetimeTest {
                 try {
                     var session=session(program,input.checked());var context=session.contexts().iterator().next();var node=context.entryNode();
                     var result=DataflowSolver.solve(session,definition(session,direction));
-                    assertEquals(List.of(1),result.states(context,node,true));program.close();
+                    assertEquals(List.of(1),result.states(context,node,true));
+                    var expiredSlots=new java.util.ArrayList<Object[]>();
+                    for(String name:List.of("in","out")){var field=DataflowResult.class.getDeclaredField(name);field.setAccessible(true);expiredSlots.add((Object[])field.get(result));}
+                    program.close();
                     assertThrows(IllegalStateException.class,()->result.states(context,node,true));
-                    for(String name:List.of("in","out")){var field=DataflowResult.class.getDeclaredField(name);field.setAccessible(true);for(Object state:(Object[])field.get(result))assertNull(state,"expired state slot "+name);}
+                    for(var slots:expiredSlots)for(Object state:slots)assertNull(state,"expired state slot");
+                    for(String name:List.of("in","out","lookup")){var field=DataflowResult.class.getDeclaredField(name);field.setAccessible(true);assertNull(field.get(result),"expired result still owns backing capacity "+name);}
                     assertEquals(before,resources.heapUsed());assertEquals(shape,snapshot.shape(root));
                     result.close();assertEquals(DataflowResult.Status.STABLE,result.status());assertEquals(10,result.metrics().analysisPoints());
                 }finally{program.close();}

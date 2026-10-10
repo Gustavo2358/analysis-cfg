@@ -41,9 +41,6 @@ public final class DataflowSolver {
             run.initializationAttempts = Math.incrementExact(run.initializationAttempts);
             run.enqueueIfAbsent(p);
         }
-        int[] heads = forward ? graph.forwardHead : graph.backwardHead;
-        int[] next = forward ? graph.forwardNext : graph.backwardNext;
-        int[] destinations = forward ? graph.to : graph.from;
         while (run.queue.size() != 0) {
             session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             int p = run.queue.remove();
@@ -61,11 +58,16 @@ public final class DataflowSolver {
             run.published[p] = true;
             if (first) run.first = Math.incrementExact(run.first);
             else run.changed = Math.incrementExact(run.changed);
-            for (int e = heads[p]; e != -1; e = next[e]) {
+            var point=graph.points[p];
+            var edges=forward?point.context().successors(point.node()):point.context().predecessors(point.node());
+            while(edges.advance()) {
                 session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
-                int destination = destinations[e];
+                var target=graph.find(point.context(),forward?edges.target():edges.source());
+                if(target==null)continue; // Backward cannot introduce program-unreachable points.
+                int destination=target.ordinal;
+                if(first)run.contextualEdges=Math.incrementExact(run.contextualEdges);
                 run.edgeTransfers = Math.incrementExact(run.edgeTransfers);
-                S contribution = Objects.requireNonNull(definition.transferEdge(graph.points[p], graph.edges[e], candidate, work), "edge root");
+                S contribution = Objects.requireNonNull(definition.transferEdge(point, edges.transition(), candidate, work), "edge root");
                 run.edgeJoins = Math.incrementExact(run.edgeJoins);
                 var joined = definition.joinInto(run.anchor(destination), contribution, work);
                 if (joined.changed()) {
@@ -94,7 +96,7 @@ public final class DataflowSolver {
         private AnalysisResources.Reservation statesCapacity,workingCapacity;
         long boundaryJoins, initializationAttempts, attempts, pushes, pops, duplicates, maxSize;
         long transfers, first, changed, unchanged, edgeTransfers, edgeJoins, accumulatorChanged, accumulatorUnchanged;
-        long predecessorReads, successorReads;
+        long predecessorReads, successorReads,contextualEdges;
         Run(SolverTopology graph, AnalysisDefinition<S> definition, Function<SolverTopology,IntWorklist> schedule, boolean forward, DomainWork work) {
             this.graph = graph;this.forward = forward; this.work = work;
             int size = graph.points.length;
@@ -125,7 +127,7 @@ public final class DataflowSolver {
             pushes = Math.incrementExact(pushes); maxSize = Math.max(maxSize, queue.size());
         }
         SolverMetrics snapshot() {
-            return new SolverMetrics(graph.points.length, graph.edges.length, boundaryJoins, initializationAttempts,
+            return new SolverMetrics(graph.points.length, contextualEdges, boundaryJoins, initializationAttempts,
                     attempts, pushes, pops, duplicates, maxSize, transfers, work.operations(), first, changed,
                     unchanged, edgeTransfers, edgeJoins, accumulatorChanged, accumulatorUnchanged,
                     predecessorReads, successorReads, work.joinEntries(), work.compareEntries());
