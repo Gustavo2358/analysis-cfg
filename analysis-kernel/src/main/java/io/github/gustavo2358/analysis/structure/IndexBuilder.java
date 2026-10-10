@@ -26,6 +26,9 @@ final class IndexBuilder {
     private long expectedOutside;
     Map<OperationId, ProgramIndex.Site> operations;
     private ProgramStore.OperationDirectory operationDirectory;
+    ProgramStore.OperandDirectory operandDirectory;
+    private ProgramStore.OrdinalColumn operandMembership;
+    private long registeredOperands;
     final Map<Class<? extends Operation>, List<ProgramIndex.Site>> buckets = new HashMap<>();
     final ProgramIndex.Declarations objects = new ProgramIndex.Declarations();
     final ProgramIndex.Storages storage = new ProgramIndex.Storages();
@@ -84,12 +87,17 @@ final class IndexBuilder {
         // transfers directly; it never captures this construction lifetime.
         operations=new OperationTable<>(store);
         operationDirectory=store.operationDirectory().orElse(null);
-        payload();
-        store.operationDirectory().ifPresent(directory->valid(operations.size()==directory.size(),"changed Operation inventory"));
-        nodes(graph);
-        edges(graph);
-        localRules=graph.localRules();
-        return new ProgramIndex(this);
+        operandDirectory=store.operandDirectory().orElse(null);
+        try(var membership=operandDirectory==null?null:operandDirectory.column(operandDirectory.size())) {
+            operandMembership=membership;
+            payload();
+            if(operandDirectory!=null)valid(registeredOperands==operandDirectory.size(),"changed Operand inventory");
+            store.operationDirectory().ifPresent(directory->valid(operations.size()==directory.size(),"changed Operation inventory"));
+            nodes(graph);
+            edges(graph);
+            localRules=graph.localRules();
+            return new ProgramIndex(this);
+        } finally {operandMembership=null;}
     }
 
 
@@ -226,11 +234,17 @@ final class IndexBuilder {
             Operand operand = pending.removeLast();
             count.visit("operands");
             valid(operand.header().id().owner().equals(expectedOwner), "foreign Operand owner");
-            valid(operandIds.add(operand.header().id()), "duplicate Operand occurrence");
-            if(operand instanceof Place place)places.put(place.header().id(),place);
+            if(operandDirectory==null)valid(operandIds.add(operand.header().id()), "duplicate Operand occurrence");
+            else {
+                int ordinal=operandDirectory.ordinal(operand.header().id());
+                valid(ordinal>=0,"foreign Operand inventory occurrence");
+                valid(operandMembership.get(ordinal)==0,"duplicate Operand occurrence");
+                operandMembership.set(ordinal,1);registeredOperands=Math.incrementExact(registeredOperands);
+            }
+            if(operandDirectory==null&&operand instanceof Place place)places.put(place.header().id(),place);
             if (operand instanceof Places.ObjectPlace place) {
                 ObjectId declaration = resolveObject(place.object());
-                objectReferences.put(place.header().id(), declaration);
+                if(operandDirectory==null)objectReferences.put(place.header().id(), declaration);
             }
             pending.addAll(Operands.children(operand));
         }

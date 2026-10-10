@@ -38,15 +38,38 @@ public final class StatementEffects {
     }
     public record CapturedBytes(StorageIndex.Resolution source, BigInteger length) implements Source { }
     public record UnknownSource(String reason) implements Source { }
-    public record Read(Optional<OperandId> occurrence,ReadKind kind,StorageIndex.Resolution location) { }
+    /** An occurrence address, not an owning copy of its complete OperationOwner. */
+    public static final class OccurrenceRef {
+        private final Optional<OperandId> resident;
+        private final ProgramStore.OperandDirectory owner;
+        private final int ordinal;
+        private OccurrenceRef(Optional<OperandId> value){resident=Objects.requireNonNull(value);owner=null;ordinal=-1;}
+        private OccurrenceRef(ProgramStore.OperandDirectory owner,OperandId identity){
+            this.owner=Objects.requireNonNull(owner);resident=null;ordinal=owner.ordinal(identity);
+            if(ordinal<0)throw new IllegalArgumentException("operand outside prepared snapshot");
+        }
+        public Optional<OperandId> value(){return owner==null?resident:Optional.of(owner.identity(ordinal));}
+        @Override public boolean equals(Object other){return this==other||other instanceof OccurrenceRef reference&&value().equals(reference.value());}
+        @Override public int hashCode(){return value().hashCode();}
+        @Override public String toString(){return value().toString();}
+    }
+    public record Read(OccurrenceRef reference,ReadKind kind,StorageIndex.Resolution location) {
+        public Read {Objects.requireNonNull(reference);}
+        public Read(Optional<OperandId> occurrence,ReadKind kind,StorageIndex.Resolution location){this(new OccurrenceRef(occurrence),kind,location);}
+        public Optional<OperandId> occurrence(){return reference.value();}
+    }
     public record Target(StorageIndex.Location location,Strength strength,boolean sourceApplicable,List<PremiseId> premises,List<String> reasons) {
         public Target { premises=List.copyOf(premises);reasons=List.copyOf(reasons); }
     }
     /** Logical identity is not a physical allocation or a disjointness proof. */
     public record LogicalTarget(ObjectId object,boolean sourceApplicable) { }
-    public record Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,
+    public record Write(int slot,OccurrenceRef reference,StorageIndex.Resolution destination,Source source,List<Target> targets,
                         Selection selection,Strength occurrenceStrength,List<LogicalTarget> logicalTargets) {
-        public Write { logicalTargets=List.copyOf(logicalTargets);if(!(targets instanceof WholeTargets))targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+        public Write { Objects.requireNonNull(reference);logicalTargets=List.copyOf(logicalTargets);if(!(targets instanceof WholeTargets))targets=List.copyOf(targets);Objects.requireNonNull(selection);Objects.requireNonNull(occurrenceStrength); }
+        public Optional<OperandId> occurrence(){return reference.value();}
+        public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,Selection selection,Strength occurrenceStrength,List<LogicalTarget> logicalTargets) {
+            this(slot,new OccurrenceRef(occurrence),destination,source,targets,selection,occurrenceStrength,logicalTargets);
+        }
         public Write(int slot,Optional<OperandId> occurrence,StorageIndex.Resolution destination,Source source,List<Target> targets,Selection selection,Strength occurrenceStrength) {
             this(slot,occurrence,destination,source,targets,selection,occurrenceStrength,List.of());
         }
@@ -65,6 +88,7 @@ public final class StatementEffects {
         @Override public int hashCode(){return Objects.hash(operation(),reads,writes,outcomes,otherwise);}
     }
     private final StorageIndex storage;
+    private final ProgramStore.OperandDirectory operands;
     private record OpenLocation(int declarationOrdinal,ObjectId object,StorageIndex.Location location) { }
     private final Map<StorageId,List<OpenLocation>> openByBase;
     private final WholeAliases wholeAliases;
@@ -74,6 +98,7 @@ public final class StatementEffects {
         this.storage=Objects.requireNonNull(storage);
         var byBase=new HashMap<StorageId,List<OpenLocation>>();
         var store=storage.session().index().store();
+        operands=store.operandDirectory().orElse(null);
         statements=new OperationTable<>(store);
         var declarations=store.declarationInventory();var inventory=store.storageInventory();
         WholeAliases broad=null;int declarationOrdinal=0;
@@ -259,7 +284,7 @@ public final class StatementEffects {
             if(storage.session().index().unprovedPreconditions(operation.header().id()))strength=Strength.MAY;
             var place=occurrence.map(places::get).orElse(null);
             var targets=targets(destination,strength);
-            out.add(new Write(nextSlot++,occurrence,destination,source,targets,Selection.SINGLE_DESTINATION,strength,logicalTargets(place,targets)));
+            out.add(new Write(nextSlot++,borrow(occurrence),destination,source,targets,Selection.SINGLE_DESTINATION,strength,logicalTargets(place,targets)));
         }
         List<LogicalTarget> logicalTargets(Place place,List<Target> targets) {
             // Index once by positive storage scope; no write scans unrelated open objects.
@@ -313,7 +338,7 @@ public final class StatementEffects {
             var place=places.get(id);if(place==null)throw new IllegalArgumentException("effect references a non-place occurrence");return storage.resolve(place);
         }
         void envelope(Envelopes.MemoryEnvelope e,List<Write> out) {
-            for(var id:e.knownReads())reads.add(new Read(Optional.of(id),ReadKind.VALUE,occurrence(id)));
+            for(var id:e.knownReads())reads.add(new Read(borrow(Optional.of(id)),ReadKind.VALUE,occurrence(id)));
             boundRead(e.otherReads(),ReadKind.FOREIGN);
             if(e.otherWrites() instanceof Scopes.WithinMemory w)scopeWrite(out,w.scope(),"ENVELOPE_MAY_WRITE");
             for(var id:e.knownWrites())write(out,Optional.of(id),occurrence(id),Strength.MAY,new UnknownSource("ENVELOPE_KNOWN_WRITE"));
@@ -330,7 +355,7 @@ public final class StatementEffects {
                     if(p instanceof Places.RegionSlice s){pending.push(new Visit(s.length(),ReadKind.ADDRESS));pending.push(new Visit(s.offset(),ReadKind.ADDRESS));}
                     else if(p instanceof Places.Choice c)for(int i=c.candidates().size()-1;i>=0;i--)pending.push(new Visit(c.candidates().get(i),ReadKind.ADDRESS));
                 } else if(operand instanceof Expressions.Read r) {
-                    reads.add(new Read(Optional.of(r.header().id()),role,storage.resolve(r.place())));pending.push(new Visit(r.place(),ReadKind.ADDRESS));
+                    reads.add(new Read(borrow(Optional.of(r.header().id())),role,storage.resolve(r.place())));pending.push(new Visit(r.place(),ReadKind.ADDRESS));
                 } else if(operand instanceof Expressions.Unknown u) {
                     boundRead(u.remainingReads(),role);for(int i=u.dependencies().size()-1;i>=0;i--)pending.push(new Visit(u.dependencies().get(i),role));
                 } else {
@@ -339,5 +364,8 @@ public final class StatementEffects {
                 }
             }
         }
+    }
+    private OccurrenceRef borrow(Optional<OperandId> identity){
+        return operands!=null&&identity.isPresent()?new OccurrenceRef(operands,identity.orElseThrow()):new OccurrenceRef(identity);
     }
 }

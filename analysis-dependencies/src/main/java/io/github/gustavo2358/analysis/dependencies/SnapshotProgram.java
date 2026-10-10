@@ -41,6 +41,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private NativeDeclarations declarationInventory;
     private NativeStorages storageInventory;
     private NativeOperations operationDirectory;
+    private NativeOperands operandDirectory;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private final EnumMap<ProjectionPolicy,SnapshotNodes> nodeStores=new EnumMap<>(ProjectionPolicy.class);
     private boolean closed;
@@ -433,6 +434,78 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
             }
             return -1;
         }
+        @Override public void close(){
+            if(ended)return;ended=true;Throwable failure=null;
+            for(var tape:new SnapshotOrderStorage.Tape[]{sourceOrder,sourceKeys,lookupOrder})if(tape!=null)
+                try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            sourceOrder=sourceKeys=lookupOrder=null;
+            if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
+        }
+    }
+    @Override public Optional<ProgramStore.OperandDirectory> operandDirectory(){
+        borrowedOpen();if(operandDirectory==null)operandDirectory=new NativeOperands();return Optional.of(operandDirectory);
+    }
+    /** The append-only paged source tape is also the typed traversal frontier.
+     * No resident queue, OperandId set or decoded operand catalogue is retained. */
+    private final class NativeOperands implements ProgramStore.OperandDirectory,AutoCloseable {
+        private SnapshotOrderStorage.Tape sourceOrder,sourceKeys,lookupOrder;
+        private boolean ended;
+        NativeOperands(){
+            try {
+                sourceOrder=orderStorage.tape();sourceKeys=orderStorage.tape();
+                long units=field(snapshot.root(),4);
+                for(long u=0;u<snapshot.size(units);u++) {
+                    long unit=snapshot.element(units,UNIT,u),sequences=field(unit,5);
+                    for(long s=0;s<snapshot.size(sequences);s++) {
+                        long sequence=snapshot.element(sequences,SEQUENCE,s),instructions=field(sequence,1);
+                        for(long at=0;at<snapshot.size(instructions);at++)
+                            SnapshotOperands.roots(snapshot,snapshot.element(instructions,INSTRUCTION,at),sourceOrder::append);
+                        SnapshotOperands.roots(snapshot,field(sequence,2),sourceOrder::append);
+                    }
+                    long entries=field(unit,4);
+                    for(long e=0;e<snapshot.size(entries);e++) {
+                        long entry=snapshot.element(entries,ENTRIES_ENTRY,e),conditions=field(field(entry,3),0);
+                        for(long c=0;c<snapshot.size(conditions);c++) {
+                            long condition=snapshot.element(conditions,ENTRIES_INITIAL_CONDITION,c);
+                            sourceOrder.append(field(condition,0));long value=field(condition,1);
+                            if(snapshot.shape(value)==ENTRIES_LITERAL_INITIAL)sourceOrder.append(field(value,0));
+                            else if(snapshot.shape(value)==ENTRIES_POSSIBLE_LITERALS) {
+                                long candidates=field(value,0);
+                                for(long at=0;at<snapshot.size(candidates);at++)sourceOrder.append(snapshot.element(candidates,EXPRESSION,at));
+                            }
+                        }
+                    }
+                }
+                for(long at=0;at<sourceOrder.size();at++)SnapshotOperands.children(snapshot,sourceOrder.handle(at),sourceOrder::append);
+                try(var index=orderStorage.open((a,b)->Long.compare(sourceKeys.handle(a-1),sourceKeys.handle(b-1)))) {
+                    for(long at=0;at<sourceOrder.size();at++) {
+                        sourceKeys.append(keys.key(field(field(sourceOrder.handle(at),0),0)));index.add(at+1);
+                    }
+                    lookupOrder=orderStorage.tape();long previous=0;
+                    try(var rows=index.cursor()) {
+                        while(rows.advance()) {
+                            long ordinal=rows.handle(),key=sourceKeys.handle(ordinal-1);
+                            if(key<=previous)throw new IllegalArgumentException("duplicate canonical Operand identity");
+                            lookupOrder.append(ordinal);previous=key;
+                        }
+                    }
+                    if(lookupOrder.size()!=sourceOrder.size())throw new IllegalArgumentException("changed Operand inventory");
+                }
+            }catch(RuntimeException|Error failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        private void available(){borrowedOpen();if(ended)throw new IllegalStateException("native operand directory is closed");}
+        @Override public int size(){available();return Math.toIntExact(sourceOrder.size());}
+        @Override public OperandId identity(int ordinal){available();Objects.checkIndex(ordinal,size());return occurrence(field(field(sourceOrder.handle(ordinal),0),0),OperandId.class);}
+        @Override public Operand at(int ordinal){available();Objects.checkIndex(ordinal,size());return occurrence(sourceOrder.handle(ordinal),Operand.class);}
+        @Override public int ordinal(OperandId identity){
+            available();Objects.requireNonNull(identity);long wanted=keys.key(identity),low=0,high=lookupOrder.size();
+            while(low<high) {
+                long middle=low+(high-low)/2,ordinal=lookupOrder.handle(middle)-1,found=sourceKeys.handle(ordinal);
+                if(found<wanted)low=middle+1;else if(found>wanted)high=middle;else return Math.toIntExact(ordinal);
+            }
+            return -1;
+        }
+        @Override public ProgramStore.OrdinalColumn column(long length){available();return storageInventory().orElseThrow().column(length);}
         @Override public void close(){
             if(ended)return;ended=true;Throwable failure=null;
             for(var tape:new SnapshotOrderStorage.Tape[]{sourceOrder,sourceKeys,lookupOrder})if(tape!=null)
@@ -1170,6 +1243,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         try{if(declarationInventory!=null)declarationInventory.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
         try{if(storageInventory!=null)storageInventory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(operationDirectory!=null)operationDirectory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        try{if(operandDirectory!=null)operandDirectory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var nodes:nodeStores.values())try{nodes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(unitOrder!=null)unitOrder.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var tape:metadataOrders.values())try{tape.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}

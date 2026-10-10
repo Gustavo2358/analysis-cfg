@@ -35,7 +35,18 @@ public final class RegionalValuesAnalysis {
     private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes;
     private final Map<OperationId,List<Plan>> otherwise;
     private final Map<EntryId,List<Plan>> initial=new HashMap<>();
-    private final List<ValueFact.Support> events=new ArrayList<>();
+    private final List<SupportRef> supportAddresses=new ArrayList<>();
+    private final List<ValueFact.Support> events=new AbstractList<>() {
+        @Override public int size(){return supportAddresses.size();}
+        @Override public ValueFact.Support get(int ordinal){return supportAddresses.get(ordinal).value();}
+    };
+    private record SupportRef(StatementEffects.OperationRef operation,ValueFact.Support resident,OriginId origin,List<PremiseId> premises) {
+        ValueFact.Support value(){return operation==null?resident:new ValueFact.Support(operation.value().header().id(),origin,premises);}
+    }
+    private void support(StatementEffects.OperationRef operation,Id evidence,OriginId origin,List<PremiseId> premises){
+        supportAddresses.add(operation==null?new SupportRef(null,new ValueFact.Support(evidence,origin,premises),null,List.of())
+            :new SupportRef(operation,null,origin,premises));
+    }
     private final List<PreparedEvent> eventDetails=new ArrayList<>();
     private final Set<UnitId> controlOpen=new HashSet<>();
     private record TargetRef(StatementEffects.Write write,int ordinal,StatementEffects.Target replacement) {
@@ -348,12 +359,12 @@ public final class RegionalValuesAnalysis {
         if(mode.physical())for(var write:writes)for(int ordinal=0;ordinal<write.targets().size();ordinal++) {
             var reference=new TargetRef(write,ordinal,null);
             var premises=new LinkedHashSet<>(initialPremises);premises.addAll(StatementEffects.targetPremises(write,ordinal));
-            var event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(premises)));
+            var event=events.size();support(operation,evidence,origin,ordered(premises));
             eventDetails.add(new PreparedEvent(operation,initial,write,reference,outcome,null));
             result.add(new Plan(write,reference,event,null));
         }
         for(var write:writes)for(var logical:logicalTargets(write)) {
-            int event=events.size();events.add(new ValueFact.Support(evidence,origin,ordered(initialPremises)));
+            int event=events.size();support(operation,evidence,origin,ordered(initialPremises));
             eventDetails.add(new PreparedEvent(operation,initial,write,null,outcome,logical));
             result.add(new Plan(write,null,event,logical));
         }

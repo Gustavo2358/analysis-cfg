@@ -487,6 +487,107 @@ final class SnapshotDependencyAnalysisTest {
         }
     }
 
+    @Test void nativeOperandOwnersAndPreparedSupportsStayColdAndPreserveReachedFacts() throws Exception {
+        for(boolean reached:new boolean[]{false,true}){
+            var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();
+            var type=Types.known(Types.Builtin.TEXT);var sink=new ObjectId(unit.id(),"borrowed-owner-sink");var storageId=new StorageId(seed.id(),"borrowed-owner-sink");
+            var precision=unit.objects().getFirst().precision();var objects=new java.util.ArrayList<>(unit.objects());
+            objects.add(new Memory.ObjectDeclaration(sink,Optional.empty(),type,new Memory.CellBinding(storageId),Memory.Visibility.PRIVATE,origin,Evidence.CoverageStatus.MODELED,precision));
+            var storage=new java.util.ArrayList<>(seed.storage());storage.add(new Memory.Cell(new Memory.StorageHeader(storageId,Optional.of(unit.id()),Memory.Lifetime.ACTIVATION,Memory.Visibility.PRIVATE,origin),type));
+            var instructions=new java.util.ArrayList<Instruction>();
+            for(int at=0;at<16;at++){
+                var id=new OperationId(unit.id(),"cold-operation-identity-"+"x".repeat(4096)+"/"+at);var owner=new OperationOwner(id);
+                var destination=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,at==2?"Aa":"destination"),Operand.Role.VALUE_WRITE,origin),sink);
+                Expression value=at==1?new Expressions.Read(new Operand.Header(new OperandId(owner,"read"),Operand.Role.VALUE_READ,origin),
+                    new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"read-place"),Operand.Role.VALUE_READ,origin),sink)):
+                    new Expressions.Literal(new Operand.Header(new OperandId(owner,at==2?"BB":"value"),Operand.Role.VALUE_READ,origin),new Values.TextValue("OWNER-IDENTITY-SYNTHETIC"));
+                instructions.add(new Operations.Assign(new Operations.Header(id,origin,Evidence.CoverageStatus.MODELED,precision,List.of()),destination,value));
+            }
+            var label=new LabelId(unit.id(),"borrowed-owner-body");var terminal=new Operations.Return(new Operations.Header(new OperationId(unit.id(),"borrowed-owner-return"),origin,Evidence.CoverageStatus.MODELED,precision,List.of()),List.of());
+            var sequences=new java.util.ArrayList<>(unit.sequences());sequences.add(new Sequence(label,instructions,terminal,origin));
+            var entries=unit.entries().stream().map(entry->reached?new Entries.Entry(entry.id(),Optional.of(label),entry.signature(),entry.state(),entry.origin()):entry).toList();
+            var changed=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),entries,sequences,unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),origin);
+            var artifact=new ArtifactId(seed.id(),"source");var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),List.of(new Origins.Artifact(artifact,"borrowed-operand-owners.synthetic",Optional.empty())),List.of(changed),storage,seed.resources(),seed.artifactRelations(),
+                List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),seed.coverage(),seed.uncertainties(),seed.premises());
+            var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());var residentCfg=coordinator.build(publication,BuildOptions.defaults());
+            var residentSession=io.github.gustavo2358.analysis.structure.AnalysisSession.open(residentCfg,publication,residentCfg.options().projectionPolicy(),entries).session().orElseThrow();
+            var observedId=instructions.get(1).header().id();var point=io.github.gustavo2358.analysis.query.ProgramPoint.after(entries.getFirst().id(),observedId);
+            var query=new io.github.gustavo2358.analysis.query.PointQuery<io.github.gustavo2358.analysis.storage.StorageSubject>(point,new io.github.gustavo2358.analysis.storage.StorageSubject.NamedObject(sink));
+            var residentEffects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(residentSession));
+            var expectedDefinitions=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(residentEffects).analysis().orElseThrow().execute().observeStorage(List.of(query));
+            var expectedValues=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(residentSession,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow().execute().observeStorage(List.of(query));
+            var ledger=resources();var input=directory.resolve("borrowed-operand-owner-"+reached+".air.json");Files.write(input,new AirJson().encode(publication));
+            io.github.gustavo2358.analysis.storage.StatementEffects.Write write;io.github.gustavo2358.analysis.storage.StatementEffects.Read readEffect;
+            try(var read=new DataflowAirReader().readSnapshot(input,ledger);var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)){
+                assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());
+                var cfg=coordinator.buildChecked(program,read.checked(),BuildOptions.defaults());
+                var session=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),entries.stream().map(Entries.Entry::id).toList()).session().orElseThrow();
+                var operands=program.operandDirectory().orElseThrow();var identities=new java.util.HashSet<OperandId>();
+                for(int at=0;at<operands.size();at++) {
+                    var identity=operands.identity(at);assertTrue(identities.add(identity));assertEquals(at,operands.ordinal(identity));assertEquals(identity,operands.at(at).header().id());
+                }
+                assertThrows(IndexOutOfBoundsException.class,()->operands.identity(-1));assertThrows(IndexOutOfBoundsException.class,()->operands.at(operands.size()));
+                var collision=(Operations.Assign)instructions.get(2);assertEquals(collision.destination().header().id().hashCode(),collision.value().header().id().hashCode());
+                assertNotEquals(operands.ordinal(collision.destination().header().id()),operands.ordinal(collision.value().header().id()));
+                var foreign=new OperandId(new OperationOwner(new OperationId(new UnitId(seed.id(),"foreign-unit"),collision.header().id().localId())),"Aa");
+                assertEquals(-1,operands.ordinal(foreign));assertNull(session.index().place(foreign));
+                assertEquals(0,retainedUnusedIdentities(session.index(),OperationId.class),"native operand lookup must not retain cold Place/OperandOwner payloads");
+                for(var operation:instructions){var assign=(Operations.Assign)operation;assertEquals(assign.destination(),session.index().place(assign.destination().header().id()));assertEquals(sink,session.index().referencedObject(assign.destination().header().id()).id());}
+                var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(session));
+                assertEquals(sequences.stream().mapToInt(sequence->sequence.instructions().size()+1).sum(),effects.statements().size());
+                assertEquals(0,retainedUnusedIdentities(effects,OperationId.class));
+                var statement=effects.statement(observedId);write=statement.writes().getFirst();readEffect=statement.reads().getFirst();
+                assertEquals(Optional.of(((Operations.Assign)instructions.get(1)).destination().header().id()),write.occurrence());
+                assertEquals(Optional.of(((Operations.Assign)instructions.get(1)).value().header().id()),readEffect.occurrence());
+                assertEquals(0,retainedUnusedIdentities(effects,OperationId.class),"public occurrence access must not install an ID cache");
+                var rd=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(effects).analysis().orElseThrow();assertEquals(0,retainedUnusedIdentities(rd,OperationId.class));
+                var definitions=rd.execute().observeStorage(List.of(query));assertEquals(expectedDefinitions.observations(),definitions.observations());
+                if(reached)assertTrue(definitions.observations().getFirst().value().definitions().stream().anyMatch(contribution->contribution.definition().operation().filter(observedId::equals).isPresent()));
+                var regional=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(session,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
+                assertEquals(0,retainedUnusedIdentities(regional,OperationId.class),"prepared supports must borrow their full operation evidence");
+                var actual=regional.execute().observeStorage(List.of(query));assertEquals(expectedValues.observations(),actual.observations());
+                assertEquals(0,retainedUnusedIdentities(regional,OperationId.class));
+                if(reached){assertEquals(List.of(new Values.TextValue("OWNER-IDENTITY-SYNTHETIC")),actual.observations().getFirst().value().candidates());
+                    assertTrue(actual.observations().getFirst().value().alternatives().stream().flatMap(alternative->alternative.fragments().stream()).anyMatch(fragment->fragment.producer().flatMap(producer->producer.definition().operation()).filter(instructions.getFirst().header().id()::equals).isPresent()),"copied content preserves the original literal producer, while RD records the current write");}
+            }
+            assertThrows(IllegalStateException.class,write::occurrence);assertThrows(IllegalStateException.class,readEffect::occurrence);
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
+    @Test void nativeOperandDirectoryIncludesLiteralAndPossibleEntryState() throws Exception {
+        for(boolean possible:new boolean[]{false,true}) {
+            var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();var entry=unit.entries().getFirst();var owner=new EntryOwner(entry.id());
+            var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"initial-place"),Operand.Role.VALUE_WRITE,origin),unit.objects().getFirst().id());
+            var first=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial-first"),Operand.Role.VALUE_READ,origin),new Values.TextValue("INITIAL-A"));
+            var second=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial-second"),Operand.Role.VALUE_READ,origin),new Values.TextValue("INITIAL-B"));
+            var gap=new UncertaintyId(seed.id(),"entry-value-gap");
+            Entries.InitialValue value=possible?new Entries.PossibleLiterals(List.of(first,second),gap):new Entries.LiteralInitial(first);
+            var initial=new Entries.InitialCondition(place,value,origin,List.of());
+            var changedEntry=new Entries.Entry(entry.id(),entry.initialLabel(),entry.signature(),new Entries.EntryState(List.of(initial),List.of()),entry.origin());
+            var changed=new Unit(unit.id(),unit.containingUnit(),unit.objects(),unit.visibleObjects(),List.of(changedEntry),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),origin);
+            var required=new java.util.ArrayList<>(seed.capabilities().required());if(possible)required.add(Capabilities.ENTRY_POSSIBILITIES_V2);
+            var uncertainties=possible?List.of(new Evidence.Uncertainty(gap,"ENTRY_VALUE_UNKNOWN",List.of(Evidence.Dimension.VALUES),new Scopes.UnitScope(unit.id()),"synthetic unenumerated entry content",origin)):seed.uncertainties();
+            var artifact=new ArtifactId(seed.id(),"source");
+            var publication=new Publication(seed.id(),seed.airVersion(),new Capabilities.Manifest(required,seed.capabilities().provided()),List.of(new Origins.Artifact(artifact,"operand-entry.synthetic",Optional.empty())),List.of(changed),seed.storage(),seed.resources(),seed.artifactRelations(),
+                List.of(new Origins.Written(origin,artifact,Optional.empty(),List.of(),true)),seed.coverage(),uncertainties,seed.premises());
+            var expected=new java.util.HashMap<OperandId,Operand>();var pending=new java.util.ArrayDeque<Operand>();
+            for(var sequence:changed.sequences()){for(var operation:sequence.instructions())pending.addAll(Operands.roots(operation));pending.addAll(Operands.roots(sequence.terminator()));}
+            pending.add(place);pending.add(first);if(possible)pending.add(second);
+            while(!pending.isEmpty()){var operand=pending.removeFirst();assertNull(expected.put(operand.header().id(),operand));pending.addAll(Operands.children(operand));}
+            var ledger=resources();var input=directory.resolve("operand-entry-"+possible+".air.json");Files.write(input,new AirJson().encode(publication));
+            ProgramStore.OperandDirectory borrowed;
+            try(var read=new DataflowAirReader().readSnapshot(input,ledger);var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)) {
+                assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());borrowed=program.operandDirectory().orElseThrow();assertEquals(expected.size(),borrowed.size());
+                for(var operand:expected.values()){int ordinal=borrowed.ordinal(operand.header().id());assertTrue(ordinal>=0);assertEquals(operand.header().id(),borrowed.identity(ordinal));assertEquals(operand,borrowed.at(ordinal));}
+                assertEquals(possible,borrowed.ordinal(second.header().id())>=0);
+                try(var membership=borrowed.column(borrowed.size())){membership.set(0,7);assertEquals(7,membership.get(0));}
+            }
+            var expired=borrowed;assertThrows(IllegalStateException.class,expired::size);assertThrows(IllegalStateException.class,()->expired.identity(0));assertThrows(IllegalStateException.class,()->expired.ordinal(place.header().id()));assertThrows(IllegalStateException.class,()->expired.at(0));
+            for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
+        }
+    }
+
     @Test void nativeOperationLookupBorrowsCompleteColdIdentitiesAndCanonicalSites() throws Exception {
         var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();
         var template=unit.sequences().getFirst().terminator().header();
@@ -553,6 +654,14 @@ final class SnapshotDependencyAnalysisTest {
     }
 
     @Test void failedNativeOperationDirectoryWritePreservesPrimaryAndClosesTapes() throws Exception {
+        assertNativeDirectoryFailure(false);
+    }
+
+    @Test void failedNativeOperandDirectoryWritePreservesPrimaryAndClosesTapes() throws Exception {
+        assertNativeDirectoryFailure(true);
+    }
+
+    private void assertNativeDirectoryFailure(boolean operand) throws Exception {
         var publication=directCall();var ledger=resources();
         var primary=new IllegalStateException("injected operation directory append failure");
         var cleanup=new IllegalStateException("injected operation directory cleanup failure");
@@ -575,7 +684,7 @@ final class SnapshotDependencyAnalysisTest {
                 @Override public void close(){delegate.close();}
             };
             try(var program=new SnapshotProgram(checked,new PagedSnapshotIdentityStorage(pages,ledger),failing,ledger)){
-                assertSame(primary,assertThrows(IllegalStateException.class,program::operationDirectory));
+                assertSame(primary,assertThrows(IllegalStateException.class,()->{if(operand)program.operandDirectory();else program.operationDirectory();}));
                 assertEquals(1,written[0],"failure occurs after a real positive append, not before allocation");
                 assertEquals(opened[0],closed[0]);assertEquals(List.of(cleanup),List.of(primary.getSuppressed()));
             }
@@ -661,7 +770,7 @@ final class SnapshotDependencyAnalysisTest {
 
     @Test void failedNativePartitionColumnWriteReleasesAllOwnersAndPreservesPrimary() {
         var publication=directCall();var ledger=resources();var primary=new IllegalStateException("injected failure after native partition column write");
-        int[] columns={0},written={0};
+        boolean[] partitionConstruction={false};int[] written={0};
         try(var pages=new FilePageStore(directory,512,16,ledger);
             var checked=SnapshotValidator.check(AirSnapshot.fromPublication(publication),ValidationOptions.defaults(),new PagedSnapshotValidationStorage(pages,ledger))){
             var delegate=new PagedSnapshotOrderStorage(pages,ledger);
@@ -669,7 +778,7 @@ final class SnapshotDependencyAnalysisTest {
                 @Override public Index open(Order order){return delegate.open(order);}
                 @Override public Tape tape(){return delegate.tape();}
                 @Override public ProgramStore.OrdinalColumn column(long length){
-                    var column=delegate.column(length);if(++columns[0]!=4)return column;
+                    var column=delegate.column(length);if(!partitionConstruction[0])return column;
                     return new ProgramStore.OrdinalColumn(){
                         @Override public long get(long ordinal){return column.get(ordinal);}
                         @Override public void set(long ordinal,long value){column.set(ordinal,value);if(value!=0){written[0]++;throw primary;}}
@@ -684,6 +793,7 @@ final class SnapshotDependencyAnalysisTest {
                 assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
                 var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow()));
                 long originalHeap=ledger.heapUsed(),originalPages=pages.statistics().livePages();
+                partitionConstruction[0]=true;
                 assertSame(primary,assertThrows(IllegalStateException.class,()->new io.github.gustavo2358.analysis.storage.StoragePartition(effects)));
                 assertEquals(1,written[0],"fault must follow a real nonzero paged column write");
                 assertEquals(originalHeap,ledger.heapUsed());assertEquals(originalPages,pages.statistics().livePages());
@@ -765,7 +875,7 @@ final class SnapshotDependencyAnalysisTest {
         var changed=new Unit(unit.id(),unit.containingUnit(),objects,unit.visibleObjects(),unit.entries(),unit.sequences(),unit.completionPorts(),unit.body(),unit.bodyUnavailable(),unit.coverage(),unit.origin());
         var uncertainties=new java.util.ArrayList<>(seed.uncertainties());uncertainties.add(new Evidence.Uncertainty(reason,"UNPROVED",List.of(Evidence.Dimension.STORAGE),new Scopes.UnitScope(unit.id()),"whole alias",origin));
         var publication=new Publication(seed.id(),seed.airVersion(),seed.capabilities(),seed.artifacts(),List.of(changed),seed.storage(),seed.resources(),seed.artifactRelations(),seed.origins(),seed.coverage(),uncertainties,seed.premises());
-        var ledger=resources();var primary=new IllegalStateException("after a real whole-alias column write");int[] writes={0};
+        var ledger=resources();var primary=new IllegalStateException("after a real whole-alias column write");boolean[] effectsConstruction={false};int[] writes={0};
         try(var pages=new FilePageStore(directory,4096,32,ledger);var source=AirSnapshot.fromPublication(publication);
             var builder=new AirSnapshotBuilder(new PagedAirStorage(pages,ledger,AnalysisResources.Phase.DECODE))) {
             long root=PagedAirStorageTest.copy(source,source.root(),null,builder);
@@ -776,7 +886,7 @@ final class SnapshotDependencyAnalysisTest {
                     @Override public Tape tape(){return delegate.tape();}
                     @Override public Index open(Order order){return delegate.open(order);}
                     @Override public ProgramStore.OrdinalColumn column(long length){
-                        var column=delegate.column(length);
+                        var column=delegate.column(length);if(!effectsConstruction[0])return column;
                         return new ProgramStore.OrdinalColumn(){
                             @Override public long get(long at){return column.get(at);}
                             @Override public void set(long at,long value){column.set(at,value);if(value!=0){writes[0]++;throw primary;}}
@@ -791,6 +901,7 @@ final class SnapshotDependencyAnalysisTest {
                     assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,opened.status(),opened.reason());
                     var storage=new io.github.gustavo2358.analysis.storage.StorageIndex(opened.session().orElseThrow());
                     long heap=ledger.heapUsed(),livePages=pages.statistics().livePages();
+                    effectsConstruction[0]=true;
                     assertSame(primary,assertThrows(IllegalStateException.class,()->new io.github.gustavo2358.analysis.storage.StatementEffects(storage)));
                     assertEquals(1,writes[0]);assertEquals(heap,ledger.heapUsed());assertEquals(livePages,pages.statistics().livePages());
                     assertSame(checked.snapshot(),program.admission().snapshot());

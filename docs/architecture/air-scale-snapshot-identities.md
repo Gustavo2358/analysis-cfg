@@ -582,3 +582,81 @@ for OperationTable. Registration and compiled inventory were updated without
 changing denied dependencies,DAG,tests,dimensions or quotas; that failure remains
 preserved. Operand-owner identity retention is a separate demonstrated next RED;
 the admitted Nop counterexample remains GREEN and AS-W09/W10 remain PARTIAL.
+
+## Native operand owners and prepared support evidence
+
+A separately frozen Assign counterexample on961a6946 exposes another path:
+16 complete4096-character operation identities survive inside Place/OperandOwner
+keys,Write occurrences and prepared Regional Support rows. The unchanged stored
+String auditor reports16/32/48 at nested preparation roots,not96 independent
+copies. A typed native-reader law independently reports17 retained OperationId
+instances (including the nested Read),before any production correction.
+
+Structural operandDirectory now covers all typed operation roots,nested children
+and Entry state definitions,including literal and possible-literal initial values.
+The append-only source tape doubles as the paged traversal frontier. Source handles,
+exact complete identity keys and sorted lookup ordinals borrow the admitted owner;
+there is no resident traversal queue or decoded OperandId catalogue. Structural
+duplicate membership uses a temporary owner-managed ordinal column,closed on both
+success and failure. Every operand still undergoes owner/reference checks and final
+cardinality verification. ProgramIndex resolves Places/ObjectPlaces on access;
+resident compatibility retains its existing maps explicitly.
+
+Effect Read/Write occurrences borrow operand ordinals and reconstruct their complete
+IDs without a cache. Public constructors/accessors and value equality remain
+available. Prepared Regional supports borrow the canonical OperationRef rather than
+storing another full OperationId; detached public Support facts retain exact evidence,
+origin and ordered premises. RD writes and Regional copied-content producer evidence
+remain distinct and are checked against both complete resident facts and manual
+expectations. The native Assign auditor is GREEN0/0/0. Owner closure invalidates
+occurrence access; positive append failure preserves the primary error and suppresses
+cleanup failures,with all pools released. Entry definitions,equal Java hashes,foreign
+owners and explicit access without caching are covered by typed laws.
+
+The physical CLI reference for the same16 Assigns was produced BEFORE correction
+on961a6946,Java21/Xmx128m/original quotas,2.37s. A completely admitted144490643-byte
+fixture changes only identity width to3000000:67 operations,337 entities,140 operands,
+66 domain queries and the same two historical I-56 obligations. Its input SHA256 is
+94c68d7130d266b4f61ebdae884ecc0cd5c1197ef8b4391ca192f6a7315f1d42.
+Physical large-input qualification and the final coherent FAST are pending.
+The first large-input CLI attempt on producer650 failed OOM47.24s before
+consumer preparation,in DomainProofEngine.initialize after the TypeResolver pass.
+The complete failed output/log is preserved;15 input and1246 runtime-class hashes
+still match. Consumer focused58/47/10/37/7 and compiled boundaries remain PASS,
+not a substitute for that failed physical gate.
+
+Producer9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae now removes demonstrated complete
+ID copies from native type keys,proof subjects/signature indexes and per-site graph
+caches,using the canonical admitted declaration identity address. Every rule/query
+still runs. Subject kind,direction,associated Entry and full position remain distinct;
+absent IDs keep their full typed identities rather than aliasing zero. Two independent
+stored-key REDs32/32 become GREEN;late scoped registration,outside-scope negatives,
+equal-hash missing identities,foreign owners,exact native/resident ValidationResult
+and expired admission remain covered. Original producer FAST PASS29.983s,
+282 model/145 transport checks,484 classfiles/7748 dependencies,44 harness tests.
+PR30 exact remote contracts jobs114079325310/114079308588 both SUCCESS. The consumer
+lock,CI checkout and clean managed clone now use this strict immutable pin. No merge,
+public API/schema/rule/dimension/limit change. The unchanged large physical repeat
+is PASS113.28s,CPU110.53+6.73s,RSS269928KiB,exit0 on Java21/Xmx128m and original
+quotas. This is the real CLI,not a test substitute. Both complete public products
+are byte-identical to the reference frozen before correction:CFG SHA256
+2498cb07246bcbd658ea975722a318e86127455bb3c055fff1b26bc8e6622df0 and dependencies
+SHA256 f92323fa037777e733c34016ffea0ca13fccb39e1a38126dbd8f0869f18124ac.
+The independent oracle checks21 semantic wire fields,83 ordered origins and the
+complete CFG. All21 material inputs and1249 runtime classes match afterwards.
+The complete native consumer class is PASS46 tests,zero failures/errors/skips,
+292.9s after restricting two fault injectors to the actual partition/effects
+construction. Their positive writes,primary error and owner/pool cleanup are not
+weakened. Its N256 repeat uses workspace java.io.tmpdir after /tmp disk exhaustion;
+dimensions and resource quotas remain unchanged. The first repetition's stale
+default Maven cache compilation failure is also preserved. Original consumer
+coherent FAST PASS1174 required methods,zero skips,architecture/post-checks,
+768.651s. Forked tests use only the same temporary directory relocation through
+argLine,without JAVA_TOOL_OPTIONS or quota changes. All14 frozen consumer files,
+21 physical material inputs and1249 runtime classes (including the complete newly
+rebuilt path set) match afterwards. This final evidence paragraph is C0-only,
+updated after those checks; no production source changed during qualification.
+Working tables,plans,initial-state bodies,solver states and result relations still
+have resident/input-cardinality components; AS-W09/W10 remain PARTIAL. This is a
+specific removal of demonstrated duplicate identity payloads,not a complete global
+funding or spill claim.

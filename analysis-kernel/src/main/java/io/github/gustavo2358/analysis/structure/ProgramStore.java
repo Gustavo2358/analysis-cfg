@@ -35,6 +35,9 @@ public interface ProgramStore {
         /** Complete code identities in original AIR occurrence order; no reachability filtering.
          * Absence selects explicit caller-managed resident compatibility. */
         default Optional<OperationDirectory> operationDirectory(){return Optional.empty();}
+        /** Complete typed operand definitions, including Entry state and nested children.
+         * Absence selects explicit resident compatibility. */
+        default Optional<OperandDirectory> operandDirectory(){return Optional.empty();}
         /** Exact identity lookup. Native implementations can resolve a cold address without
          * retaining every Origin body. The resident compatibility default remains explicit. */
         default Origins.Origin origin(OriginId id) {
@@ -49,6 +52,16 @@ public interface ProgramStore {
         OperationId identity(int ordinal);
         int ordinal(OperationId identity);
         boolean identityAt(int ordinal,OperationId identity);
+    }
+
+    /** Owner-local operand addresses; full nominal identities are checked at lookup.
+     * Access reconstructs one occurrence without a decoded-body catalogue. */
+    interface OperandDirectory {
+        int size();
+        OperandId identity(int ordinal);
+        int ordinal(OperandId identity);
+        Operand at(int ordinal);
+        OrdinalColumn column(long length);
     }
 
     /** Original AIR order plus full nominal lookup, without requiring resident keys.

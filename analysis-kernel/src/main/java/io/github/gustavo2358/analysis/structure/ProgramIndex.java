@@ -36,6 +36,7 @@ public final class ProgramIndex {
     private final Map<ObjectId, Memory.Cell> directCells;
     private final Map<OperandId, ObjectId> objectReferences;
     private final Map<OperandId, Place> places;
+    private final ProgramStore.OperandDirectory operands;
     private final Map<EntryId, Entries.Entry> entries;
     private final IndexMetrics metrics;
     private final Set<UnitId> partialControlUnits;
@@ -77,6 +78,7 @@ public final class ProgramIndex {
         operations = b.operations; b.objects.freeze();objects = b.objects; b.storage.freeze();storage = b.storage;
         if(b.directCells instanceof CellAssociations cells)cells.freeze();
         directCells = b.directCells; objectReferences = b.objectReferences;places=b.places;
+        operands=b.operandDirectory;
         entries = b.entries; entryOrdinals = b.entryOrdinals;
         entryNodes = b.entryNodes; normalExits = b.normalExits;
         // Builder ownership is transferred. No builder or mutable collection escapes.
@@ -130,9 +132,16 @@ public final class ProgramIndex {
     public Map<StorageId,Memory.Storage> storageDeclarations(){return Collections.unmodifiableMap(storage);}
     /** Direct whole Cell association only; null does not assert absence of indirect storage. */
     public Memory.Cell directCell(ObjectId id) { return directCells.get(id); }
-    public Place place(OperandId occurrence){return places.get(occurrence);}
+    public Place place(OperandId occurrence){
+        if(operands==null)return places.get(occurrence);
+        int ordinal=operands.ordinal(Objects.requireNonNull(occurrence));
+        return ordinal>=0&&operands.at(ordinal) instanceof Place place?place:null;
+    }
     /** Pre-resolved ObjectPlace occurrence, including nested operands and Entry initial conditions. */
-    public Memory.ObjectDeclaration referencedObject(OperandId occurrence) { return objects.get(objectReferences.get(occurrence)); }
+    public Memory.ObjectDeclaration referencedObject(OperandId occurrence) {
+        if(operands==null)return objects.get(objectReferences.get(occurrence));
+        return place(occurrence) instanceof Places.ObjectPlace place?objects.get(place.object()):null;
+    }
     /** Owner-checked body address; no resident AIR Sequence is required. */
     public ProgramStore.SequenceView sequence(Node node) {
         if (node.identity != identity) throw new IllegalArgumentException("foreign node");
