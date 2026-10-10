@@ -23,9 +23,12 @@ public interface AnalysisProvider<T,V> {
         AnalysisOutcome refusal();
         Run<T,V> execute();
     }
-    interface Run<T,V> {
+    interface Run<T,V> extends AutoCloseable {
         AnalysisOutcome outcome();
         Materialized<T,V> observe(List<PointQuery<T>> queries);
+        /** Release execution-owned state after its last planning epoch. Detached facts remain valid.
+         * Stateless providers need no cleanup; state-owning providers override this idempotently. */
+        @Override default void close() { }
     }
     record Materialized<T,V>(ObservationBatch<T,V> batch, Map<String,Long> metrics) {
         public Materialized { Objects.requireNonNull(batch); metrics = Map.copyOf(metrics); }

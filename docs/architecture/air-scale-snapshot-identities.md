@@ -1,5 +1,61 @@
 # Paged complete snapshot identity keys
 
+## Common native execution capacity and result lifetime (2026-10-09)
+
+The native ProgramStore now lends a neutral capacity port from the admitted
+input's AnalysisResources owner. Execution reservations, growth and transfer
+charge that same ledger; a failed reservation or growth commits no local or
+common counters. Foreign-owner, self and cross-pool transfers remain invalid.
+Resident compatibility explicitly has no borrowed capacity port. This does not
+fund a store that never requests a reservation.
+
+The ordinary forward/backward solver reserves conservative capacity for its
+resident point/lookup metadata, graph construction workspace, bounded worklist
+and stable state-reference arrays before allocation or growth. Construction
+workspace closes after solve; the returned AutoCloseable DataflowResult owns
+the retained metadata and arrays until explicit close or native program expiry.
+Expiry clears the actual stored state references and rejects later state access;
+stable status and metrics remain detached history. Native leases are registered
+intrusively only while live, not in a historical list. Cleanup runs for every
+lease even after an earlier cleanup failure, preserving primary/suppressed errors.
+
+Forward/backward activation results use the same funded result builder for
+published context/point metadata and reference arrays. Owner expiry observes
+results weakly: registration must not pin solved states through the borrowed
+program. This is not GC-based capacity reclamation; abandoned leases stay charged
+until explicit close or program expiry. Expired results clear references to their
+state arrays, lookup, capacities and program.
+
+PlanningExecution closes each cached provider run at lifetime end, including
+cleanup of a started run rejected by binding validation. Scalar and regional
+providers release their real stable results and discard their stored execution
+engines from closed run handles; reachability detaches its label
+sets before closing the solved result. Immutable delivered candidates, producer
+supports, premises, provenance and remainder are not erased by result cleanup.
+Twelve added capacity/lifetime laws are registered alongside the unchanged FAST
+families. Focused regressions cover ordinary directions, native scalar/regional
+delivery, deadline, cleanup failures, planning epochs, CALL and FILE products.
+
+This is PARTIAL AS-W09, not a spill backend or measured whole-JVM heap bound.
+The topology still resides in Java collections/arrays. Arbitrary domain-state
+payloads, domain interners, preparation/site indexes and live activation-engine
+containers still require their own funding/lifetime or external-store work. Passing the
+zero-headroom refusal law does not qualify successful delivery for larger finite
+inputs. The physical Java 21 CLI on the unchanged 144490643-byte input,
+Xmx128m and original quotas/deadline passed in 103.14 s (RSS266904 KiB);
+both products are byte-identical to the earlier frozen outputs. An independent
+oracle checked all 21 semantic fields, 83 original origins, no added origins and
+the full CFG. FAST passed all 1186 required methods with zero skips in 790.483 s,
+including the twelve new laws and every original architecture rule. Source and
+complete runtime-class inventories remained identical to the physical run.
+Three earlier failed FAST attempts are preserved: an obsolete resident proxy,
+the real strong-expiry retention regression, and an obsolete private constructor
+seam in the CLI deadline test. No deadline/output/cleanup assertion was weakened.
+Producer pin: air-java `9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae`.
+Global AS-W09/AS-W10 qualification is still incomplete: native scalar preparation
+retains actual cells, writes, values and producers without additional common
+capacity in the demonstrated next counterexample.
+
 AS-W02 / IN_PROGRESS. Producer pin: air-java
 `5c41a64a9838bb934218f918fe7bd8d0f4325c7a`; normative AIR
 `4f09e8b1b496bf8de2e0fb62532e7aa0b97b9c6e`, identity §2, I-01/I-02.

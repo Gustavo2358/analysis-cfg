@@ -12,6 +12,24 @@ public interface ProgramStore {
      * The resident compatibility route has no managed execution owner. */
     enum ExecutionPhase { INDEX, DEMAND, CONTROL, DOMAIN, REPLAY, SORT, ENCODE }
     default void progress(ExecutionPhase phase) { Objects.requireNonNull(phase); }
+    /** Native execution capacity borrows the same admitted lifetime and quotas.
+     * Empty is explicit caller-managed resident compatibility, not a native fallback. */
+    default Optional<ExecutionBudget> executionBudget(){return Optional.empty();}
+    enum CapacityPool { RESIDENT, SCRATCH, DIRECT, TEMPORARY, OPEN_FILES }
+    interface ExecutionBudget {
+        CapacityLease reserve(CapacityPool pool,long amount,ExecutionPhase phase);
+    }
+    /** Capacity changes are atomic. Absorb transfers already charged capacity,
+     * never charges again; foreign owner/pool, self and closed transfers fail.
+     * Close releases only this lease and must remain possible after owner expiry. */
+    interface CapacityLease extends AutoCloseable {
+        void grow(long amount,ExecutionPhase phase);
+        void absorb(CapacityLease staged);
+        /** One cleanup-only action on admitted owner expiry. Explicit lease close
+         * unregisters it; an action must not compute or publish semantic facts. */
+        void onOwnerClose(Runnable cleanup);
+        @Override void close();
+    }
     PublicationId publicationId();
     Evidence.InventoryStatus inventory();
     List<Origins.Artifact> artifacts();

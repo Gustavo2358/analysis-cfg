@@ -9,6 +9,7 @@ class BooleanConditionsTest {
         var shared=new AnalysisResources(new AnalysisResources.Limits(Long.MAX_VALUE,Long.MAX_VALUE,0,0,0,Long.MAX_VALUE,Long.MAX_VALUE),5,()->now[0]);
         var program=(io.github.gustavo2358.analysis.structure.ProgramStore)java.lang.reflect.Proxy.newProxyInstance(
             getClass().getClassLoader(),new Class<?>[]{io.github.gustavo2358.analysis.structure.ProgramStore.class},(proxy,method,args)->{
+                if(method.getName().equals("executionBudget"))return java.util.Optional.empty(); // Explicit resident compatibility, not native capacity admission.
                 if(!method.getName().equals("progress"))throw new AssertionError(method);
                 if(armed[0]&&++probes[0]==10)now[0]=5;
                 shared.work(1,AnalysisResources.Phase.CONTROL);return null;

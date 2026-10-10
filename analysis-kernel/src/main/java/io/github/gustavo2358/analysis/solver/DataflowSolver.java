@@ -24,10 +24,10 @@ public final class DataflowSolver {
         var direction=Objects.requireNonNull(definition.direction(), "direction");
         if(session.hasLocalControl())return direction==Direction.FORWARD
             ?new ActivationSolver<>(session,definition).solve():new BackwardActivationSolver<>(session,definition).solve();
-        SolverTopology graph = new SolverTopology(session);
         boolean forward = direction == Direction.FORWARD;
         DomainWork work = new DomainWork();
-        Run<S> run = new Run<>(graph, definition, schedule.apply(graph), forward, work);
+        try(var graph=new SolverTopology(session);
+            var run=new Run<S>(graph,definition,schedule,forward,work)) {
         for (var boundary : definition.boundaries(session)) {
             session.index().store().progress(ProgramStore.ExecutionPhase.CONTROL);
             int p = graph.require(boundary.context(), boundary.node()).ordinal;
@@ -79,28 +79,36 @@ public final class DataflowSolver {
         }
         // Ownership transfer only after the worklist is empty. Failures above expose no result.
         session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
-        return new DataflowResult<>(graph, forward ? run.anchors : run.publications,
-                forward ? run.publications : run.anchors, run.snapshot());
+        DataflowResult<S> result=new DataflowResult<>(graph,forward?run.anchors:run.publications,forward?run.publications:run.anchors,run.snapshot(),run.statesCapacity);
+        graph.transferRetainedCapacity();run.statesCapacity=null;return result;
+        }
     }
 
-    private static final class Run<S> {
+    private static final class Run<S> implements AutoCloseable {
         final Object[] anchors, publications;
         final boolean[] published, queued;
         final IntWorklist queue;
         final SolverTopology graph;
         final boolean forward;
         final DomainWork work;
+        private AnalysisResources.Reservation statesCapacity,workingCapacity;
         long boundaryJoins, initializationAttempts, attempts, pushes, pops, duplicates, maxSize;
         long transfers, first, changed, unchanged, edgeTransfers, edgeJoins, accumulatorChanged, accumulatorUnchanged;
         long predecessorReads, successorReads;
-        Run(SolverTopology graph, AnalysisDefinition<S> definition, IntWorklist queue, boolean forward, DomainWork work) {
-            this.graph = graph; this.queue = Objects.requireNonNull(queue); this.forward = forward; this.work = work;
+        Run(SolverTopology graph, AnalysisDefinition<S> definition, Function<SolverTopology,IntWorklist> schedule, boolean forward, DomainWork work) {
+            this.graph = graph;this.forward = forward; this.work = work;
             int size = graph.points.length;
+            statesCapacity=graph.resources().reserve(AnalysisResources.Pool.RESIDENT,64L+16L*size,AnalysisResources.Phase.DOMAIN);
+            try {
+            workingCapacity=graph.resources().reserve(AnalysisResources.Pool.SCRATCH,512L+2L*size+4L*Math.max(1,size),AnalysisResources.Phase.CONTROL);
+            queue=Objects.requireNonNull(schedule.apply(graph));
             anchors = new Object[size]; publications = new Object[size];
             published = new boolean[size]; queued = new boolean[size];
             S bottom = Objects.requireNonNull(definition.bottom(), "bottom");
             Arrays.fill(anchors, bottom); Arrays.fill(publications, bottom);
+            }catch(RuntimeException|Error failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
         }
+        @Override public void close(){var working=workingCapacity;var states=statesCapacity;workingCapacity=null;statesCapacity=null;AnalysisResources.closeCapacities(working,states);}
         @SuppressWarnings("unchecked") S anchor(int point) { return (S) anchors[point]; }
         /** Reads publication slots, labelling recomposition separately from comparison at the source. */
         @SuppressWarnings("unchecked") S publication(int point, boolean contributionRead) {

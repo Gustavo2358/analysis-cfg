@@ -140,17 +140,16 @@ final class ActivationSolver<S> implements AutoCloseable {
     }
     private DataflowResult<S> result() {
         session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
-        var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
-        var ins=new ArrayList<S>();var outs=new ArrayList<S>();long edgeCount=0;
+        try(var result=new DataflowResult.Builder<S>(session.index().store(),indexResources)) {
+        long edgeCount=0;
         for(var entry:entries) {
-            var nodes=new IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>();lookup.put(entry.context,nodes);
+            result.context(entry.context);
             for(var region:entry.regions)for(var slot:region.slots.values()) {
                 session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
                 for(var anchor:slot.anchors.pieces) {
                     // The output is joined pointwise; keep roots separate until observation replay.
                     for(var output:slot.outputs.pieces)if(feasible(region,entry.bdd.and(anchor.condition,output.condition))) {
-                        var list=nodes.computeIfAbsent(slot.node,n->new ArrayList<>());
-                        var point=new AnalysisPoint(ins.size(),entry.context,slot.node);list.add(point);ins.add(anchor.state);outs.add(output.state);
+                        result.add(entry.context,slot.node,anchor.state,output.state);
                     }
                 }
                 edgeCount+=slot.moves.size();
@@ -158,9 +157,10 @@ final class ActivationSolver<S> implements AutoCloseable {
         }
         checkRecursion();
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,initializations,attempts,pushes,pops,duplicates,maxSize,
-            transfers,work.operations(),ins.size(),changed,unchanged,edgeTransfers,edgeJoins,changed,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,0,callerProofEdgesRead(),conditionPeak(),certificateEdgesRead(),valuationVisits(),hintIndexProbes());
-        return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
+        var metrics=new SolverMetrics(result.size(),edgeCount,joins,initializations,attempts,pushes,pops,duplicates,maxSize,
+            transfers,work.operations(),result.size(),changed,unchanged,edgeTransfers,edgeJoins,changed,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,0,callerProofEdgesRead(),conditionPeak(),certificateEdgesRead(),valuationVisits(),hintIndexProbes());
+        return result.finish(metrics);
+        }
     }
     private void checkRecursion() {
         for(var entry:entries)for(var region:entry.regions)for(var error:region.recursive.entrySet())

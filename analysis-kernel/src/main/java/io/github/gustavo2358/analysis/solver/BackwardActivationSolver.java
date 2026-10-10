@@ -105,21 +105,22 @@ final class BackwardActivationSolver<S> implements AutoCloseable {
             session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
         }
         collectSummaries(true);
-        var lookup=new IdentityHashMap<ContextView,IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>>();
-        var ins=new ArrayList<S>();var outs=new ArrayList<S>();long edgeCount=0;
+        try(var result=new DataflowResult.Builder<S>(session.index().store(),indexResources)) {
+        long edgeCount=0;
         for(var entry:entries) {
-            var nodes=new IdentityHashMap<ProgramIndex.Node,List<AnalysisPoint>>();lookup.put(entry.model.context(),nodes);
+            result.context(entry.model.context());
             for(var region:entry.regions)for(var slot:region.slots.values()) {
                 session.index().store().progress(ProgramStore.ExecutionPhase.DOMAIN);
                 edgeCount+=slot.shape.moves().size();entry.bdd.beginMutation();
                 for(var in:slot.in.pieces)for(var out:slot.out.pieces)if(feasible(region,entry.bdd.and(in.condition,out.condition))) {
-                    int id=ins.size();nodes.computeIfAbsent(slot.node,n->new ArrayList<>()).add(new AnalysisPoint(id,entry.model.context(),slot.node));ins.add(in.state);outs.add(out.state);
+                    result.add(entry.model.context(),slot.node,in.state,out.state);
                 }entry.bdd.endMutation();
             }
         }
         long indexProbes=closedIndexProbes;for(var entry:entries)for(var index:entry.byFrame.values())indexProbes+=index.probes();
-        var metrics=new SolverMetrics(ins.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),ins.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads,callerProofEdgesRead(),conditionPeak(),certificateEdgesRead(),valuationVisits(),hintIndexProbes());
-        return new DataflowResult<>(lookup,ins.toArray(),outs.toArray(),metrics);
+        var metrics=new SolverMetrics(result.size(),edgeCount,joins,nextPoint,attempts,pushes,pops,duplicates,maxSize,transfers,work.operations(),result.size(),changes,unchanged,deliveries,deliveries,changes,unchanged,0,0,work.joinEntries(),work.compareEntries(),summaryCreated,summaryRetired,summaryLive,summaryPeak,summaryCollections,indexProbes,returnSourceReads,callerProofEdgesRead(),conditionPeak(),certificateEdgesRead(),valuationVisits(),hintIndexProbes());
+        return result.finish(metrics);
+        }
     }
     private void collectConditions(EntryRun entry) {
         if(!entry.bdd.collectionDue())return;

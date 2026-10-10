@@ -42,6 +42,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private NativeStorages storageInventory;
     private NativeOperations operationDirectory;
     private NativeOperands operandDirectory;
+    private NativeBudget executionBudget;
     private Set<Capabilities.Capability> namePolicyExtensions;
     private final EnumMap<ProjectionPolicy,SnapshotNodes> nodeStores=new EnumMap<>(ProjectionPolicy.class);
     private boolean closed;
@@ -130,6 +131,48 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     }
 
     private void borrowedOpen(){open();admission.snapshot();}
+    @Override public Optional<ProgramStore.ExecutionBudget> executionBudget() {
+        borrowedOpen();if(runtime==null)return Optional.empty();
+        if(executionBudget==null)executionBudget=new NativeBudget();return Optional.of(executionBudget);
+    }
+    /** Intrusive live-lease registry: no historical collection or per-pool catalogue. */
+    private final class NativeBudget implements ProgramStore.ExecutionBudget {
+        private NativeCapacity first;
+        @Override public ProgramStore.CapacityLease reserve(ProgramStore.CapacityPool pool,long amount,ProgramStore.ExecutionPhase phase) {
+            borrowedOpen();Objects.requireNonNull(pool);Objects.requireNonNull(phase);
+            var owned=runtime.reserve(AnalysisResources.Pool.valueOf(pool.name()),amount,AnalysisResources.Phase.valueOf(phase.name()));
+            try {
+                var lease=new NativeCapacity(this,owned);lease.next=first;if(first!=null)first.previous=lease;first=lease;return lease;
+            }catch(RuntimeException|Error failure){owned.close();throw failure;}
+        }
+        private void close(){Throwable failure=null;
+            while(first!=null)try{first.expire();}catch(RuntimeException|Error error){if(failure==null)failure=error;else if(failure!=error)failure.addSuppressed(error);}
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
+        }
+    }
+    private final class NativeCapacity implements ProgramStore.CapacityLease {
+        private final NativeBudget owner;
+        private final AnalysisResources.Reservation reservation;
+        private NativeCapacity previous,next;
+        private boolean released;
+        private Runnable expiration;
+        private NativeCapacity(NativeBudget owner,AnalysisResources.Reservation reservation){this.owner=owner;this.reservation=reservation;}
+        @Override public void grow(long amount,ProgramStore.ExecutionPhase phase) {
+            borrowedOpen();reservation.grow(amount,AnalysisResources.Phase.valueOf(Objects.requireNonNull(phase).name()));
+        }
+        @Override public void absorb(ProgramStore.CapacityLease staged) {
+            borrowedOpen();if(!(staged instanceof SnapshotProgram.NativeCapacity other)||other.owner!=owner)
+                throw new IllegalArgumentException("capacity transfer requires the same native owner");
+            reservation.absorb(other.reservation);other.close();
+        }
+        @Override public void onOwnerClose(Runnable cleanup){borrowedOpen();if(released||expiration!=null)throw new IllegalStateException("closed lease or duplicate expiry action");expiration=Objects.requireNonNull(cleanup);}
+        private void expire(){var cleanup=expiration;expiration=null;try{if(cleanup!=null)cleanup.run();}finally{close();}}
+        @Override public void close() {
+            if(released)return;released=true;expiration=null;reservation.close();
+            if(previous==null)owner.first=next;else previous.next=next;
+            if(next!=null)next.previous=previous;previous=null;next=null;
+        }
+    }
     @Override public void progress(ProgramStore.ExecutionPhase phase) {
         borrowedOpen();Objects.requireNonNull(phase);
         // Older explicitly assembled native stores still check the borrowed
@@ -1240,7 +1283,8 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private String text(long source){long length=snapshot.characterCount(source);if(length>Integer.MAX_VALUE)throw new IllegalStateException("program text too large");char[] result=new char[(int)length],block=new char[Math.min(1024,Math.max(1,result.length))];long offset=0;while(offset<length){int count=snapshot.readCharacters(source,offset,block,0,(int)Math.min(block.length,length-offset));System.arraycopy(block,0,result,(int)offset,count);offset+=count;}return new String(result);}
     private void open(){if(closed)throw new IllegalStateException("snapshot program is closed");}
     @Override public void close(){if(closed)return;closed=true;Throwable failure=null;
-        try{if(declarationInventory!=null)declarationInventory.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+        try{if(executionBudget!=null)executionBudget.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+        try{if(declarationInventory!=null)declarationInventory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(storageInventory!=null)storageInventory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(operationDirectory!=null)operationDirectory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(operandDirectory!=null)operandDirectory.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}

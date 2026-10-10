@@ -25,10 +25,11 @@ final class DependencyCliTest {
             java.util.function.Consumer<io.github.gustavo2358.analysis.solver.AnalysisResources.Phase> progress=
                 phase->{if(phase==io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.CONTROL)expired[0]=true;};
             var constructor=io.github.gustavo2358.analysis.solver.AnalysisResources.class.getDeclaredConstructor(
-                io.github.gustavo2358.analysis.solver.AnalysisResources.Limits.class,long.class,java.util.function.LongSupplier.class,java.util.function.Consumer.class);
+                io.github.gustavo2358.analysis.solver.AnalysisResources.Limits.class,long.class,java.util.function.LongSupplier.class,java.util.function.Consumer.class,
+                io.github.gustavo2358.analysis.structure.ProgramStore.ExecutionBudget.class);
             constructor.setAccessible(true);
             var resources=constructor.newInstance(new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
-                64L*1024*1024,16L*1024*1024,0,256L*1024*1024,8,Long.MAX_VALUE,Long.MAX_VALUE),5L,clock,progress);
+                64L*1024*1024,16L*1024*1024,0,256L*1024*1024,8,Long.MAX_VALUE,Long.MAX_VALUE),5L,clock,progress,null);
             var diagnostics=new ByteArrayOutputStream();
             int status=pipeline?AnalysisPipeline.runSnapshot(new String[]{fixture().toString(),cfg.toString(),output.toString()},err(diagnostics),new DataflowAirReader(),resources)
                 :AnalysisDependencies.run(new String[]{fixture().toString(),output.toString()},err(diagnostics),new DataflowAirReader(),resources);

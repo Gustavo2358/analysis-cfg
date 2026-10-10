@@ -93,16 +93,22 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
                 execution.preparationMetrics().forEach((k,v) -> metrics.put("prepare_"+k,v));
                 execution.solveMetrics().forEach((k,v) -> metrics.put("solve_"+k,v));
                 var outcome = new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,metrics);
-                return new Run<>() {
-                    public AnalysisOutcome outcome() { return outcome; }
-                    public Materialized<ObjectId,ValueFact> observe(List<PointQuery<ObjectId>> queries) {
-                        var observations = execution.observe(queries);
-                        var work = new TreeMap<String,Long>(observations.quality());
-                        observations.stateMetrics().forEach((k,v) -> work.put("replay_"+k,v));
-                        return new Materialized<>(observations.batch(),work);
-                    }
-                };
+                return new ProviderRun(outcome,execution);
             }
         };
+    }
+    /** A closed public handle keeps only detached outcome metadata, never a captured engine. */
+    private static final class ProviderRun implements Run<ObjectId,ValueFact> {
+        private final AnalysisOutcome outcome;
+        private PossibleValuesAnalysis.Execution execution;
+        private ProviderRun(AnalysisOutcome outcome,PossibleValuesAnalysis.Execution execution){this.outcome=outcome;this.execution=execution;}
+        public AnalysisOutcome outcome(){return outcome;}
+        public Materialized<ObjectId,ValueFact> observe(List<PointQuery<ObjectId>> queries) {
+            var active=execution;if(active==null)throw new IllegalStateException("closed provider execution");
+            var observations=active.observe(queries);var work=new TreeMap<String,Long>(observations.quality());
+            observations.stateMetrics().forEach((k,v)->work.put("replay_"+k,v));
+            return new Materialized<>(observations.batch(),work);
+        }
+        public void close(){var owned=execution;execution=null;if(owned!=null)owned.dataflow().close();}
     }
 }

@@ -478,6 +478,19 @@
       "expiryInsideNativeObservationTransferCannotPublishACompleteBatch",
       "expiryInsideTransferNeverPublishesEitherDirectionAndReleasesInput"
     ],
+    "io.github.gustavo2358.analysis.solver.NativeActivationLifetimeTest": [
+      "nativeActivationReferenceArraysStayFundedUntilResultClose",
+      "nativeActivationOwnerExpiryClearsStateSlotsAndPreservesBorrowedInput"
+    ],
+    "io.github.gustavo2358.analysis.solver.NativeExecutionCapacityTest": [
+      "nativeExecutionReservationsGrowAndTransferAgainstOneInputLedger",
+      "nativeExecutionQuotaFailureDoesNotPartiallyChargeOrFreeAnotherOwner",
+      "nativeReservationOwnerExpiresWithoutBlockingCleanupOrClosingBorrowedAir",
+      "zeroNativeControlCapacityCannotPublishEitherOrdinaryDirection",
+      "nativeOrdinaryResultOwnsCapacityUntilCloseAndCannotOutliveItsProgram",
+      "nativePlanningClosesScalarAndRegionalStateWithoutInvalidatingDeliveredFacts",
+      "nativeOwnerCleanupRetiresEveryLeaseEvenWhenCallbacksFail"
+    ],
     "io.github.gustavo2358.analysis.adapters.SnapshotDependencyAnalysisTest": [
       "nativeDeclarationIndexesBorrowColdPayloadsAndPreserveEveryIdentity",
       "nativeRegionalGroupsBorrowPagedDirectoriesAndPreserveTransitiveCanonicalOrder",
@@ -1124,6 +1137,11 @@
       "batchesWithSameIdCannotAliasDifferentKeys",
       "perSiteQueriesAreCompiledBeforeExecutionAndDependenciesAreExplicit",
       "modelCandidatesSupportsAndPremisesRemainAbstractAtConsumerBoundary"
+    ],
+    "io.github.gustavo2358.analysis.values.PlanningLifetimeTest": [
+      "executionClosesEveryCachedRunOnceDespiteCleanupFailure",
+      "rejectedExecutionClosesItsRunAndPreservesBindingFailure",
+      "closedProviderHandlesDiscardEnginesWithoutErasingDeliveredFacts"
     ],
     "io.github.gustavo2358.analysis.values.PlanningRuntimeTest": [
       "realVerticalSharesRunQueryReplayAndProducerSupport",

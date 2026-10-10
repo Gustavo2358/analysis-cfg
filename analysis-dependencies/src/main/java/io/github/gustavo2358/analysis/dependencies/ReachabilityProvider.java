@@ -59,13 +59,15 @@ public final class ReachabilityProvider implements AnalysisProvider<LabelId,Reac
                         return unknown?state|2:state;
                     }
                 };
-                var solved=DataflowSolver.solve(selected,definition);
                 var reached=new HashSet<LabelId>();var openLabels=new HashSet<LabelId>();
-                for(var sequence:unit.sequences())for(int state:solved.states(selectedContext,session.index().sequence(sequence.label()),true)) {
-                    if((state&1)!=0)reached.add(sequence.label());
-                    if((state&2)!=0)openLabels.add(sequence.label());
+                final AnalysisOutcome outcome;
+                try(var solved=DataflowSolver.solve(selected,definition)) {
+                    for(var sequence:unit.sequences())for(int state:solved.states(selectedContext,session.index().sequence(sequence.label()),true)) {
+                        if((state&1)!=0)reached.add(sequence.label());
+                        if((state&2)!=0)openLabels.add(sequence.label());
+                    }
+                    outcome=new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,Map.of("nodesVisited",solved.metrics().analysisPoints(),"edgesVisited",solved.metrics().contextualEdges(),"reachabilityRuns",1L));
                 }
-                var outcome=new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,Map.of("nodesVisited",solved.metrics().analysisPoints(),"edgesVisited",solved.metrics().contextualEdges(),"reachabilityRuns",1L));
                 return new Run<>() {
                     public AnalysisOutcome outcome(){return outcome;}
                     public Materialized<LabelId,Fact> observe(List<PointQuery<LabelId>> queries) {

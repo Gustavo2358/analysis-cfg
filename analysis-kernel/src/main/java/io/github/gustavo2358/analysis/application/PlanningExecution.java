@@ -104,13 +104,19 @@ public final class PlanningExecution implements AutoCloseable {
             };
         }
         counts.add("analysisRuns",1); var run = Objects.requireNonNull(prepared.execute());
-        var outcome = Objects.requireNonNull(run.outcome());
-        if (!key.equals(outcome.key()) || outcome.status() != AnalysisOutcome.Status.STABLE) throw new IllegalArgumentException("provider execution binding mismatch");
-        return new BoundRun<>(provider.subjectType(),provider.factType(),key,outcome,run);
+        try {
+            var outcome = Objects.requireNonNull(run.outcome());
+            if (!key.equals(outcome.key()) || outcome.status() != AnalysisOutcome.Status.STABLE) throw new IllegalArgumentException("provider execution binding mismatch");
+            return new BoundRun<>(provider.subjectType(),provider.factType(),key,outcome,run);
+        } catch (RuntimeException | Error failure) {
+            try { run.close(); } catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+            throw failure;
+        }
     }
     private interface CachedRun {
         AnalysisOutcome outcome();
         BatchResult observe(ExecutionPlan.BatchPlan batch);
+        default void close() { }
     }
     /** Only a registered provider can supply this inseparable execution/materializer. No external run injection. */
     private static final class BoundRun<T,V> implements CachedRun {
@@ -123,6 +129,7 @@ public final class PlanningExecution implements AutoCloseable {
             this.subjects = subjects; this.facts = facts; this.key = key; this.outcome = outcome; this.execution = execution;
         }
         public AnalysisOutcome outcome() { return outcome; }
+        public void close() { execution.close(); }
         public BatchResult observe(ExecutionPlan.BatchPlan batch) {
             if (!key.equals(batch.id.analysisKey()) || subjects != batch.id.subjectType() || facts != batch.id.factType())
                 throw new IllegalArgumentException("wrong batch bound to analysis key");
@@ -198,6 +205,19 @@ public final class PlanningExecution implements AutoCloseable {
     private void requireOpen() { if (session == null) throw new IllegalStateException("closed execution lifetime"); }
     @Override public void close() {
         if (executing) throw new IllegalStateException("cannot close during execution");
-        runs.clear(); executed.clear(); session = null; registry = null;
+        if (session == null) return;
+        session = null; registry = null;
+        Throwable failure = null;
+        try {
+            for (var run : runs.values()) {
+                try { run.close(); }
+                catch (RuntimeException | Error cleanup) {
+                    if (failure == null) failure = cleanup;
+                    else if (cleanup != failure) failure.addSuppressed(cleanup);
+                }
+            }
+        } finally { runs.clear(); executed.clear(); }
+        if (failure instanceof RuntimeException runtime) throw runtime;
+        if (failure instanceof Error error) throw error;
     }
 }
