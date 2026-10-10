@@ -116,7 +116,7 @@ public final class DependencyAnalysis {
     }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg,SnapshotProgram metadataOwner) {
         var opened=AnalysisSession.open(cfg,publication,cfg.options().projectionPolicy(),publication.units().stream()
-            .flatMap(u->u.entries().stream()).filter(e->e.initialLabel().isPresent()).map(Entries.Entry::id).toList());
+            .flatMap(u->u.entryViews().stream()).filter(e->e.initialLabel().isPresent()).map(ProgramStore.EntryView::id).toList());
         if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason(),metadataOwner);
         var session=opened.session().orElseThrow();
         try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
@@ -205,7 +205,7 @@ public final class DependencyAnalysis {
     }
     private static List<SiteView> inventory(ProgramStore.Structural publication) {
         var result=new ArrayList<SiteView>();
-        for(var unit:publication.units())for(var entry:unit.entries())for(var sequence:unit.sequences())
+        for(var unit:publication.units())for(var entry:unit.entryViews())for(var sequence:unit.sequences())
             if(sequence.terminator() instanceof Operations.Invoke invoke&&CallDependencyPlan.selected(invoke))
                 result.add(new SiteView(entry.id(),sequence.label(),sequence.instructions().size(),invoke));
         return List.copyOf(result);

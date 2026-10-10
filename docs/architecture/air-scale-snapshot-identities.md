@@ -906,3 +906,46 @@ all Entry condition bodies for ReferenceChecks. Its small control and unchanged
 full oracle pass. These diagnostic timings ran concurrently with FAST,not isolated
 G4. Entry headers and retained initial value bodies remain the next demonstrated
 gap; AS-W09/W10 remain PARTIAL,not a global bounded-memory claim.
+
+## Borrowed Entry headers and initial conditions
+
+Strict producer pin8b596372e7ba712de3a186b64200be94d7b4481a keeps public AIR
+records/wire unchanged. Validation reads immutable Entry headers/state metadata
+without cold initial literal bodies; consistency checks borrow canonical initial
+operand addresses and decode only the current compared values. The consumer's
+additive EntryView/EntryStateView/InitialConditionView route similarly borrows
+addresses for indexing,control,EntryFacts,RD and Regional initial sources. Explicit
+resident access still materializes the complete original values. EntryFacts.Fact
+is now a value class rather than a record,with its old constructor/accessors and
+value equality preserved; callers using record-specific reflection need migration.
+
+Producer FAST282/145/44 PASS29.649s. Consumer focused native2,initial/coexistence25
+and structural/RD19 laws pass. An isolated materializing Entry-view mutant fails
+the independent cold-payload retention audit. Mandatory initial values,supports,
+origins,remainder,owner validation,operand directory and expired views remain exact.
+Original consumer FAST's test batch passes1204 required methods,zero skips
+(Maven12:22min),but the enclosing command exits1 at W5 compiled inventory drift.
+The reviewed capture diff only replaces DefaultValuePlan's resident Entry edge
+with EntryView. Original capture updated that inventory;all seven original compiled
+W1/W2/W3/W4/W5/W1D/storage guards rerun without update. Tests and fresh guards
+compose local evidence on unchanged executables;the failed FAST command is retained
+and is not reported as a successful full command run.
+
+Unchanged InitialCatalogue512173757655B first failed OOM43.55s during eager Entry
+admission. Final isolated Java21/Xmx128m/original-quota CLI runs pass
+122.73/121.30/122.10s,median122.10s;small976079B passes8.09s. The unchanged oracle
+checks21 semantic fields,83 origins,67 operations,input-derived CALL offset16 and
+complete CFG. All three large products have CFG2498cb07246bcbd658ea975722a318e86127455bb3c055fff1b26bc8e6622df0
+and dependencies8d8d78aad0d18286ed234214d757ca95c3b9cb53e2ae6b2bb2090bd62e40feb4.
+Original cold144490643B preserves both complete products in106.38s;this overlaps
+FAST and is only a semantic regression check,not an isolated benchmark. After tests,
+1364 runtime classes and complete path inventory,2175 consumer/649 producer tracked
+files,21 historical plus4 catalogue inputs and15 libraries match frozen hashes
+before documentation/capture edits. No production executable changed afterwards.
+
+Next actual counterexample is InitialCell512156064090B: admission succeeds,but
+TextProfile's per-Entry consistency map retains all512 decoded initial text bodies,
+causing OOM93.17s. Its before-correction small reference includes all original17
+CALL sites and the complete new cold-sequence CFG. These diagnostic timings overlap
+FAST. Header borrowing is qualified locally,not a complete AS-W09/W10 spill claim.
+Remote publication/CI and human review remain pending;no merge.

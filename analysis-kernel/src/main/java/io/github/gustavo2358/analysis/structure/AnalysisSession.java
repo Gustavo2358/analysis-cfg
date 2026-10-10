@@ -10,10 +10,10 @@ import java.util.*;
 public final class AnalysisSession {
     private final ProgramIndex index;
     private final Map<EntryId, ContextView> contexts;
-    private AnalysisSession(ProgramIndex index, Collection<Entries.Entry> selected) {
+    private AnalysisSession(ProgramIndex index, Collection<ProgramStore.EntryView> selected) {
         this.index = index;
         Map<EntryId, ContextView> views = new LinkedHashMap<>();
-        for (Entries.Entry entry : selected) views.computeIfAbsent(entry.id(), ignored -> new ContextView(index, entry));
+        for (var entry : selected) views.computeIfAbsent(entry.id(), ignored -> new ContextView(index, entry));
         contexts = Collections.unmodifiableMap(views);
     }
     public enum Status { ACCEPTED, INVALID_INPUT, UNSUPPORTED }
@@ -36,11 +36,11 @@ public final class AnalysisSession {
      * The new view has its own contextual handles; it does not mutate this session or any stable run.
      */
     public AnalysisSession selectEntries(Collection<EntryId> selectedEntries) {
-        var selected = new ArrayList<Entries.Entry>();
+        var selected = new ArrayList<ProgramStore.EntryView>();
         for (var id : selectedEntries) {
             var context = contexts.get(Objects.requireNonNull(id));
             if (context == null) throw new IllegalArgumentException("Entry not selected by owning session");
-            selected.add(context.entry());
+            selected.add(context.entryView());
         }
         return new AnalysisSession(index, selected);
     }
@@ -82,9 +82,9 @@ public final class AnalysisSession {
         try {
             var builder = new IndexBuilder(result, store, policy);
             ProgramIndex index = builder.build();
-            List<Entries.Entry> selected = new ArrayList<>();
+            List<ProgramStore.EntryView> selected = new ArrayList<>();
             for (EntryId id : selectedEntries) {
-                Entries.Entry entry = id == null ? null : index.entry(id);
+                var entry = id == null ? null : index.entryView(id);
                 IndexBuilder.valid(entry != null, "foreign selected Entry");
                 if(index.entryNodes.get(entry.id())==null) throw new IndexBuilder.Rejection(Status.UNSUPPORTED,"selected Entry body unavailable");
                 selected.add(entry);

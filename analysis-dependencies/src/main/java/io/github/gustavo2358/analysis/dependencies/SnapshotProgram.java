@@ -570,6 +570,11 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         @Override public List<Memory.ObjectDeclaration> objects(){return borrowed(field(handle,2),MEMORY_OBJECT_DECLARATION,Memory.ObjectDeclaration.class);}
         @Override public List<ObjectId> visibleObjects(){return borrowed(field(handle,3),IDS_OBJECT_ID,ObjectId.class);}
         @Override public List<Entries.Entry> entries(){return borrowed(field(handle,4),ENTRIES_ENTRY,Entries.Entry.class);}
+        @Override public List<ProgramStore.EntryView> entryViews(){
+            long list=field(handle,4);
+            return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
+                ordinal->new StructuralEntry(snapshot.element(list,ENTRIES_ENTRY,ordinal)),SnapshotProgram.this::borrowedOpen);
+        }
         @Override public List<ProgramStore.SequenceView> sequences(){
             long list=field(handle,5);
             return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
@@ -580,6 +585,40 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         @Override public Optional<UncertaintyId> bodyUnavailable(){return optional(field(handle,8),IDS_UNCERTAINTY_ID,UncertaintyId.class);}
         @Override public ProgramStore.CoverageView coverage(){return new StructuralCoverage(field(handle,9));}
         @Override public OriginId origin(){return occurrence(field(handle,10),OriginId.class);}
+    }
+    private final class StructuralEntry implements ProgramStore.EntryView {
+        private final long handle;
+        StructuralEntry(long handle){this.handle=handle;}
+        public EntryId id(){return occurrence(field(handle,0),EntryId.class);}
+        public Optional<LabelId> initialLabel(){return optional(field(handle,1),IDS_LABEL_ID,LabelId.class);}
+        public Interactions.Signature signature(){return occurrence(field(handle,2),Interactions.Signature.class);}
+        public OriginId origin(){return occurrence(field(handle,4),OriginId.class);}
+        public ProgramStore.EntryStateView state(){
+            long state=field(handle,3);
+            return new ProgramStore.EntryStateView() {
+                public List<ProgramStore.InitialConditionView> conditions(){
+                    long list=field(state,0);
+                    return new ProgramStore.BorrowedList<>(Math.toIntExact(snapshot.size(list)),
+                        ordinal->new StructuralInitial(snapshot.element(list,ENTRIES_INITIAL_CONDITION,ordinal)),SnapshotProgram.this::borrowedOpen);
+                }
+                public List<UncertaintyId> uncertainties(){return borrowed(field(state,1),IDS_UNCERTAINTY_ID,UncertaintyId.class);}
+            };
+        }
+    }
+    private final class StructuralInitial implements ProgramStore.InitialConditionView {
+        private final long handle;
+        StructuralInitial(long handle){this.handle=handle;}
+        public Place place(){return occurrence(field(handle,0),Place.class);}
+        public Entries.InitialValue value(){return occurrence(field(handle,1),Entries.InitialValue.class);}
+        public OriginId origin(){return occurrence(field(handle,2),OriginId.class);}
+        public List<PremiseId> premises(){return borrowed(field(handle,3),IDS_PREMISE_ID,PremiseId.class);}
+        public boolean literal(){borrowedOpen();return snapshot.shape(field(handle,1))==ENTRIES_LITERAL_INITIAL;}
+        public boolean possible(){borrowedOpen();return snapshot.shape(field(handle,1))==ENTRIES_POSSIBLE_LITERALS;}
+        public Expressions.Literal candidate(int at){
+            long value=field(handle,1);
+            if(literal()){Objects.checkIndex(at,1);return occurrence(field(value,0),Expressions.Literal.class);}
+            return occurrence(snapshot.element(field(value,0),EXPRESSIONS_LITERAL,at),Expressions.Literal.class);
+        }
     }
     private final class StructuralSequence implements ProgramStore.SequenceView {
         private final long handle;

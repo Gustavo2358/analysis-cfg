@@ -71,7 +71,7 @@ public final class CallDependencyPlan {
         for(var site:session.index().sites(Operations.Invoke.class))if(selected((Operations.Invoke)site.operation()))
             invokes.computeIfAbsent(site.owner().id(),ignored->new ArrayList<>()).add(site);
         for(var context:session.contexts()) {
-            var entry=context.entry().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
+            var entry=context.entryView().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
             var admission=new HashMap<ObjectId,Boolean>();var demand=new HashSet<ObjectId>();
             var selected=new EnumMap<Provider,Set<OperationId>>(Provider.class);
             var queries=new HashSet<PointQuery<ObjectId>>();

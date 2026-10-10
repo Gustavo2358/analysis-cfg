@@ -10,12 +10,13 @@ import java.util.Objects;
 /** Selected activation Entry, not a local invocation frame or a reachability certificate. */
 public final class ContextView {
     private final ProgramIndex index;
-    private final Entries.Entry entry;
+    private final ProgramStore.EntryView entry;
     private final int ordinal;
-    ContextView(ProgramIndex index, Entries.Entry entry) {
+    ContextView(ProgramIndex index, ProgramStore.EntryView entry) {
         this.index = index; this.entry = entry; ordinal = index.entryOrdinals.get(entry.id());
     }
-    public Entries.Entry entry() { return entry; }
+    public Entries.Entry entry() { return entry.materialize(); }
+    public ProgramStore.EntryView entryView() { return entry; }
     public ProgramIndex.Node entryNode() { return index.entryNodes.get(entry.id()); }
     public ProgramIndex.Node normalExit() { return index.normalExits.get(entry.id()); }
     public EdgeCursor successors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, true); }
@@ -99,13 +100,13 @@ public final class ContextView {
         private int current = -1;
         private long edgesVisited;
         private final ProgramIndex.Node anchor;
-        private final Entries.Entry entry;
+        private final ProgramStore.EntryView entry;
         private final boolean forward;
         private final boolean exactLabels;
         private final java.util.Iterator<ProgramIndex.Node> candidates;
         private ProgramIndex.Node symbolicSource, symbolicTarget;
         private CfgTransition symbolicEdge,boundEdge;
-        EdgeCursor(ProgramIndex index, int[] next, int position,int sharedPosition, ProgramIndex.Node anchor, Entries.Entry entry, boolean forward) {
+        EdgeCursor(ProgramIndex index, int[] next, int position,int sharedPosition, ProgramIndex.Node anchor, ProgramStore.EntryView entry, boolean forward) {
             this.index = index; this.next = next; this.position = position;this.sharedPosition=sharedPosition; this.anchor = anchor; this.entry = entry; this.forward = forward;
             var sources = index.openSources.getOrDefault(entry.id().unit(), java.util.List.of());
             var labels=forward ? index.labelTargets.get(anchor) : null;

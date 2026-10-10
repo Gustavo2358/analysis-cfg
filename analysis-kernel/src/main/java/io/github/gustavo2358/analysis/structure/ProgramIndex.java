@@ -37,7 +37,7 @@ public final class ProgramIndex {
     private final Map<OperandId, ObjectId> objectReferences;
     private final Map<OperandId, Place> places;
     private final ProgramStore.OperandDirectory operands;
-    private final Map<EntryId, Entries.Entry> entries;
+    private final Map<EntryId, ProgramStore.EntryView> entries;
     private final IndexMetrics metrics;
     private final Set<UnitId> partialControlUnits;
     private final Set<OperationId> unprovedPreconditions;
@@ -108,7 +108,9 @@ public final class ProgramIndex {
     public Node node(CfgNodeId id) { return nodeIds.get(id); }
     public Node sequence(LabelId id) { return sequences.get(id); }
     public ProgramStore.UnitView unit(UnitId id) { return units.get(id); }
-    public Entries.Entry entry(EntryId id) { return entries.get(id); }
+    /** Explicit resident compatibility,not used by native analysis preparation. */
+    public Entries.Entry entry(EntryId id) { var entry=entries.get(id);return entry==null?null:entry.materialize(); }
+    public ProgramStore.EntryView entryView(EntryId id) { return entries.get(id); }
     public Site site(OperationId id) { return operations.get(id); }
     /** Immutable source occurrence, not Java allocation identity; rejects changed same-ID payloads. */
     public void requireOperation(Operation operation) {

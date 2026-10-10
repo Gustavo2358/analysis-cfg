@@ -157,12 +157,55 @@ public interface ProgramStore {
         List<Memory.ObjectDeclaration> objects();
         List<ObjectId> visibleObjects();
         List<Entries.Entry> entries();
+        /** Borrowed headers for native execution; entries() is explicit resident compatibility. */
+        default List<EntryView> entryViews(){return new BorrowedList<>(entries().size(),at->residentEntry(entries().get(at)),()->{});}
         List<SequenceView> sequences();
         List<Entries.CompletionPort> completionPorts();
         Unit.BodyAvailability body();
         Optional<UncertaintyId> bodyUnavailable();
         CoverageView coverage();
         OriginId origin();
+    }
+
+    interface EntryView {
+        EntryId id(); Optional<LabelId> initialLabel(); Interactions.Signature signature();
+        EntryStateView state(); OriginId origin();
+        default Entries.Entry materialize(){return new Entries.Entry(id(),initialLabel(),signature(),
+            new Entries.EntryState(state().conditions().stream().map(InitialConditionView::materialize).toList(),state().uncertainties()),origin());}
+    }
+    interface EntryStateView {
+        List<InitialConditionView> conditions(); List<UncertaintyId> uncertainties();
+    }
+    interface InitialConditionView {
+        Place place(); Entries.InitialValue value(); OriginId origin(); List<PremiseId> premises();
+        default boolean literal(){return value() instanceof Entries.LiteralInitial;}
+        default boolean possible(){return value() instanceof Entries.PossibleLiterals;}
+        default Expressions.Literal candidate(int at){
+            var value=value();
+            if(value instanceof Entries.LiteralInitial exact){Objects.checkIndex(at,1);return exact.value();}
+            return ((Entries.PossibleLiterals)value).candidates().get(at);
+        }
+        default Entries.InitialCondition materialize(){return new Entries.InitialCondition(place(),value(),origin(),premises());}
+    }
+    static InitialConditionView residentInitial(Entries.InitialCondition condition) {
+        Objects.requireNonNull(condition);
+        return new InitialConditionView() {
+            public Place place(){return condition.place();}public Entries.InitialValue value(){return condition.value();}
+            public OriginId origin(){return condition.origin();}public List<PremiseId> premises(){return condition.premises();}
+            public Entries.InitialCondition materialize(){return condition;}
+        };
+    }
+    static EntryView residentEntry(Entries.Entry entry) {
+        Objects.requireNonNull(entry);
+        return new EntryView() {
+            public EntryId id(){return entry.id();}public Optional<LabelId> initialLabel(){return entry.initialLabel();}
+            public Interactions.Signature signature(){return entry.signature();}public OriginId origin(){return entry.origin();}
+            public EntryStateView state(){return new EntryStateView() {
+                public List<InitialConditionView> conditions(){return new BorrowedList<>(entry.state().conditions().size(),at->residentInitial(entry.state().conditions().get(at)),()->{});}
+                public List<UncertaintyId> uncertainties(){return entry.state().uncertainties();}
+            };}
+            public Entries.Entry materialize(){return entry;}
+        };
     }
 
     /** Operation access may reconstruct one occurrence. Java object identity is not an AIR ID. */

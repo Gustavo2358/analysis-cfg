@@ -14,7 +14,7 @@ final class IndexBuilder {
     final IndexMetrics.Counter count = new IndexMetrics.Counter();
     final Map<UnitId, ProgramStore.UnitView> units = new HashMap<>();
     final Map<LabelId, ProgramStore.SequenceView> sequences = new HashMap<>();
-    final Map<EntryId, Entries.Entry> entries = new HashMap<>();
+    final Map<EntryId, ProgramStore.EntryView> entries = new HashMap<>();
     final Map<EntryId, Integer> entryOrdinals = new HashMap<>();
     final Map<CfgNodeId, ProgramIndex.Node> nodeIds = new HashMap<>();
     final Map<LabelId, ProgramIndex.Node> sequenceNodes = new HashMap<>();
@@ -189,7 +189,7 @@ final class IndexBuilder {
                 }
                 operation(sequence, unit, offset, term);
             }
-            for (Entries.Entry entry : unit.entries()) {
+            for (var entry : unit.entryViews()) {
                 count.visit("entries");
                 valid(entry.id().unit().equals(unit.id()), "foreign Entry owner");
                 unique(entries, entry.id(), entry, "duplicate Entry");
@@ -201,7 +201,7 @@ final class IndexBuilder {
                 valid(entry.initialLabel().orElseThrow().unit().equals(unit.id())
                         && sequences.containsKey(entry.initialLabel().orElseThrow()), "foreign/missing Entry initial Sequence");
                 }
-                for (Entries.InitialCondition condition : entry.state().conditions()) {
+                for (var condition : entry.state().conditions()) {
                     count.visit("entry.conditions");
                     operands(List.of(condition.place()), new EntryOwner(entry.id()));
                     if (condition.value() instanceof Entries.LiteralInitial initial)
@@ -212,7 +212,7 @@ final class IndexBuilder {
             }
             // Expected cardinality plus unique valid roles proves completeness without constructing
             // expected edges, including on a severely truncated input. No Entries x Sequences pass.
-            expectedEdges = Math.addExact(expectedEdges, Math.multiplyExact(unit.entries().stream().filter(e->e.initialLabel().isPresent()).count(), Math.incrementExact(arity)));
+            expectedEdges = Math.addExact(expectedEdges, Math.multiplyExact(unit.entryViews().stream().filter(e->e.initialLabel().isPresent()).count(), Math.incrementExact(arity)));
         }
     }
 
@@ -338,7 +338,7 @@ final class IndexBuilder {
         for (CfgTransition edge : rows) {
             count.visit("cfg.transitions");
             ProgramIndex.Node source = nodeIds.get(edge.from()), target = nodeIds.get(edge.to());
-            Entries.Entry activation = entries.get(edge.activationEntry());
+            var activation = entries.get(edge.activationEntry());
             valid(source != null && target != null && activation != null, "foreign edge endpoint/Entry");
             valid(source.owner().id().equals(activation.id().unit()) && target.owner().id().equals(activation.id().unit()), "wrong edge activationEntry");
             ProgramIndex.Node expected = expectedTarget(source, activation, edge.kind(), target);
@@ -364,7 +364,7 @@ final class IndexBuilder {
         }
     }
 
-    private ProgramIndex.Node expectedTarget(ProgramIndex.Node source, Entries.Entry activation, CfgTransition.Kind kind, ProgramIndex.Node target) {
+    private ProgramIndex.Node expectedTarget(ProgramIndex.Node source, ProgramStore.EntryView activation, CfgTransition.Kind kind, ProgramIndex.Node target) {
         if (source.source() instanceof CfgNode.EntryNode entry) {
             return kind == CfgTransition.Kind.ENTRY && entry.entry().equals(activation.id())
                     ? sequenceNodes.get(activation.initialLabel().orElseThrow()) : null;

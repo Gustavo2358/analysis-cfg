@@ -62,11 +62,14 @@ final class OpenControl {
         }
         return Scopes.NoControl.INSTANCE;
     }
-    static boolean allows(ProgramIndex.Node source,ProgramIndex.Node target,Entries.Entry entry, ProjectionPolicy policy) {
+    static boolean allows(ProgramIndex.Node source,ProgramIndex.Node target,ProgramStore.EntryView entry, ProjectionPolicy policy) {
         if(!source.owner().id().equals(entry.id().unit())||!target.owner().id().equals(entry.id().unit()))return false;
         return bound(source,policy) instanceof Scopes.WithinControl w && contains(w.scope(),target,entry);
     }
-    private static boolean contains(Scopes.ControlScope scope,ProgramIndex.Node target,Entries.Entry entry) {
+    static boolean allows(ProgramIndex.Node source,ProgramIndex.Node target,Entries.Entry entry,ProjectionPolicy policy) {
+        return allows(source,target,ProgramStore.residentEntry(entry),policy);
+    }
+    private static boolean contains(Scopes.ControlScope scope,ProgramIndex.Node target,ProgramStore.EntryView entry) {
         if(target.source() instanceof CfgNode.EntryNode)return false;
         if(target.source() instanceof CfgNode.NormalExit exit&&!exit.entryId().equals(entry.id()))return false;
         if(scope instanceof Scopes.AllControl)return true;

@@ -21,11 +21,11 @@ public final class ReachingDefinitions {
     private final Map<OperationId,List<Plan>> otherwise;
     private final Map<EntryId,List<Initial>> initial=new HashMap<>();
     private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
-    private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
+    private record LogicalInitial(int slot,ProgramStore.InitialConditionView condition,ObjectId object,StorageIndex.Resolution resolution) { }
     private final Map<UnitId,Boolean> controlOpen=new HashMap<>();
     private record Plan(StatementEffects.OperationRef occurrence,StatementEffects.Write write,StatementEffects.Target target,
                         Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments,StatementEffects.LogicalTarget logical) { }
-    private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
+    private record Initial(int slot,ProgramStore.InitialConditionView condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<ReachingDefinitions> analysis) { }
     public static Admission prepare(StatementEffects effects) {
@@ -53,8 +53,8 @@ public final class ReachingDefinitions {
         }
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();int slot=0;
-            for(var fact:EntryFacts.admitted(effects.storage(),context.entry())) {
-                var condition=fact.condition();var resolution=fact.resolution();
+            for(var fact:EntryFacts.admitted(effects.storage(),context.entryView())) {
+                var condition=fact.conditionView();var resolution=fact.resolution();
                 if(condition.value() instanceof Entries.PossibleLiterals&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
                     logicalSeeds.add(new LogicalInitial(slot++,condition,object.object(),resolution));continue;
                 }
@@ -64,7 +64,7 @@ public final class ReachingDefinitions {
                 }
                 slot=Math.incrementExact(slot);
             }
-            initial.put(context.entry().id(),List.copyOf(seeds));logicalInitial.put(context.entry().id(),List.copyOf(logicalSeeds));
+            initial.put(context.entryView().id(),List.copyOf(seeds));logicalInitial.put(context.entryView().id(),List.copyOf(logicalSeeds));
         }
     }
     private List<Plan> compile(StatementEffects.OperationRef operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
@@ -123,7 +123,7 @@ public final class ReachingDefinitions {
             if(session!=owner.session)throw new IllegalArgumentException("foreign session");
             var result=new ArrayList<Boundary<State>>();
             for(var context:session.contexts()) {
-                var entry=context.entry().id();var root=new SegmentMap<Set<EventHandle>>();
+                var entry=context.entryView().id();var root=new SegmentMap<Set<EventHandle>>();
                 for(var seed:owner.initial.get(entry)) {
                     var event=intern(DefinitionEvent.initial(entry,seed.condition(),seed.slot(),seed.target(),owner.effects.storage().resolve(seed.condition().place())));
                     for(var segment:seed.segments()) {
@@ -262,7 +262,7 @@ public final class ReachingDefinitions {
             return store.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!store.coverage().uncertainties().isEmpty()
                 ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()
                 ||owner.controlOpen.getOrDefault(unit.id(),false)
-                ||!owner.session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
+                ||!owner.session.context(query.point().entry()).entryView().state().uncertainties().isEmpty()
                 ||owner.effects.storage().explicitObjects(query.subject()).stream().map(owner.session.index()::object)
                     .anyMatch(object->object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
         }

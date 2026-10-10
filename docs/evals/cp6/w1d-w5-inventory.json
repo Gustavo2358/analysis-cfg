@@ -96,8 +96,6 @@
         "java.lang.String"
       ],
       "io.github.gustavo2358.analysis.dataflow.DefaultValuePlan": [
-        "io.github.gustavo2358.air.model.Entries",
-        "io.github.gustavo2358.air.model.Entries$Entry",
         "io.github.gustavo2358.air.model.Ids",
         "io.github.gustavo2358.air.model.Ids$EntryId",
         "io.github.gustavo2358.air.model.Ids$LabelId",
@@ -138,6 +136,7 @@
         "io.github.gustavo2358.analysis.structure.ProgramIndex",
         "io.github.gustavo2358.analysis.structure.ProgramIndex$Site",
         "io.github.gustavo2358.analysis.structure.ProgramStore",
+        "io.github.gustavo2358.analysis.structure.ProgramStore$EntryView",
         "io.github.gustavo2358.analysis.structure.ProgramStore$SequenceView",
         "io.github.gustavo2358.analysis.structure.ProgramStore$UnitView",
         "io.github.gustavo2358.analysis.values.PossibleValuesProvider",

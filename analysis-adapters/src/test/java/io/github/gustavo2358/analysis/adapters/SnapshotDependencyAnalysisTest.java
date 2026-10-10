@@ -559,8 +559,8 @@ final class SnapshotDependencyAnalysisTest {
         for(boolean possible:new boolean[]{false,true}) {
             var seed=directCall();var unit=seed.units().getFirst();var origin=unit.origin();var entry=unit.entries().getFirst();var owner=new EntryOwner(entry.id());
             var place=new Places.ObjectPlace(new Operand.Header(new OperandId(owner,"initial-place"),Operand.Role.VALUE_WRITE,origin),unit.objects().getFirst().id());
-            var first=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial-first"),Operand.Role.VALUE_READ,origin),new Values.TextValue("INITIAL-A"));
-            var second=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial-second"),Operand.Role.VALUE_READ,origin),new Values.TextValue("INITIAL-B"));
+            var first=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial-first"),Operand.Role.VALUE_READ,origin),new Values.TextValue("cold-dormant-literal-initial-A/"+"x".repeat(4096)));
+            var second=new Expressions.Literal(new Operand.Header(new OperandId(owner,"initial-second"),Operand.Role.VALUE_READ,origin),new Values.TextValue("cold-dormant-literal-initial-B/"+"y".repeat(4096)));
             var gap=new UncertaintyId(seed.id(),"entry-value-gap");
             Entries.InitialValue value=possible?new Entries.PossibleLiterals(List.of(first,second),gap):new Entries.LiteralInitial(first);
             var initial=new Entries.InitialCondition(place,value,origin,List.of());
@@ -577,13 +577,43 @@ final class SnapshotDependencyAnalysisTest {
             while(!pending.isEmpty()){var operand=pending.removeFirst();assertNull(expected.put(operand.header().id(),operand));pending.addAll(Operands.children(operand));}
             var ledger=resources();var input=directory.resolve("operand-entry-"+possible+".air.json");Files.write(input,new AirJson().encode(publication));
             ProgramStore.OperandDirectory borrowed;
+            ProgramStore.EntryView borrowedEntry;
+            ProgramStore.InitialConditionView borrowedCondition;
+            io.github.gustavo2358.analysis.storage.StatementEffects.ExpressionSource borrowedSource;
             try(var read=new DataflowAirReader().readSnapshot(input,ledger);var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),ledger)) {
                 assertTrue(read.checked().result().isStructurallyValid(),read.checked().result().toString());borrowed=program.operandDirectory().orElseThrow();assertEquals(expected.size(),borrowed.size());
                 for(var operand:expected.values()){int ordinal=borrowed.ordinal(operand.header().id());assertTrue(ordinal>=0);assertEquals(operand.header().id(),borrowed.identity(ordinal));assertEquals(operand,borrowed.at(ordinal));}
                 assertEquals(possible,borrowed.ordinal(second.header().id())>=0);
                 try(var membership=borrowed.column(borrowed.size())){membership.set(0,7);assertEquals(7,membership.get(0));}
+                borrowedEntry=program.units().getFirst().entryViews().getFirst();
+                borrowedCondition=borrowedEntry.state().conditions().getFirst();
+                assertEquals(changedEntry,borrowedEntry.materialize());assertEquals(initial,borrowedCondition.materialize());
+                assertEquals(possible,borrowedCondition.possible());assertEquals(!possible,borrowedCondition.literal());
+                borrowedSource=io.github.gustavo2358.analysis.storage.StatementEffects.ExpressionSource.initial(borrowedCondition,possible?1:0);
+                assertEquals(possible?second:first,borrowedSource.value());
+                var coordinator=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty());
+                var cfg=coordinator.buildChecked(program,read.checked(),BuildOptions.defaults());
+                var session=io.github.gustavo2358.analysis.structure.AnalysisSession.open(cfg,program,cfg.options().projectionPolicy(),List.of(entry.id())).session().orElseThrow();
+                assertEquals(0,retainedDormantTexts(session.index()),"Entry index must not own decoded initial bodies");
+                var effects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(session));
+                var facts=io.github.gustavo2358.analysis.storage.EntryFacts.admitted(effects.storage(),session.context(entry.id()).entryView());
+                assertEquals(initial,facts.getFirst().condition());assertEquals(0,retainedDormantTexts(facts));
+                var rd=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(effects).analysis().orElseThrow();
+                assertEquals(0,retainedDormantTexts(rd),"RD initial plans borrow condition addresses");
+                var regional=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(session,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow();
+                assertEquals(0,retainedDormantTexts(regional),"Regional initial plans and sources must not retain initial literals");
+                var residentCfg=coordinator.build(publication,BuildOptions.defaults());
+                var resident=io.github.gustavo2358.analysis.structure.AnalysisSession.open(residentCfg,publication,residentCfg.options().projectionPolicy(),List.of(changedEntry)).session().orElseThrow();
+                var query=new io.github.gustavo2358.analysis.query.PointQuery<io.github.gustavo2358.analysis.storage.StorageSubject>(io.github.gustavo2358.analysis.query.ProgramPoint.before(entry.id(),changed.sequences().getFirst().instructions().getFirst().header().id()),new io.github.gustavo2358.analysis.storage.StorageSubject.NamedObject(place.object()));
+                var expectedValues=io.github.gustavo2358.analysis.values.RegionalValuesAnalysis.prepare(resident,io.github.gustavo2358.analysis.values.StorageAnalysisMode.EXPERIMENTAL_PHYSICAL).analysis().orElseThrow().execute().observeStorage(List.of(query));
+                assertEquals(expectedValues.observations(),regional.execute().observeStorage(List.of(query)).observations(),"all initial values/supports/remainder remain exact");
+                var residentEffects=new io.github.gustavo2358.analysis.storage.StatementEffects(new io.github.gustavo2358.analysis.storage.StorageIndex(resident));
+                var expectedDefinitions=io.github.gustavo2358.analysis.rd.ReachingDefinitions.prepare(residentEffects).analysis().orElseThrow().execute().observeStorage(List.of(query));
+                assertEquals(expectedDefinitions.observations(),rd.execute().observeStorage(List.of(query)).observations());
+                assertEquals(0,retainedDormantTexts(session.index()));assertEquals(0,retainedDormantTexts(regional));
             }
             var expired=borrowed;assertThrows(IllegalStateException.class,expired::size);assertThrows(IllegalStateException.class,()->expired.identity(0));assertThrows(IllegalStateException.class,()->expired.ordinal(place.header().id()));assertThrows(IllegalStateException.class,()->expired.at(0));
+            assertThrows(IllegalStateException.class,borrowedEntry::id);assertThrows(IllegalStateException.class,borrowedCondition::value);assertThrows(IllegalStateException.class,borrowedSource::value);
             for(var pool:AnalysisResources.Pool.values())assertEquals(0,ledger.used(pool),pool.toString());
         }
     }

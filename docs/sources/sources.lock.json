@@ -150,7 +150,7 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "7315f75ff5c468e62fd7237ad98bbb86206e2313",
+    "commit": "8b596372e7ba712de3a186b64200be94d7b4481a",
     "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
@@ -246,15 +246,23 @@
       "integration": "Strict local pin7315 qualified with consumer4af: coherent dependency/build and admission9/RegionalInitial5 PASS; compiled architecture guards PASS. Isolated real CLI Java21/Xmx128m/original quotas: Initial16 small2.44s,large24440175B22.88/22.67/22.89s,median22.88s; unchanged21-field/83-origin/67-operation/full-CFG oracle PASS and all three products byte-identical. Original cold144490643B repeat106.60s preserves both complete reference products. Original consumer FAST1204 required methods,zero skips,PASS777.356s. Post-FAST1348 runtime classes including complete path inventory,2175 consumer/649 producer tracked files,21 material inputs and15 libraries match their frozen hashes. Prior22.46s remains intermediate smoke,not final qualification.",
       "limits": "Codec validation avoids materialized octet catalogues; initial overlap checks borrow literal+codec descriptors and compare exact primitive octets. Decoded initial bodies,proof/state tables and other cardinality-dependent stores still require AS-W09/W10 work. No quota/rule/dimension change,push or merge."
     },
+    "native_entry_borrowing_checkpoint": {
+      "commit": "8b596372e7ba712de3a186b64200be94d7b4481a",
+      "previous_commit": "7315f75ff5c468e62fd7237ad98bbb86206e2313",
+      "api_impact": "AIR model/wire unchanged; consumer adds borrowed Entry/state/condition views with explicit resident materialization",
+      "validation": "Producer original FAST PASS29.649s:282 model/145 transport/44 harness. Consumer native Entry/shared-label2,initial/coexistence25 and structural/RD19 laws PASS; controlled Entry materialization mutant RED. Original FAST unit/contract batch PASS1204 required methods,zero skips; enclosing FAST exited1 at W5 compiled inventory drift. Reviewed W5 diff replaces only DefaultValuePlan's resident Entry edge with EntryView; original mechanical capture updated it,then all seven original W1/W2/W3/W4/W5/W1D/storage compiled guards reran without update. No executable changed between tests and final guards; this is composed local evidence,not a successful exit of the original FAST command.",
+      "integration": "InitialCatalogue512 same173757655B Java21/Xmx128m/original quotas: isolated large122.73/121.30/122.10s,median122.10s; final small976079B8.09s. Unchanged independent21-field/83-origin/67-operation/full-CFG oracle PASS; three large products byte-identical. Original cold144490643B106.38s preserves both complete reference products,but overlaps FAST and is not an isolated benchmark. Post-test1364 runtime classes and complete path inventory,2175 consumer/649 producer tracked files,21 historical plus4 catalogue inputs and15 libraries match frozen hashes before documentation/inventory capture edits.",
+      "limits": "Borrowed headers and initial descriptors remove eager Entry literal catalogues,not all cardinality-dependent state. A separate admitted InitialCell512 fixture156064090B still fails OOM93.17s in TextProfile's initial consistency map; its frozen small pre-fix reference and unchanged original17 CALL sites are preserved. AS-W09/W10 remain PARTIAL. No quota/rule/schema change,push or merge."
+    },
     "previous_ci": {
       "checked_commit": "9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae",
       "status": "PASS",
       "context": "PR30 exact producer9da08d5; remote contracts jobs114079325310/114079308588 (runs38007423531/38007418347) both completed SUCCESS,observed2026-10-10T00:06:38Z. Local FAST282/145 PASS29.983s. Prior650 remote runs37969756139/37969748975 SUCCESS remain historical,not the verdict for this pin. Consumer physical repeat,coherent FAST and human review pending;no merge."
     },
     "ci": {
-      "checked_commit": "7315f75ff5c468e62fd7237ad98bbb86206e2313",
+      "checked_commit": "8b596372e7ba712de3a186b64200be94d7b4481a",
       "status": "NOT_RUN",
-      "context": "Exact producer SHA is local only;remote publication authorization remains pending. No remote CI run or merge is claimed. Producer local FAST282/145 PASS29.409s;consumer strict local repin qualified with real CLI and original FAST1204 PASS777.356s. previous_ci is historical9da evidence,not this pin's verdict."
+      "context": "Exact producer SHA8b59637 is local only;remote publication authorization remains pending. Producer local FAST282/145/44 PASS29.649s. Consumer local composed test/compiled-boundary and real CLI evidence is recorded in native_entry_borrowing_checkpoint,including the original FAST's W5 inventory failure;no remote CI run,successful full FAST command exit or merge is claimed. physical_initial_codec_checkpoint preserves historical7315 evidence;previous_ci preserves historical9da evidence."
     },
     "air_scale_access": {
       "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",

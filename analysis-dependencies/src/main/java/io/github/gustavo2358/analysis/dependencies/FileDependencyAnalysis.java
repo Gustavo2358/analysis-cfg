@@ -45,7 +45,7 @@ final class FileDependencyAnalysis {
             for(var indexed:session.index().sites(Operations.Invoke.class))if(FileDependencyConsumer.selected(indexed.operation(),locals))kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(Operations.Invoke.class);
             for(var id:locals){var indexed=session.index().site(id);if(indexed!=null)kinds.computeIfAbsent(indexed.owner().id(),k->new HashSet<>()).add(indexed.operation().getClass());}
             for(var context:session.contexts()){
-                var entry=context.entry().id();if(!kinds.containsKey(entry.unit()))continue;
+                var entry=context.entryView().id();if(!kinds.containsKey(entry.unit()))continue;
                 String key=part(entry.unit().localId())+part(entry.localId());var batch=ReachabilityProvider.batch("file-reach:"+key,entry);
                 var values=StorageValuesProvider.batch("file-values:"+key,StorageValuesProvider.key(entry,mode));
                 for(var kind:kinds.get(entry.unit()).stream().sorted(Comparator.comparing(Class::getName)).toList())for(int route:List.of(0,1,2,3,5,7)) {
@@ -66,7 +66,7 @@ final class FileDependencyAnalysis {
             metrics.put("possibleValuesPreparations",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)).count());
             metrics.put("possibleValuesStable",result.analyses().stream().filter(a->a.key().implementation().equals(StorageValuesProvider.IMPLEMENTATION)&&a.status()==AnalysisOutcome.Status.STABLE).count());
         }
-        for(var unit:p.units())for(var entry:unit.entries())for(var sequence:unit.sequences()) {
+        for(var unit:p.units())for(var entry:unit.entryViews())for(var sequence:unit.sequences()) {
             // Borrow the typed body; inventory fallback must not materialize every
             // operand/literal merely to select FILE occurrences. Include the
             // terminator at its original offset, even at the int address boundary.

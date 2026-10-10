@@ -64,7 +64,7 @@ public final class RegionalValuesAnalysis {
     private record LogicalValue(LogicalText text,int event) {
         LogicalValue(Values.TextValue text,int event){this(LogicalText.of(text.value()),event);}
     }
-    private record PreparedEvent(StatementEffects.OperationRef occurrence,Entries.InitialCondition initial,StatementEffects.Write write,TargetRef reference,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
+    private record PreparedEvent(StatementEffects.OperationRef occurrence,ProgramStore.InitialConditionView initial,StatementEffects.Write write,TargetRef reference,Optional<Control.OutcomeKey> outcome,StatementEffects.LogicalTarget logical) {
         StatementEffects.Target target(){return reference==null?null:reference.value();}
         Operation operation(){return occurrence==null?null:occurrence.value();}
         DefinitionEvent definition(EntryId entry) {
@@ -166,13 +166,13 @@ public final class RegionalValuesAnalysis {
             var seeds=new ArrayList<Plan>();int slot=0;var seededLocations=new HashSet<StorageIndex.Location>();
             // Simultaneous strong facts initialize first; possible support and open entry
             // content then widen that boundary. Input order is not overwrite authority.
-            for(var fact:EntryFacts.admitted(effects.storage(),context.entry())) {
-                var condition=fact.condition();var resolution=fact.resolution();
+            for(var fact:EntryFacts.admitted(effects.storage(),context.entryView())) {
+                var condition=fact.conditionView();var resolution=fact.resolution();
                 var sources=new ArrayList<StatementEffects.Source>();
-                boolean possible=condition.value() instanceof Entries.PossibleLiterals;
+                boolean possible=condition.possible();
                 if(condition.value() instanceof Entries.PossibleLiterals p)
-                    p.candidates().forEach(l->sources.add(new StatementEffects.ExpressionSource(l)));
-                else if(condition.value() instanceof Entries.LiteralInitial l)sources.add(new StatementEffects.ExpressionSource(l.value()));
+                    for(int candidate=0;candidate<p.candidates().size();candidate++)sources.add(StatementEffects.ExpressionSource.initial(condition,candidate));
+                else if(condition.literal())sources.add(StatementEffects.ExpressionSource.initial(condition,0));
                 else sources.add(new StatementEffects.UnknownSource("ENTRY_CONTENT_NOT_LITERAL"));
                 var strength=fact.strength();
                 for(var source:sources) {
@@ -198,7 +198,7 @@ public final class RegionalValuesAnalysis {
             var batch=Collections.unmodifiableList(new ArrayList<>(seeds));
             var seedWrites=new OccurrenceMap<Boolean>();for(var plan:seeds)seedWrites.put(plan.write(),Boolean.TRUE);
             batchWrites.put(batch,List.copyOf(seedWrites.keySet()));
-            initial.put(context.entry().id(),batch);
+            initial.put(context.entryView().id(),batch);
         }
         // Static read/write connectivity preserves branch correlations before the first copy executes.
         try(var parent=nativeMetadata!=null?nativeMetadata.column(bases.size()):ProgramStore.residentColumn(bases.size())){
@@ -348,7 +348,7 @@ public final class RegionalValuesAnalysis {
         int root=member;while(parent.get(root)!=root)root=Math.toIntExact(parent.get(root));
         while(parent.get(member)!=member){int next=Math.toIntExact(parent.get(member));parent.set(member,root);member=next;}return root;
     }
-    private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,StatementEffects.OperationRef operation,Entries.InitialCondition initial,Optional<Control.OutcomeKey> outcome) {
+    private List<Plan> compile(List<StatementEffects.Write> writes,Id evidence,OriginId origin,List<PremiseId> initialPremises,StatementEffects.OperationRef operation,ProgramStore.InitialConditionView initial,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
         for(var write:writes)closureImpacts.computeIfAbsent(write,w->{
             var impacted=new HashSet<ObjectId>();
@@ -492,7 +492,7 @@ public final class RegionalValuesAnalysis {
             if(session!=selected)throw new IllegalArgumentException("foreign session");
             var result=new ArrayList<Boundary<State>>();
             for(var context:session.contexts()) {
-                var seed=new State(context.entry().id(),new SegmentMap<>(),Map.of(),Set.of(),groupSizes);
+                var seed=new State(context.entryView().id(),new SegmentMap<>(),Map.of(),Set.of(),groupSizes);
                 var boundary=track(apply(seed,initial.get(seed.entry),false));boundaryAlternatives=Math.max(boundaryAlternatives,boundary.materializedAlternatives());
                 result.add(new Boundary<>(context,context.entryNode(),boundary));
             }
@@ -648,12 +648,12 @@ public final class RegionalValuesAnalysis {
                     }
                     var supplied=piece;suppliedValues.put(level(segment),supplied);
                     updates.put(level(segment),prior->{
-                        if(prior instanceof Bytes bytes&&eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().value() instanceof Entries.LiteralInitial)
+                        if(prior instanceof Bytes bytes&&eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().literal())
                             return new Bytes(bytes.image().initialize(new StorageRange(BigInteger.ZERO,bytes.image().extent()),((Bytes)supplied).image()));
                         return supplied;
                     });
                 }
-                boolean initialLiteral=eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().value() instanceof Entries.LiteralInitial;
+                boolean initialLiteral=eventDetails.get(plan.event).initial()!=null&&eventDetails.get(plan.event).initial().literal();
                 result=relations.union(result,initialLiteral?relations.update(old,updates):relations.overwrite(old,suppliedValues));
             }
             return result;
@@ -957,7 +957,7 @@ public final class RegionalValuesAnalysis {
         var store=session.index().store();var unit=session.index().unit(query.point().entry().unit());
         return store.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!store.coverage().uncertainties().isEmpty()
             ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()||controlOpen.contains(unit.id())
-            ||!session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
+            ||!session.context(query.point().entry()).entryView().state().uncertainties().isEmpty()
             ||effects.storage().explicitObjects(query.subject()).stream().map(session.index()::object)
                 .anyMatch(object->object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
     }

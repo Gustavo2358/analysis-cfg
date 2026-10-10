@@ -20,9 +20,13 @@ public final class StatementEffects {
     public static final class ExpressionSource implements Source {
         private final Expression resident;
         private final OperationRef occurrence;
-        public ExpressionSource(Expression value){resident=Objects.requireNonNull(value);occurrence=null;}
-        private ExpressionSource(OperationRef occurrence){this.occurrence=Objects.requireNonNull(occurrence);resident=null;}
-        public Expression value(){return occurrence==null?resident:((Operations.Assign)occurrence.value()).value();}
+        private final ProgramStore.InitialConditionView initial;
+        private final int candidate;
+        public ExpressionSource(Expression value){resident=Objects.requireNonNull(value);occurrence=null;initial=null;candidate=0;}
+        private ExpressionSource(OperationRef occurrence){this.occurrence=Objects.requireNonNull(occurrence);resident=null;initial=null;candidate=0;}
+        private ExpressionSource(ProgramStore.InitialConditionView initial,int candidate){this.initial=Objects.requireNonNull(initial);if(candidate<0)throw new IllegalArgumentException("negative candidate");this.candidate=candidate;resident=null;occurrence=null;}
+        public static ExpressionSource initial(ProgramStore.InitialConditionView initial,int candidate){return new ExpressionSource(initial,candidate);}
+        public Expression value(){return initial!=null?initial.candidate(candidate):occurrence==null?resident:((Operations.Assign)occurrence.value()).value();}
         @Override public boolean equals(Object other){return this==other||other instanceof ExpressionSource source&&value().equals(source.value());}
         @Override public int hashCode(){return value().hashCode();}
         @Override public String toString(){return "ExpressionSource[value="+value()+"]";}

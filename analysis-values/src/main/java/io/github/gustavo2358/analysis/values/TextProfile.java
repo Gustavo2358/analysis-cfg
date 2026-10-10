@@ -42,7 +42,7 @@ final class TextProfile {
         this.effectAware=effectAware;
         this.session=Objects.requireNonNull(session);
         var index=session.index();var store=index.store();
-        var entryUnits=session.contexts().stream().map(c->c.entry().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+        var entryUnits=session.contexts().stream().map(c->c.entryView().id().unit()).collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
         var cells=new HashMap<StorageId,Location>();
         var nativeSubjects=store.declarationInventory().isPresent()?new NativeSubjects(index,cells):null;
         if(nativeSubjects==null){subjects=new HashMap<>();textSubjects=new HashSet<>();}
@@ -118,9 +118,9 @@ final class TextProfile {
         }
         relations=ScalarRelations.create(this.selected,preparedWrites,subjects,cells.size(),()->store.progress(ProgramStore.ExecutionPhase.DOMAIN));
         for(var context:session.contexts()) {
-            if(!context.entry().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entry().id());
+            if(!context.entryView().state().uncertainties().isEmpty())sourceOpenEntries.add(context.entryView().id());
             var seed=PossibleValuesState.reached();var initial=new HashMap<Integer,Values.TextValue>();var initialized=new HashSet<Integer>();
-            for(var condition:context.entry().state().conditions().stream().sorted(Comparator.comparingInt(c->c.value() instanceof Entries.LiteralInitial?0:1)).toList()) {
+            for(var condition:context.entryView().state().conditions().stream().sorted(Comparator.comparingInt(c->c.literal()?0:1)).toList()) {
                 if(!(condition.place() instanceof Places.ObjectPlace object))throw new Refusal(false,"UNSUPPORTED_INITIAL_PLACE");
                 var location=subjects.get(object.object());
                 // A nominal BOOL Cell cannot alias the admitted TEXT/INT Cells

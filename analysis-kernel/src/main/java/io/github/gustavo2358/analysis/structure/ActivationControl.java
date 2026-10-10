@@ -29,11 +29,11 @@ public final class ActivationControl {
     private Interface unwindInterface;
     public ActivationControl(AnalysisSession session,ContextView context) {
         this.index=session.index();this.context=context;
-        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Invoke invoke&&invoke.operation().unit().equals(context.entry().id().unit())) {
+        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Invoke invoke&&invoke.operation().unit().equals(context.entryView().id().unit())) {
             Object key=invoke.reentryGuard().<Object>map(g->new Guard(invoke.operation().unit(),g.activationKey())).orElse(invoke.operation());
             frames.put(invoke.source(),new Frame(invoke,variables.computeIfAbsent(key,k->variables.size())));
         }
-        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind&&unwind.operation().unit().equals(context.entry().id().unit())) {
+        for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind&&unwind.operation().unit().equals(context.entryView().id().unit())) {
             if(unwind.all())resetStarts.add(index.node(unwind.destination()));
             else if(unwind.count().signum()>0&&unwind.count().compareTo(BigInteger.valueOf(frames.size()))<=0)unwindStarts.add(index.node(unwind.destination()));
         }
@@ -100,7 +100,7 @@ public final class ActivationControl {
         var parents=new IdentityHashMap<Frame,Set<Frame>>();
         var remaining=new LinkedHashSet<ProgramIndex.Node>();var roots=new LinkedHashSet<ProgramIndex.Node>();
         for(var rule:index.localRules.values())if(rule instanceof LocalControlRules.Unwind unwind
-                &&unwind.operation().unit().equals(context.entry().id().unit())) {
+                &&unwind.operation().unit().equals(context.entryView().id().unit())) {
             if(unwind.all())roots.add(index.node(unwind.destination()));
             else if(unwind.count().signum()>0&&unwind.count().compareTo(BigInteger.valueOf(frames.size()))<=0)
                 remaining.add(index.node(unwind.destination()));
@@ -173,5 +173,5 @@ public final class ActivationControl {
     private Move move(Action action,ProgramIndex.Node from,ProgramIndex.Node to,Frame frame,int variable,boolean present,int count,ProgramIndex.Node invalid) {
         return new Move(action,to,frame,variable,present,count,invalid,edge(from,to));
     }
-    public CfgTransition edge(ProgramIndex.Node from,ProgramIndex.Node to){return new CfgTransition(from.source().id(),to.source().id(),CfgTransition.Kind.LOCAL,context.entry().id());}
+    public CfgTransition edge(ProgramIndex.Node from,ProgramIndex.Node to){return new CfgTransition(from.source().id(),to.source().id(),CfgTransition.Kind.LOCAL,context.entryView().id());}
 }

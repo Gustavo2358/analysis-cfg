@@ -29,7 +29,7 @@ public final class StoragePartition {
             addWrites(boundaries,statement.writes());addWrites(boundaries,statement.otherwise());
             for(var writes:statement.outcomes().values())addWrites(boundaries,writes);
         }
-        for(var context:storage.session().contexts())for(var condition:context.entry().state().conditions())
+        for(var context:storage.session().contexts())for(var condition:context.entryView().state().conditions())
             for(var candidate:storage.resolve(condition.place()).candidates())add(boundaries,candidate.location());
         var all=new ArrayList<Segment>();var groups=new LinkedHashMap<StorageId,List<Segment>>();
         for(var base:storage.bases()) {
@@ -111,7 +111,7 @@ public final class StoragePartition {
                     for(var read:statement.reads())candidates(read.location().candidates());
                     writes(statement.writes());writes(statement.otherwise());for(var writes:statement.outcomes().values())writes(writes);
                 }
-                for(var context:storage.session().contexts())for(var condition:context.entry().state().conditions())candidates(storage.resolve(condition.place()).candidates());
+                for(var context:storage.session().contexts())for(var condition:context.entryView().state().conditions())candidates(storage.resolve(condition.place()).candidates());
                 try(var ordered=inventory.order(pointCount,(a,b)->{
                     long first=points.get(a),second=points.get(b);
                     int base=Long.compare(numbers.get(first),numbers.get(second));
