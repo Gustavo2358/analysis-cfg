@@ -114,7 +114,7 @@ public final class AnalysisPipeline {
                     var analysis=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
                     var result=evidence==null?null:analysis.prepareLeased(program,built,evidence,List.of(),read.borrowedPages(),execution);
                     try(result) {
-                        var executable=evidence==null?analysis.prepareLeased(program,built):null;
+                        var executable=evidence==null?analysis.prepareLeased(program,built,read.borrowedPages(),execution):null;
                         try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
                                 bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                         catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}

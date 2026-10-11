@@ -107,6 +107,60 @@ successful-bytecode equivalence. General native result/staging/sorting maps,
 all-store coverage, architecture human review and global qualification remain
 pending; this local wave does not complete AS-W00--AS-W10.
 
+## General native CALL fact staging (local qualified; global PARTIAL)
+
+PlanningExecution.executeStored explicitly accepts a typed FactStorage factory;
+arbitrary Java facts have no inferred codec or automatic spill contract. The
+ordinary execute API remains resident and detached. Successful stored consumer
+views are immutable and expire with their execution. Commit does not read the
+whole store. Consumer failure discards its transaction; a later failed epoch
+does not close an earlier committed epoch. Cleanup preserves the original
+callback/storage failure, including suppressed cleanup exceptions.
+
+PagedDependencyFactStorage encodes all29 fields of DependencySiteFact, every
+sealed AIR ID and both OperandOwner variants, full UTF16, duplicate list ordinals,
+supports/premises, optional program points/outcomes and all completion/remainder
+shapes. It is a closed disposable typed codec, not AIR parsing, a new wire or an
+admission certificate. Two PagedLongArray tapes own payload and ordinal offsets;
+no cardinality-sized resident payload/directory and no hash-only identity.
+Fixed controls cost7168B plus the separately funded shared backend cache.
+Sequential consumer ranges share those tapes, with256B funded per transaction
+view before allocation. Closing a failed active tail clears its physical cells;
+closing an earlier range cannot change a later range. No tapes-per-entry product.
+
+Detached projection of one complete fact preflights1024+64B per encoded cell in
+SCRATCH and releases that projection envelope on return; a caller retaining the
+returned DTO is explicitly resident. The full-shape test's former100KB success
+budget could not fund its175808B projection. Raw failure is preserved; a closed
+fixture inventory of <=10000cells derives650000B for one projection plus fixed
+controls, without changing production quotas or weakening full-pressure denial.
+Five finite geometries preserve all fields with fixed resident store controls.
+Work denial initially left owned pages until close: the identical law now passes
+after open aborts immediately. Native program expiry, read faults and projection
+denial retire owned pages while borrowed AIR/backend remain usable.
+
+Actual dependencies/pipeline CLI preparation, plain AIR and admitted SOURCE,
+uses the same general planner/providers with this CALL staging. It does not
+switch to the limited direct-dependency engine.20 focused current laws/neighbors
+and18 unchanged original CLI contracts pass. All1373 prior mandatory method names
+are preserved and13 new methods are added. Seven architecture guards pass after
+explicit registration of the two new kernel classes and exact mechanical refresh
+of only the active W4/core inventories; outer and historical inventories stay
+unchanged. Purity/denials, Java21, Maven and solver rules are not weakened.
+Five fresh actual CLI products pass the original complete oracles and preserve
+previous whole bytes: SOURCE32000 (70.029858s,22824055B), manifests1/4 and
+SOURCEFILE16 through both dependencies and pipeline. Original production defaults
+and watchdog480 are unchanged. These are single finite observations, not medians
+or fresh qualification of the previous large SOURCE/manifest/SOURCEFILE dimensions.
+Original FAST1386 passes in1470.273s with zero failures/errors/skips. Exact audit
+matches all1441 production classfiles across nine consumer and two AIR modules,
+575 Java sources,579 fixtures and15 runtime components to the frozen runtime
+used by those products. Producer a0 remains clean/unchanged; its old FAST is
+reused. Human architecture review and global qualification remain pending.
+Final retained site/reachability/enrichment maps, detached site/edge result DTOs,
+FILE staging, observation maps and writer sorting are still migration debt;
+typed staging alone does not close the architectural resident-result RED or all-store.
+
 SourceShape lists the41 existing record shapes and4 primitive/container shapes
 from QualifiedSourceDependencies,NominalValueEvidence and NominalValues. Typed
 storage is NOT a successful admission/certificate. All existing local constraints,

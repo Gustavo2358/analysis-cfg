@@ -14,6 +14,7 @@ public final class PlanningExecution implements AutoCloseable {
     private AnalysisRegistry registry;
     private final Map<AnalysisKey,CachedRun> runs = new HashMap<>();
     private final Set<Long> executed = new HashSet<>();
+    private final List<FactStorage<?>> factStores = new ArrayList<>();
     private long epoch;
     private boolean executing;
     public PlanningExecution(AnalysisSession session, AnalysisRegistry registry) {
@@ -25,12 +26,29 @@ public final class PlanningExecution implements AutoCloseable {
         var plan = SitePlanner.compile(identity,next,session,registry,registrations); epoch = next; return plan;
     }
     public <F> PreparedAnalysisResult<F> execute(String resultId, ExecutionPlan<F> plan) {
+        return execute(resultId,plan,null);
+    }
+    /** Explicit complete typed storage, never an automatic codec for arbitrary F.
+     * Successful fact views are borrowed until this execution closes. Failed
+     * transactions and aborted epochs retire their storage without publication. */
+    public <F> PreparedAnalysisResult<F> executeStored(String resultId,ExecutionPlan<F> plan,
+            java.util.function.Function<String,? extends FactStorage<F>> storage) {
+        return execute(resultId,plan,Objects.requireNonNull(storage));
+    }
+    private <F> PreparedAnalysisResult<F> execute(String resultId,ExecutionPlan<F> plan,
+            java.util.function.Function<String,? extends FactStorage<F>> storage) {
         requireOpen(); Objects.requireNonNull(resultId);
         if (executing || plan.owner != identity || !executed.add(plan.epoch)) throw new IllegalStateException("foreign or already executed planning epoch");
-        executing = true;
-        try { return executePlan(resultId,plan); } finally { executing = false; }
+        executing = true;int firstStore=factStores.size();
+        try { return executePlan(resultId,plan,storage); }
+        catch(RuntimeException|Error failure) {
+            for(int i=factStores.size()-1;i>=firstStore;i--)try{factStores.remove(i).close();}
+                catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }finally { executing = false; }
     }
-    private <F> PreparedAnalysisResult<F> executePlan(String resultId, ExecutionPlan<F> plan) {
+    private <F> PreparedAnalysisResult<F> executePlan(String resultId, ExecutionPlan<F> plan,
+            java.util.function.Function<String,? extends FactStorage<F>> storage) {
         var analysis = new Counts("analysisRuns","analysisCacheHits","analysisAdmissionCacheHits");
         var observations = new Counts("observationBatchesExecuted","queryRequests","uniqueQueries","sequencesReplayed","operationsReplayed",
             "queriesAnswered","unsupportedQueries","queriesNotMaterialized","observationFailures",
@@ -73,7 +91,13 @@ public final class PlanningExecution implements AutoCloseable {
                 consumers.add("consumersNotStarted",1); completed.add(new ConsumerOutcome<>(id,ConsumerStatus.NOT_STARTED,"DEPENDENCY_UNAVAILABLE",List.of())); continue;
             }
             var facts = new ResolvedFacts(dependencies,plan.requests.get(id),outcomes,batches,answers,consumers);
-            var staging = new Staging<F>(consumers);
+            FactStorage<F> typed=null;
+            if(storage!=null) {
+                typed=Objects.requireNonNull(storage.apply(id));
+                try{if(typed.size()!=0)throw new IllegalArgumentException("consumer fact storage must be new and empty");factStores.add(typed);}
+                catch(RuntimeException|Error failure){try{typed.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+            }
+            var staging = new Staging<F>(consumers,typed,this::requireOpen);
             try {
                 for (var site : plan.sites.get(id)) {
                     consumers.add("consumerInvocations",1); registration.consumer().consume(site,facts,staging);
@@ -81,8 +105,12 @@ public final class PlanningExecution implements AutoCloseable {
                 var bundle = staging.commit(); consumers.add("consumersComplete",1);
                 completed.add(new ConsumerOutcome<>(id,ConsumerStatus.COMPLETE,null,bundle));
             } catch (FactConsumer.ConsumerException failure) {
-                staging.discard(); consumers.add("consumerFailures",1);
+                try{staging.discard();}
+                catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);throw failure;}
+                consumers.add("consumerFailures",1);
                 completed.add(new ConsumerOutcome<>(id,ConsumerStatus.FAILED,"CONSUMER_ERROR",List.of()));
+            } catch(RuntimeException|Error failure) {
+                try{staging.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;
             } finally { staging.close(); }
         }
         boolean complete = outcomes.values().stream().allMatch(r -> r.status() == AnalysisOutcome.Status.STABLE)
@@ -161,20 +189,27 @@ public final class PlanningExecution implements AutoCloseable {
         }
     }
     private static final class Staging<F> implements FactSink<F> {
-        private final List<F> facts = new ArrayList<>();
+        private final List<F> facts;
+        private final FactStorage<F> storage;
+        private final Runnable owner;
         private final Counts counts;
         private boolean open = true;
-        Staging(Counts counts) { this.counts = counts; }
+        private boolean committed;
+        Staging(Counts counts,FactStorage<F> storage,Runnable owner) {
+            this.counts=counts;this.storage=storage;this.owner=owner;
+            facts=storage==null?new ArrayList<>():null;
+        }
         public void emit(F fact) {
             if (!open) throw new IllegalStateException("closed consumer staging");
-            facts.add(Objects.requireNonNull(fact)); counts.add("factsStaged",1);
+            Objects.requireNonNull(fact);if(storage==null)facts.add(fact);else storage.append(fact);counts.add("factsStaged",1);
         }
         List<F> commit() {
-            var bundle = List.copyOf(facts); counts.add("factsCommitted",bundle.size()); counts.add("factsEmitted",bundle.size());
+            List<F> bundle=storage==null?List.copyOf(facts):new StoredFacts<>(storage,owner);
+            counts.add("factsCommitted",bundle.size());counts.add("factsEmitted",bundle.size());committed=true;
             close(); return bundle;
         }
-        void discard() { counts.add("factsDiscarded",facts.size()); close(); }
-        void close() { open = false; facts.clear(); }
+        void discard() { counts.add("factsDiscarded",storage==null?facts.size():storage.size()); close(); }
+        void close() {if(!open)return;open=false;if(storage==null)facts.clear();else if(!committed)storage.close();}
     }
     private static final class ResolvedFacts implements PreparedFacts {
         private final Map<AnalysisKey,AnalysisOutcome> analyses;
@@ -210,6 +245,8 @@ public final class PlanningExecution implements AutoCloseable {
         session = null; registry = null;
         Throwable failure = null;
         try {
+            for(var store:factStores)try{store.close();}
+                catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
             for (var run : runs.values()) {
                 try { run.close(); }
                 catch (RuntimeException | Error cleanup) {
@@ -217,7 +254,7 @@ public final class PlanningExecution implements AutoCloseable {
                     else if (cleanup != failure) failure.addSuppressed(cleanup);
                 }
             }
-        } finally { runs.clear(); executed.clear(); }
+        } finally { runs.clear(); executed.clear();factStores.clear(); }
         if (failure instanceof RuntimeException runtime) throw runtime;
         if (failure instanceof Error error) throw error;
     }

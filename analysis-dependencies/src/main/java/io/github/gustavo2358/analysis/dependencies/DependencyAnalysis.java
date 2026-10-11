@@ -93,6 +93,16 @@ public final class DependencyAnalysis {
         var qualification=DependencyInput.qualify(program,Optional.empty(),List.of());
         return enrich(prepareExecutable(program,cfg,program),Optional.empty(),qualification.preparedSource(),qualification.occurrences(),program,null,null);
     }
+    /** Productive native CALL staging uses complete typed paged transactions.
+     * Final site/reachability/enrichment maps and detached result projection are
+     * still explicit migration debt; this does not certify all-store output. */
+    public DependencyResult prepareLeased(SnapshotProgram program,CfgBuildResult cfg,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(pages);Objects.requireNonNull(resources);
+        program.admission();resources.requireExecutionProgram(program);
+        if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
+        var qualification=DependencyInput.qualify(program,Optional.empty(),List.of());
+        return enrich(prepareExecutable(program,cfg,program,pages,resources),Optional.empty(),qualification.preparedSource(),qualification.occurrences(),program,null,null);
+    }
     /** Explicit source authority composes with the same native executable analysis and shared page owner. */
     public DependencyResult prepare(SnapshotProgram program,CfgBuildResult cfg,QualifiedSourceDependencies source,
             List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
@@ -109,7 +119,7 @@ public final class DependencyAnalysis {
         Objects.requireNonNull(pages);Objects.requireNonNull(resources);program.admission();
         if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
         var qualification=DependencyInput.qualify(program,Optional.of(source),correlations);
-        return enrich(prepareExecutable(program,cfg,program),Optional.of(source),qualification.preparedSource(),qualification.occurrences(),program,pages,resources);
+        return enrich(prepareExecutable(program,cfg,program,pages,resources),Optional.of(source),qualification.preparedSource(),qualification.occurrences(),program,pages,resources);
     }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg) {
         return prepareExecutable(publication,cfg,null);
@@ -120,7 +130,7 @@ public final class DependencyAnalysis {
         Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(source);Objects.requireNonNull(correlations);
         source.requireContext(Objects.requireNonNull(pages),Objects.requireNonNull(resources));program.admission();
         if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
-        return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program),correlations,pages,resources);
+        return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program,pages,resources),correlations,pages,resources);
     }
     /** Productive typed manifest correlations; no nominal DTO projection. */
     public ManagedDependencyResult prepareLeased(SnapshotProgram program,CfgBuildResult cfg,SourceAdmissionSnapshot source,
@@ -129,16 +139,21 @@ public final class DependencyAnalysis {
         source.requireContext(Objects.requireNonNull(pages),Objects.requireNonNull(resources));program.admission();resources.requireExecutionProgram(program);
         if(correlations.program()!=program)throw new IllegalArgumentException("foreign correlation input program");
         if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
-        return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program),correlations,pages,resources);
+        return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program,pages,resources),correlations,pages,resources);
     }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg,SnapshotProgram metadataOwner) {
+        return prepareExecutable(publication,cfg,metadataOwner,null,null);
+    }
+    private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg,SnapshotProgram metadataOwner,PageStore pages,AnalysisResources resources) {
         var opened=AnalysisSession.open(cfg,publication,cfg.options().projectionPolicy(),publication.units().stream()
             .flatMap(u->u.entryViews().stream()).filter(e->e.initialLabel().isPresent()).map(ProgramStore.EntryView::id).toList());
         if(opened.status()!=AnalysisSession.Status.ACCEPTED)return partialInventory(publication,opened.reason(),metadataOwner);
         var session=opened.session().orElseThrow();
-        try(var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
+        try(var staged=pages==null?null:new PagedDependencyFactStorage(pages,Objects.requireNonNull(resources));
+            var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
             var selection=CallDependencyPlan.choose(session,"call",false,mode);
-            var plan=execution.plan(selection.registrations());var result=execution.execute("dependencies@1",plan);
+            var plan=execution.plan(selection.registrations());
+            var result=staged==null?execution.execute("dependencies@1",plan):execution.executeStored("dependencies@1",plan,ignored->staged.transaction());
             for(var analysis:result.analyses())if(analysis.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new Failure(Kind.INVALID_INPUT,analysis.reason());
             var reasons=new TreeSet<String>();
             if(session.index().hasUnprovedPreconditions())reasons.add("UNPROVED_OPERATION_PRECONDITION");

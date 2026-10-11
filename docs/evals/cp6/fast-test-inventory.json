@@ -474,6 +474,23 @@
       "plainNativeRootBufferDenialOccursBeforeOutputAndDoesNotExpireBorrowedInput",
       "failedPlainNativeOutputKeepsPrimaryAndReleasesTheObservedRootLease"
     ],
+    "io.github.gustavo2358.analysis.adapters.NativeFactStoragePortTest": [
+      "nativeStoredStagingCommitsOnlyThroughTheSelectedTypedPortAndExpiresWithExecution",
+      "consumerFailureDiscardsTheWholeTypedTransactionAndCannotPublishStagedFacts",
+      "storageFailureKeepsItsPrimaryAbortsStagingAndNeverFallsBackToResidentFacts",
+      "nativeApplicationUsesActualTypedStagingPreservesWholeWireAndKeepsStorageFailurePrimary",
+      "typedCleanupFailureDoesNotMaskTheOriginalConsumerFailure",
+      "failedLaterEpochRetiresOnlyItsOwnTypedStoresAndKeepsPriorCommittedFactsAlive"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedDependencyFactStorageTest": [
+      "completeFactsAllTypedIdsUtf16DuplicatesAndOutcomesSpillAcrossFiveGeometries",
+      "projectionDenialAbortsOnlyOwnedFactPagesBeforeAnyDetachedFactEscapes",
+      "arbitraryReadFailureKeepsPrimaryRetiresBothTapesAndLeavesBorrowedBackendAlive",
+      "sharedStorageTransactionsKeepDistinctRangesAndDiscardOnlyTheActiveTail",
+      "workDenialImmediatelyRetiresOwnedPayloadWithoutWaitingForAnotherQueryOrClose",
+      "nativeProgramExpiryDetachesEveryFactPageWithoutClosingBorrowedAdmittedInput",
+      "allCompletionReachabilityTargetKindsAndOptionalPointShapesRetainExactClosedFields"
+    ],
     "io.github.gustavo2358.analysis.adapters.PagedJsonWordMemoTest": [
       "exactPhysicalWordsRemainCoherentAndWorkChecked"
     ],

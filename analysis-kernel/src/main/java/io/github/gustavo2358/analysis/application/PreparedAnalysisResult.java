@@ -5,7 +5,8 @@ import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
 import java.util.*;
 
-/** Detached in-memory preparation. COMPLETE does not certify delivery; the wire belongs to a later checkpoint. */
+/** Resident detached preparation or explicitly stored consumer facts leased to the
+ * execution. COMPLETE does not certify delivery; the wire belongs to its adapter. */
 public record PreparedAnalysisResult<F>(String resultId, PublicationId publicationId, long planningEpoch,
         List<AnalysisOutcome> analyses, List<BatchResult> results, List<ConsumerPlan> consumerPlan,
         List<ConsumerOutcome<F>> consumers, PreparationStatus preparationStatus, Map<String,Map<String,Long>> metrics) {
@@ -21,7 +22,7 @@ public record PreparedAnalysisResult<F>(String resultId, PublicationId publicati
     }
     public record ConsumerOutcome<F>(String consumerId, ConsumerStatus status, String reason, List<F> facts) {
         public ConsumerOutcome {
-            Objects.requireNonNull(consumerId); Objects.requireNonNull(status); facts = List.copyOf(facts);
+            Objects.requireNonNull(consumerId); Objects.requireNonNull(status); facts = StoredFacts.copyOrBorrow(facts);
             if (status == ConsumerStatus.COMPLETE ? reason != null : reason == null || !facts.isEmpty()) throw new IllegalArgumentException("consumer completion shape");
         }
     }

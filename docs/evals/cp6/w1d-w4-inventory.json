@@ -9,8 +9,10 @@
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PlanningExecution.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/PreparedAnalysisResult.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/SitePlanner.java",
+      "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/application/StoredFacts.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactConsumer.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactSink.java",
+      "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/FactStorage.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/PreparedFacts.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/consumers/SiteView.java",
       "analysis-kernel/src/main/java/io/github/gustavo2358/analysis/plan/AnalysisKey.java",
@@ -48,9 +50,11 @@
       "io/github/gustavo2358/analysis/application/SitePlanner$Binding.class",
       "io/github/gustavo2358/analysis/application/SitePlanner$PendingBatch.class",
       "io/github/gustavo2358/analysis/application/SitePlanner.class",
+      "io/github/gustavo2358/analysis/application/StoredFacts.class",
       "io/github/gustavo2358/analysis/consumers/FactConsumer$ConsumerException.class",
       "io/github/gustavo2358/analysis/consumers/FactConsumer.class",
       "io/github/gustavo2358/analysis/consumers/FactSink.class",
+      "io/github/gustavo2358/analysis/consumers/FactStorage.class",
       "io/github/gustavo2358/analysis/consumers/PreparedFacts$Lookup.class",
       "io/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus.class",
       "io/github/gustavo2358/analysis/consumers/PreparedFacts.class",
@@ -244,6 +248,7 @@
         "io.github.gustavo2358.analysis.consumers.FactConsumer",
         "io.github.gustavo2358.analysis.consumers.FactConsumer$ConsumerException",
         "io.github.gustavo2358.analysis.consumers.FactSink",
+        "io.github.gustavo2358.analysis.consumers.FactStorage",
         "io.github.gustavo2358.analysis.consumers.PreparedFacts",
         "io.github.gustavo2358.analysis.consumers.SiteView",
         "io.github.gustavo2358.analysis.plan.AnalysisKey",
@@ -266,6 +271,7 @@
         "java.lang.Long",
         "java.lang.Math",
         "java.lang.Object",
+        "java.lang.Runnable",
         "java.lang.RuntimeException",
         "java.lang.String",
         "java.lang.Throwable",
@@ -287,6 +293,7 @@
         "java.util.Set",
         "java.util.TreeMap",
         "java.util.function.BiConsumer",
+        "java.util.function.Function",
         "java.util.function.Predicate",
         "java.util.stream.Stream"
       ],
@@ -383,9 +390,12 @@
       "io.github.gustavo2358.analysis.application.PlanningExecution$Staging": [
         "io.github.gustavo2358.analysis.application.Counts",
         "io.github.gustavo2358.analysis.application.PlanningExecution",
+        "io.github.gustavo2358.analysis.application.StoredFacts",
         "io.github.gustavo2358.analysis.consumers.FactSink",
+        "io.github.gustavo2358.analysis.consumers.FactStorage",
         "java.lang.IllegalStateException",
         "java.lang.Object",
+        "java.lang.Runnable",
         "java.lang.String",
         "java.util.ArrayList",
         "java.util.Collection",
@@ -456,6 +466,7 @@
       "io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerOutcome": [
         "io.github.gustavo2358.analysis.application.PreparedAnalysisResult",
         "io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerStatus",
+        "io.github.gustavo2358.analysis.application.StoredFacts",
         "java.lang.Class",
         "java.lang.IllegalArgumentException",
         "java.lang.Object",
@@ -466,7 +477,6 @@
         "java.lang.invoke.MethodHandles$Lookup",
         "java.lang.invoke.TypeDescriptor",
         "java.lang.runtime.ObjectMethods",
-        "java.util.Collection",
         "java.util.List",
         "java.util.Objects"
       ],
@@ -571,6 +581,20 @@
         "java.util.HashSet",
         "java.util.Set"
       ],
+      "io.github.gustavo2358.analysis.application.StoredFacts": [
+        "io.github.gustavo2358.analysis.consumers.FactStorage",
+        "java.lang.IllegalArgumentException",
+        "java.lang.IllegalStateException",
+        "java.lang.Object",
+        "java.lang.Runnable",
+        "java.lang.String",
+        "java.lang.UnsupportedOperationException",
+        "java.util.AbstractList",
+        "java.util.Collection",
+        "java.util.List",
+        "java.util.Objects",
+        "java.util.RandomAccess"
+      ],
       "io.github.gustavo2358.analysis.consumers.FactConsumer": [
         "io.github.gustavo2358.analysis.consumers.FactConsumer$ConsumerException",
         "io.github.gustavo2358.analysis.consumers.FactSink",
@@ -586,6 +610,10 @@
       ],
       "io.github.gustavo2358.analysis.consumers.FactSink": [
         "java.lang.FunctionalInterface",
+        "java.lang.Object"
+      ],
+      "io.github.gustavo2358.analysis.consumers.FactStorage": [
+        "java.lang.AutoCloseable",
         "java.lang.Object"
       ],
       "io.github.gustavo2358.analysis.consumers.PreparedFacts": [
@@ -811,7 +839,7 @@
       "io.github.gustavo2358.analysis.application.PlanningExecution$CachedRun": "Compiled from \"PlanningExecution.java\"\ninterface io.github.gustavo2358.analysis.application.PlanningExecution$CachedRun {\n  public abstract io.github.gustavo2358.analysis.plan.AnalysisOutcome outcome();\n    descriptor: ()Lio/github/gustavo2358/analysis/plan/AnalysisOutcome;\n\n  public abstract io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchResult observe(io.github.gustavo2358.analysis.application.ExecutionPlan$BatchPlan);\n    descriptor: (Lio/github/gustavo2358/analysis/application/ExecutionPlan$BatchPlan;)Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchResult;\n\n  public default void close();\n    descriptor: ()V\n}\n",
       "io.github.gustavo2358.analysis.application.PlanningExecution$ResolvedFacts": "Compiled from \"PlanningExecution.java\"\nfinal class io.github.gustavo2358.analysis.application.PlanningExecution$ResolvedFacts implements io.github.gustavo2358.analysis.consumers.PreparedFacts {\n  public io.github.gustavo2358.analysis.plan.AnalysisOutcome analysis(io.github.gustavo2358.analysis.plan.AnalysisKey);\n    descriptor: (Lio/github/gustavo2358/analysis/plan/AnalysisKey;)Lio/github/gustavo2358/analysis/plan/AnalysisOutcome;\n\n  public <T, V> io.github.gustavo2358.analysis.consumers.PreparedFacts$Lookup<T, V> lookup(io.github.gustavo2358.analysis.plan.ObservationBatchId<T, V>, io.github.gustavo2358.analysis.query.PointQuery<T>);\n    descriptor: (Lio/github/gustavo2358/analysis/plan/ObservationBatchId;Lio/github/gustavo2358/analysis/query/PointQuery;)Lio/github/gustavo2358/analysis/consumers/PreparedFacts$Lookup;\n}\n",
       "io.github.gustavo2358.analysis.application.PlanningExecution$Staging": "Compiled from \"PlanningExecution.java\"\nfinal class io.github.gustavo2358.analysis.application.PlanningExecution$Staging<F> implements io.github.gustavo2358.analysis.consumers.FactSink<F> {\n  public void emit(F);\n    descriptor: (Ljava/lang/Object;)V\n}\n",
-      "io.github.gustavo2358.analysis.application.PlanningExecution": "Compiled from \"PlanningExecution.java\"\npublic final class io.github.gustavo2358.analysis.application.PlanningExecution implements java.lang.AutoCloseable {\n  public io.github.gustavo2358.analysis.application.PlanningExecution(io.github.gustavo2358.analysis.structure.AnalysisSession, io.github.gustavo2358.analysis.application.AnalysisRegistry);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;Lio/github/gustavo2358/analysis/application/AnalysisRegistry;)V\n\n  public <F> io.github.gustavo2358.analysis.application.ExecutionPlan<F> plan(java.util.List<io.github.gustavo2358.analysis.application.ConsumerRegistration<F>>);\n    descriptor: (Ljava/util/List;)Lio/github/gustavo2358/analysis/application/ExecutionPlan;\n\n  public <F> io.github.gustavo2358.analysis.application.PreparedAnalysisResult<F> execute(java.lang.String, io.github.gustavo2358.analysis.application.ExecutionPlan<F>);\n    descriptor: (Ljava/lang/String;Lio/github/gustavo2358/analysis/application/ExecutionPlan;)Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult;\n\n  public void close();\n    descriptor: ()V\n}\n",
+      "io.github.gustavo2358.analysis.application.PlanningExecution": "Compiled from \"PlanningExecution.java\"\npublic final class io.github.gustavo2358.analysis.application.PlanningExecution implements java.lang.AutoCloseable {\n  public io.github.gustavo2358.analysis.application.PlanningExecution(io.github.gustavo2358.analysis.structure.AnalysisSession, io.github.gustavo2358.analysis.application.AnalysisRegistry);\n    descriptor: (Lio/github/gustavo2358/analysis/structure/AnalysisSession;Lio/github/gustavo2358/analysis/application/AnalysisRegistry;)V\n\n  public <F> io.github.gustavo2358.analysis.application.ExecutionPlan<F> plan(java.util.List<io.github.gustavo2358.analysis.application.ConsumerRegistration<F>>);\n    descriptor: (Ljava/util/List;)Lio/github/gustavo2358/analysis/application/ExecutionPlan;\n\n  public <F> io.github.gustavo2358.analysis.application.PreparedAnalysisResult<F> execute(java.lang.String, io.github.gustavo2358.analysis.application.ExecutionPlan<F>);\n    descriptor: (Ljava/lang/String;Lio/github/gustavo2358/analysis/application/ExecutionPlan;)Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult;\n\n  public <F> io.github.gustavo2358.analysis.application.PreparedAnalysisResult<F> executeStored(java.lang.String, io.github.gustavo2358.analysis.application.ExecutionPlan<F>, java.util.function.Function<java.lang.String, ? extends io.github.gustavo2358.analysis.consumers.FactStorage<F>>);\n    descriptor: (Ljava/lang/String;Lio/github/gustavo2358/analysis/application/ExecutionPlan;Ljava/util/function/Function;)Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult;\n\n  public void close();\n    descriptor: ()V\n}\n",
       "io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchResult": "Compiled from \"PreparedAnalysisResult.java\"\npublic final class io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchResult extends java.lang.Record {\n  public io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchResult(io.github.gustavo2358.analysis.plan.ObservationBatchId<?, ?>, io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus, java.lang.String, java.util.List<? extends io.github.gustavo2358.analysis.query.ObservationBatch$Observation<?, ?>>, java.util.Map<java.lang.String, java.lang.Long>);\n    descriptor: (Lio/github/gustavo2358/analysis/plan/ObservationBatchId;Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;Ljava/lang/String;Ljava/util/List;Ljava/util/Map;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.plan.ObservationBatchId<?, ?> batchId();\n    descriptor: ()Lio/github/gustavo2358/analysis/plan/ObservationBatchId;\n\n  public io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus status();\n    descriptor: ()Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;\n\n  public java.lang.String reason();\n    descriptor: ()Ljava/lang/String;\n\n  public java.util.List<? extends io.github.gustavo2358.analysis.query.ObservationBatch$Observation<?, ?>> observations();\n    descriptor: ()Ljava/util/List;\n\n  public java.util.Map<java.lang.String, java.lang.Long> metrics();\n    descriptor: ()Ljava/util/Map;\n}\n",
       "io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus": "Compiled from \"PreparedAnalysisResult.java\"\npublic final class io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus extends java.lang.Enum<io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus> {\n  public static final io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus COMPLETE;\n    descriptor: Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;\n  public static final io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus FAILED;\n    descriptor: Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;\n  public static final io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus NOT_STARTED;\n    descriptor: Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;\n  public static io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus[] values();\n    descriptor: ()[Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;\n\n  public static io.github.gustavo2358.analysis.application.PreparedAnalysisResult$BatchStatus valueOf(java.lang.String);\n    descriptor: (Ljava/lang/String;)Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$BatchStatus;\n}\n",
       "io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerOutcome": "Compiled from \"PreparedAnalysisResult.java\"\npublic final class io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerOutcome<F> extends java.lang.Record {\n  public io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerOutcome(java.lang.String, io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerStatus, java.lang.String, java.util.List<F>);\n    descriptor: (Ljava/lang/String;Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$ConsumerStatus;Ljava/lang/String;Ljava/util/List;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.lang.String consumerId();\n    descriptor: ()Ljava/lang/String;\n\n  public io.github.gustavo2358.analysis.application.PreparedAnalysisResult$ConsumerStatus status();\n    descriptor: ()Lio/github/gustavo2358/analysis/application/PreparedAnalysisResult$ConsumerStatus;\n\n  public java.lang.String reason();\n    descriptor: ()Ljava/lang/String;\n\n  public java.util.List<F> facts();\n    descriptor: ()Ljava/util/List;\n}\n",
@@ -822,9 +850,11 @@
       "io.github.gustavo2358.analysis.application.SitePlanner$Binding": "Compiled from \"SitePlanner.java\"\nfinal class io.github.gustavo2358.analysis.application.SitePlanner$Binding extends java.lang.Record {\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public java.lang.String consumer();\n    descriptor: ()Ljava/lang/String;\n\n  public io.github.gustavo2358.analysis.plan.SiteInterest interest();\n    descriptor: ()Lio/github/gustavo2358/analysis/plan/SiteInterest;\n}\n",
       "io.github.gustavo2358.analysis.application.SitePlanner$PendingBatch": "Compiled from \"SitePlanner.java\"\nfinal class io.github.gustavo2358.analysis.application.SitePlanner$PendingBatch {\n}\n",
       "io.github.gustavo2358.analysis.application.SitePlanner": "Compiled from \"SitePlanner.java\"\nfinal class io.github.gustavo2358.analysis.application.SitePlanner {\n}\n",
+      "io.github.gustavo2358.analysis.application.StoredFacts": "Compiled from \"StoredFacts.java\"\nfinal class io.github.gustavo2358.analysis.application.StoredFacts<F> extends java.util.AbstractList<F> implements java.util.RandomAccess {\n  public int size();\n    descriptor: ()I\n\n  public F get(int);\n    descriptor: (I)Ljava/lang/Object;\n\n  public void clear();\n    descriptor: ()V\n}\n",
       "io.github.gustavo2358.analysis.consumers.FactConsumer$ConsumerException": "Compiled from \"FactConsumer.java\"\npublic final class io.github.gustavo2358.analysis.consumers.FactConsumer$ConsumerException extends java.lang.RuntimeException {\n  public io.github.gustavo2358.analysis.consumers.FactConsumer$ConsumerException(java.lang.String);\n    descriptor: (Ljava/lang/String;)V\n}\n",
       "io.github.gustavo2358.analysis.consumers.FactConsumer": "Compiled from \"FactConsumer.java\"\npublic interface io.github.gustavo2358.analysis.consumers.FactConsumer<F> {\n  public abstract void consume(io.github.gustavo2358.analysis.consumers.SiteView, io.github.gustavo2358.analysis.consumers.PreparedFacts, io.github.gustavo2358.analysis.consumers.FactSink<F>);\n    descriptor: (Lio/github/gustavo2358/analysis/consumers/SiteView;Lio/github/gustavo2358/analysis/consumers/PreparedFacts;Lio/github/gustavo2358/analysis/consumers/FactSink;)V\n}\n",
       "io.github.gustavo2358.analysis.consumers.FactSink": "Compiled from \"FactSink.java\"\npublic interface io.github.gustavo2358.analysis.consumers.FactSink<F> {\n  public abstract void emit(F);\n    descriptor: (Ljava/lang/Object;)V\n}\n",
+      "io.github.gustavo2358.analysis.consumers.FactStorage": "Compiled from \"FactStorage.java\"\npublic interface io.github.gustavo2358.analysis.consumers.FactStorage<F> extends java.lang.AutoCloseable {\n  public abstract void append(F);\n    descriptor: (Ljava/lang/Object;)V\n\n  public abstract int size();\n    descriptor: ()I\n\n  public abstract F get(int);\n    descriptor: (I)Ljava/lang/Object;\n\n  public abstract void close();\n    descriptor: ()V\n}\n",
       "io.github.gustavo2358.analysis.consumers.PreparedFacts$Lookup": "Compiled from \"PreparedFacts.java\"\npublic final class io.github.gustavo2358.analysis.consumers.PreparedFacts$Lookup<T, V> extends java.lang.Record {\n  public io.github.gustavo2358.analysis.consumers.PreparedFacts$Lookup(io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus, io.github.gustavo2358.analysis.query.ObservationBatch$Observation<T, V>);\n    descriptor: (Lio/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus;Lio/github/gustavo2358/analysis/query/ObservationBatch$Observation;)V\n\n  public final java.lang.String toString();\n    descriptor: ()Ljava/lang/String;\n\n  public final int hashCode();\n    descriptor: ()I\n\n  public final boolean equals(java.lang.Object);\n    descriptor: (Ljava/lang/Object;)Z\n\n  public io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus status();\n    descriptor: ()Lio/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus;\n\n  public io.github.gustavo2358.analysis.query.ObservationBatch$Observation<T, V> observation();\n    descriptor: ()Lio/github/gustavo2358/analysis/query/ObservationBatch$Observation;\n}\n",
       "io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus": "Compiled from \"PreparedFacts.java\"\npublic final class io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus extends java.lang.Enum<io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus> {\n  public static final io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus AVAILABLE;\n    descriptor: Lio/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus;\n  public static final io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus NOT_REQUESTED;\n    descriptor: Lio/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus;\n  public static io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus[] values();\n    descriptor: ()[Lio/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus;\n\n  public static io.github.gustavo2358.analysis.consumers.PreparedFacts$LookupStatus valueOf(java.lang.String);\n    descriptor: (Ljava/lang/String;)Lio/github/gustavo2358/analysis/consumers/PreparedFacts$LookupStatus;\n}\n",
       "io.github.gustavo2358.analysis.consumers.PreparedFacts": "Compiled from \"PreparedFacts.java\"\npublic interface io.github.gustavo2358.analysis.consumers.PreparedFacts {\n  public abstract io.github.gustavo2358.analysis.plan.AnalysisOutcome analysis(io.github.gustavo2358.analysis.plan.AnalysisKey);\n    descriptor: (Lio/github/gustavo2358/analysis/plan/AnalysisKey;)Lio/github/gustavo2358/analysis/plan/AnalysisOutcome;\n\n  public abstract <T, V> io.github.gustavo2358.analysis.consumers.PreparedFacts$Lookup<T, V> lookup(io.github.gustavo2358.analysis.plan.ObservationBatchId<T, V>, io.github.gustavo2358.analysis.query.PointQuery<T>);\n    descriptor: (Lio/github/gustavo2358/analysis/plan/ObservationBatchId;Lio/github/gustavo2358/analysis/query/PointQuery;)Lio/github/gustavo2358/analysis/consumers/PreparedFacts$Lookup;\n}\n",

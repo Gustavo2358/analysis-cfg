@@ -38,7 +38,7 @@ public final class AnalysisDependencies {
                         try{new SnapshotDependencyFileWriter().write(result,output,read.borrowedPages(),execution);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
                     }
                 }else {
-                    var result=analysis.prepareLeased(program,cfg);
+                    var result=analysis.prepareLeased(program,cfg,read.borrowedPages(),execution);
                     try{new SnapshotDependencyFileWriter().write(result,program,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
                 }
             }

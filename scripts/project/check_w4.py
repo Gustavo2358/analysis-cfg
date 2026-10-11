@@ -12,9 +12,9 @@ PREFIX='io.github.gustavo2358.analysis.'
 TEST_PREFIX=PREFIX+'values.'
 INVENTORY='docs/evals/cp6/w1d-w4-inventory.json'
 PACKAGES={
-'application':'AnalysisProvider AnalysisRegistry ConsumerRegistration Counts ExecutionPlan PlanningExecution PreparedAnalysisResult SitePlanner'.split(),
+'application':'AnalysisProvider AnalysisRegistry ConsumerRegistration Counts ExecutionPlan PlanningExecution PreparedAnalysisResult SitePlanner StoredFacts'.split(),
 'plan':'AnalysisKey AnalysisOutcome ConsumerPlan ObservationBatchId ObservationRequest SiteInterest'.split(),
-'consumers':'FactConsumer FactSink PreparedFacts SiteView'.split()}
+'consumers':'FactConsumer FactSink FactStorage PreparedFacts SiteView'.split()}
 KERNEL_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/{pkg}/{name}.java' for pkg,names in PACKAGES.items() for name in names}
 PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java'
 REGIONAL_PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesProvider.java'
