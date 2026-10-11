@@ -30,6 +30,7 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private SiteProjection siteProjections;
     private SupportProjection supportProjections;
     private SupportCursor supportCursors;
+    private FactCursor factCursors;
     private AnalysisResources resources;
     private ProgramStore.OperationDirectory directory;
     private PagedLongArray rows,operations,sites,queryRanges,requested;
@@ -185,6 +186,55 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
         @Override public void close(){if(retired)return;retired=true;if(previous==null)supportProjections=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;resident=null;var owned=projection;projection=null;if(owned!=null)owned.close();}
     }
     public boolean hasManagedSupportCursors(){open();return managed!=null;}
+    public boolean hasManagedFactCursors(){open();return managed!=null;}
+    /** Fixed plan-owned wrapper. Closing it expires raw field scopes without
+     * closing borrowed CALL storage. Invalid caller ordinals are non-destructive. */
+    public FactCursor openFact(long item,long ordinal){
+        open();if(managed==null)throw new UnsupportedOperationException("resident fact compatibility requires projectSite");
+        AnalysisResources.Reservation scratch=null;PagedDependencyFactStorage.FactCursor cursor=null;
+        try {
+            long row=row(item);if(ordinal<0||ordinal>=rows.get(row+6))throw new IndexOutOfBoundsException("target-plan site ordinal");
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,256,AnalysisResources.Phase.REPLAY);
+            cursor=managed.openFact(Math.toIntExact(sites.get(rows.get(row+5)+ordinal)));
+            var scope=new FactCursor(cursor,scratch);cursor=null;scratch=null;
+            scope.cursor.onClose(scope::close);scope.available();scope.reservation.onOwnerClose(scope::close);scope.available();return scope;
+        }catch(IndexOutOfBoundsException invalid){
+            if(cursor!=null)try{cursor.close();}catch(RuntimeException|Error cleanup){suppress(invalid,cleanup);}
+            if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){suppress(invalid,cleanup);}throw invalid;
+        }catch(RuntimeException|Error failure){
+            abort(failure);if(cursor!=null)try{cursor.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}
+            if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}throw failure;
+        }
+    }
+    public final class FactCursor implements AutoCloseable {
+        private PagedDependencyFactStorage.FactCursor cursor;
+        private AnalysisResources.Reservation reservation;
+        private FactCursor previous,next;private boolean retired;
+        private FactCursor(PagedDependencyFactStorage.FactCursor cursor,AnalysisResources.Reservation reservation){this.cursor=cursor;this.reservation=reservation;next=factCursors;if(factCursors!=null)factCursors.previous=this;factCursors=this;}
+        private void available(){if(retired)throw new IllegalStateException("SOURCE fact cursor expired");open();}
+        public int candidateCount(){available();return cursor.candidateCount();}
+        public PagedDependencyFactStorage.CandidateCursor openCandidate(int ordinal){available();return cursor.openCandidate(ordinal);}
+        public int reasonCount(){available();return cursor.reasonCount();}
+        public PagedDependencyFactStorage.TextView reason(int ordinal){available();return cursor.reason(ordinal);}
+        public DependencySiteFact.Reachability reachability(){available();return cursor.reachability();}
+        public Boolean modelValueRemainder(){available();return cursor.modelValueRemainder();}
+        public boolean sourceValueRemainder(){available();return cursor.sourceValueRemainder();}
+        public boolean interpretationUnknownRemainder(){available();return cursor.interpretationUnknownRemainder();}
+        public PagedDependencyFactStorage.IdentityView entry(){available();return cursor.entry();}
+        public PagedDependencyFactStorage.IdentityView operation(){available();return cursor.operation();}
+        public PagedDependencyFactStorage.PointView valuePoint(){available();return cursor.valuePoint();}
+        public int premiseCount(){available();return cursor.premiseCount();}
+        public PagedDependencyFactStorage.IdentityView premise(int ordinal){available();return cursor.premise(ordinal);}
+        public int provenanceCount(){available();return cursor.provenanceCount();}
+        public PagedDependencyFactStorage.IdentityView provenance(int ordinal){available();return cursor.provenance(ordinal);}
+        @Override public void close(){
+            if(retired)return;retired=true;if(previous==null)factCursors=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;
+            var owned=cursor;cursor=null;var capacity=reservation;reservation=null;Throwable failure=null;
+            try{if(owned!=null)owned.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+            try{if(capacity!=null)capacity.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+            if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;
+        }
+    }
     /** Native read port only; resident callers keep explicit projectSupport.
      * Fund the plan-owned wrapper before constructing/linking it. Its close
      * retires underlying identities,never the borrowed general CALL owner. */
@@ -239,6 +289,7 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
         synchronized(this){if(closed)return;closed=true;ready=false;owned=new AutoCloseable[]{requested,queryRanges,sites,operations,rows,airLifetime,control};requested=queryRanges=sites=operations=rows=null;airLifetime=null;control=null;source=null;admission=null;program=null;directory=null;executable=null;managed=null;resources=null;}
         var parent=owner;if(parent!=null)parent.release(this);Throwable failure=null;
         while(siteProjections!=null)try{siteProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+        while(factCursors!=null)try{factCursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         while(supportProjections!=null)try{supportProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         while(supportCursors!=null)try{supportCursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         for(var value:owned)if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}

@@ -618,3 +618,56 @@ WORK accounting, all-store/global families and new gaps, original dimensions and
 isolated repeated curves, integrated E2E, legacy retirement, human review and
 external integration remain pending. No campaign completion or fresh qualification
 of older large products is claimed.
+
+## Native fact field scopes and SOURCE consumption (2026-10-11)
+
+The existing two fact tapes now carry 27 fixed paged field anchors. Scoped reads
+cover all 29 semantic fields, inline candidate/raw/list directories, nullable
+points and all outcomes, full identity owner parts and UTF16 text blocks. No full
+String/List/typedId decode is required in the read API. Complete Reader/project
+compatibility remains intact. Fact1024, candidate512, text256, point512,
+identity512 and SOURCEwrapper256 are funded before construction, with intrusive
+lifetimes. Parent/native expiry and discarded-tail retirement invalidate live
+children; prefix scopes survive and reused ordinals never revive retired children.
+Operational failure preserves the primary error and retires only derived pages;
+caller bounds remain non-destructive. Borrowed AIR/input/backend survive normal
+scope teardown.
+
+Native SOURCE resolution interns block views, and sites/edges/executableSites
+writers sort paged ordinals with fixed256char buffers under the existing root
+65536+4096 envelope. Preparation/delivery fullFactProjections and complete typed
+support projections are zero in the five 1/2/4/8/16 SOURCE witnesses. General
+program aggregation still retains complete fact leases and resolution lists.
+Header paths still decode full typed identities, and providers still construct
+complete staged facts; neither is claimed bounded by this read/writer change.
+
+Owner annotation overlays preserve PARTIAL/status plus the three existing closed
+reason literals. Only fixed flags/constants are carried: no fact rewrite, new tape
+or per-fact resident reason list. Consumers perform the same sorted/distinct
+union. Fact free-text preserves legacy strict scalar rejection, separate from
+SOURCE's independently established escaped-code-unit contract. Full typed ID
+wire order/admission/artifact exception, stable support ties/duplicate premises,
+known candidates coexisting with partiality and every legacy field remain intact.
+
+Actual initial API/SOURCE/tail/Unicode25/annotation REDs are preserved, with
+unreached assertions distinct from later GREEN. Oracle model-admission, WORK
+followup and helper postprocessing failures are preserved, not productive fixes.
+The final 96-method family, 18 original CLI contracts, seven original guards and
+five fresh complete-product CLI oracles pass on the final runtime; all prior
+product bytes are exact. SOURCE32000 took 73.439187s for 22,824,055B: one
+observation, not a median or repeated isolated curve. Every prior 1424 mandatory
+method remains intact plus 23 new methods. Original FAST1447 passed with zero
+failures/errors/skips in 1828.707s. Audit proved all 1472 productive classfiles
+across nine consumer and both AIR paths, 593 Java sources, 579 fixtures and 15
+runtime components exact to the frozen real-CLI inputs, without helper shadow.
+Producer `a0aeb827ef53765815aa501c4687f197be77ac73` remains clean and unchanged.
+Mechanical review preserves 55 old public methods in changed owners, with seven
+additive ports; only active core/outer inventory snapshots changed. No guard,
+source-registration, pin, quota or cache policy changed. This is not human review.
+
+This local change does not close AS-W00--W10: general program/provider/header
+typedID/FILE/observations/plain qualification/common WORK/all-store/global21/new
+gaps/original dimensions/isolated repeated curves/integrated E2E/legacy/human/
+external authority remain pending. Older large products remain historical, not
+newly executed or qualified by a blanket runtime-equivalence claim. Continue
+with the genuine general program aggregation countercase, not a checkpoint stop.

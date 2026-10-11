@@ -542,6 +542,37 @@
       "everyExistingWireIdentityRetainsExactBytesAndUnsupportedSealedIdsStayRejectedWithLargeUtf16Blocks",
       "blockComparatorRetainsEverySealedFullIdentityAndRepeatedCollidingPremiseOrder"
     ],
+    "io.github.gustavo2358.analysis.adapters.PagedDependencyFactCursorTest": [
+      "oneFactReadsEveryCandidateAndSupportOrdinalAcrossFiveCountsWithConstantFundedScopes",
+      "oneCandidateKeepsItsLargeRawUtf16PayloadColdAcrossFiveWidthsWithoutWholeFactProjection",
+      "factCloseExpiresCandidateAndSupportChildrenButPreservesStorageAndBorrowedBackend",
+      "discardedTransactionTailExpiresEveryScopedReadButKeepsCommittedPrefixAndNeverRevivesOldHandles",
+      "allTwentyNineFieldsSealedEvidenceDuplicateOrdinalsUtf16AndEveryOutcomeMatchHandmadeCompleteOracle",
+      "factCandidatePressureAndInvalidTextRangesHaveDistinctNonDestructiveVersusAbortingOwnership",
+      "candidateBlockFaultKeepsPrimaryExpiresAllParentsAndChildrenWithoutClosingBorrowedBackend",
+      "nativeExpiryRetiresFactCandidateAndSupportButPreservesBorrowedCheckedAirAndBackend",
+      "scratchDenialBeforeFieldCarrierEscapesExpiresEveryOwnedScopeWithoutClosingBorrowedBackend",
+      "workDenialFromLiveCandidateImmediatelyRetiresParentsChildrenAndPayloadWithoutExtraQueryOrClose"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeSourceFactCursorTest": [
+      "actualSourceResolutionReadsCandidateFieldsWithoutCompleteFactProjection",
+      "actualWholeDependencyDeliveryDoesNotProjectCompleteFactsForSitesEdgesOrExecutableSites",
+      "planOwnsFactCandidateSupportAndIdentityScopesWithoutClosingBorrowedCallOrAir",
+      "invalidFactCandidateAndBlockRangesNeverPoisonBorrowedOwnersOrLiveProgramCatalog",
+      "lateCandidateReadFaultImmediatelyExpiresGeneralCallAndPlanWrapperFundingButNotBorrowedInput"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeFactWriterOracleTest": [
+      "completeWireEveryOutcomeAllLegalIdentityOwnersAndOptionalPointShapesMatchesLegacyBytes",
+      "reverseCandidatesRawCandidatesStableSupportTiesAndPremiseDuplicatesMatchAcrossFiveCounts",
+      "coldScalarTextRawReferenceReasonAndExceptionPayloadMatchAcrossFiveWidths",
+      "coldEvidenceProvenancePremiseUncertaintyAndDistinctReasonDirectoriesMatchAcrossFiveCounts",
+      "legacyArtifactEncodingExceptionAndUnsupportedSortAdmissionRemainExact",
+      "unpairedSurrogatesInEveryFactTextPortRetainLegacyUnicodeRejection"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeFactAnnotationTest": [
+      "eachFundedNativeAnnotationCombinationPreservesDetachedFactStatusReasonsAndWholeSiteBytes",
+      "actualPhysicalDisabledSourceProductRetainsKnownCandidateAndPerSiteReason"
+    ],
     "io.github.gustavo2358.analysis.adapters.ManagedSourceExecutableOwnerTest": [
       "planningAndColdSupportSortingNeverDecodeWholeUnrelatedFactBodies",
       "admittedSourceOwnsGeneralCallCursorAndExpiresItWithoutClosingBorrowedAir",

@@ -79,6 +79,11 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
     private long sourceMetric(String key){return switch(key){case "sourceQualifiedResolvedByExistingQuery"->reused;case "qualifiedComputedOccurrences"->qualifiedComputed;case "conditionalSourceValueRuns"->plan.conditionalRuns();case "conditionalSourceValueQueries"->plan.conditionalQueries();case "conditionalSourceWorkItems"->workItems;case "conditionalSourceResourceLimits"->0;case "targetResolutionRequests"->plan.count();default->throw new IllegalArgumentException("unknown source metric");};}
     private void closeNominal(){var value=nominal;nominal=null;if(value!=null){workItems=Math.addExact(workItems,value.workItems());value.close();}}
     private void reason(PagedLongIndex order,PagedLongIndex global,String value){long id=text.intern(value);order.intern(id,id);if(value.startsWith("CONDITIONAL_")||value.equals("SOURCE_CONTROL_UNAVAILABLE"))global.intern(id,id);}
+    private void reason(PagedLongIndex order,PagedLongIndex global,long id){
+        order.intern(id,id);String prefix="CONDITIONAL_";boolean conditional=text.characterCount(id)>=prefix.length();
+        if(conditional){text.readCharacters(id,0,left,0,prefix.length());for(int i=0;i<prefix.length();i++)if(left[i]!=prefix.charAt(i)){conditional=false;break;}}
+        if(conditional||text.matches(id,"SOURCE_CONTROL_UNAVAILABLE"))global.intern(id,id);
+    }
     /** Authority is encoded in insertion order, not sorted or inferred from names. */
     private void addAuthority(long item,int value){long at=item*ITEM+2,packed=items.get(at);for(long rest=packed;rest!=0;rest>>>=3)if((rest&7)==value+1)return;int shift=0;for(long rest=packed;rest!=0;rest>>>=3)shift+=3;items.set(at,packed|((long)value+1)<<shift);}
     private void resolve(long item,PagedLongIndex global) {
@@ -87,13 +92,25 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         try(var order=new PagedLongIndex(pages,resources,PHASE,this::compareCandidate);var reasonOrder=new PagedLongIndex(pages,resources,PHASE,this::compareText)) {
             if(qualified)addAuthority(item,plan.sourceControlRemainder(item)?1:0);
             if(plan.sourceControlRemainder(item))reason(reasonOrder,global,"SOURCE_CONTROL_UNAVAILABLE");
-            for(long s=0,n=plan.siteCount(item);s<n;s++)try(var projection=plan.projectSite(item,s)) {
+            for(long s=0,n=plan.siteCount(item);s<n;s++) {
+                if(plan.hasManagedFactCursors())try(var site=plan.openFact(item,s)) {
+                    resources.work(1,PHASE);
+                    for(int r=0,length=site.reasonCount();r<length;r++)try(var value=site.reason(r)){try{probe.factText(value);reason(reasonOrder,global,text.intern(probe));}finally{probe.clear();}}
+                    if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)continue;
+                    observed=true;addAuthority(item,site.reachability()==DependencySiteFact.Reachability.REACHABLE?2:3);valueOpen|=!Boolean.FALSE.equals(site.modelValueRemainder())||site.sourceValueRemainder();interpretationOpen|=site.interpretationUnknownRemainder();
+                    for(int c=0,size=site.candidateCount();c<size;c++)try(var candidate=site.openCandidate(c)) {
+                        resources.work(1,PHASE);execCandidates|=candidate.supportCount()!=0;long row;
+                        try{probe.factCandidate(candidate,false);long reference=text.intern(probe);probe.factCandidate(candidate,true);row=add(order,reference,text.intern(probe));}finally{probe.clear();}
+                        for(int p=0,length=candidate.supportCount();p<length;p++)addSupport(row,item,s,c,p);
+                    }
+                }else try(var projection=plan.projectSite(item,s)) {
                 resources.work(1,PHASE);var site=projection.fact();for(var r:site.analysisReasons())reason(reasonOrder,global,r);
                 if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)continue;
                 observed=true;addAuthority(item,site.reachability()==DependencySiteFact.Reachability.REACHABLE?2:3);valueOpen|=!Boolean.FALSE.equals(site.modelValueRemainder())||site.sourceValueRemainder();interpretationOpen|=site.interpretationUnknownRemainder();
                 for(int c=0,size=site.candidates().size();c<size;c++) {
                     resources.work(1,PHASE);var candidate=site.candidates().get(c);execCandidates|=!candidate.supports().isEmpty();long row=add(order,text.intern(candidate.referenceName()),text.intern(candidate.rawValue()));
                     for(int p=0,length=candidate.supports().size();p<length;p++)addSupport(row,item,s,c,p);
+                }
                 }
             }
             if(qualified&&computed&&plan.sourceUnit(item)>=0&&execCandidates)reused=Math.incrementExact(reused);
@@ -185,11 +202,16 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
     private static String domain(Id id){return switch(id){case PublicationId ignored->"publication";case UnitId ignored->"unit";case EntryId ignored->"entry";case LabelId ignored->"label";case OperationId ignored->"operation";case OperandId ignored->"operand";case ObjectId ignored->"object";case StorageId ignored->"storage";case ResourceId ignored->"resource";case ArtifactId ignored->"artifact";case ArtifactRelationId ignored->"artifactRelation";case OriginId ignored->"origin";case UncertaintyId ignored->"uncertainty";case PremiseId ignored->"premise";case CompletionPortId ignored->"completionPort";};}
     private final class BorrowedText implements CharSequence {
         private final char[] cache=new char[256];private long sourceReference,query,candidate;private int length,start=-1,count;private boolean fromNominal;
-        void source(long reference){sourceReference=reference;length=Math.toIntExact(source.characterCount(reference));fromNominal=false;start=-1;}
-        void nominal(long q,long c){query=q;candidate=c;length=Math.toIntExact(nominal.rawLength(q,c));fromNominal=true;start=-1;}
-        void clear(){sourceReference=query=candidate=0;length=count=0;start=-1;}
+        private PagedDependencyFactStorage.TextView factText;
+        private PagedDependencyFactStorage.CandidateCursor factCandidate;
+        private boolean factRaw;
+        void source(long reference){clear();sourceReference=reference;length=Math.toIntExact(source.characterCount(reference));}
+        void nominal(long q,long c){clear();query=q;candidate=c;length=Math.toIntExact(nominal.rawLength(q,c));fromNominal=true;}
+        void factText(PagedDependencyFactStorage.TextView view){clear();factText=view;length=Math.toIntExact(view.characterCount());}
+        void factCandidate(PagedDependencyFactStorage.CandidateCursor view,boolean raw){clear();factCandidate=view;factRaw=raw;length=Math.toIntExact(raw?view.rawLength():view.referenceLength());}
+        void clear(){sourceReference=query=candidate=0;length=count=0;start=-1;fromNominal=false;factText=null;factCandidate=null;factRaw=false;}
         @Override public int length(){return length;}
-        @Override public char charAt(int at){Objects.checkIndex(at,length);if(start<0||at<start||at>=start+count){start=(at/cache.length)*cache.length;count=Math.min(cache.length,length-start);if(fromNominal)nominal.readRaw(query,candidate,start,cache,0,count);else source.readCharacters(sourceReference,start,cache,0,count);}return cache[at-start];}
+        @Override public char charAt(int at){Objects.checkIndex(at,length);if(start<0||at<start||at>=start+count){start=(at/cache.length)*cache.length;count=Math.min(cache.length,length-start);if(factText!=null)factText.readCharacters(start,cache,0,count);else if(factCandidate!=null){if(factRaw)factCandidate.readRaw(start,cache,0,count);else factCandidate.readReference(start,cache,0,count);}else if(fromNominal)nominal.readRaw(query,candidate,start,cache,0,count);else source.readCharacters(sourceReference,start,cache,0,count);}return cache[at-start];}
         @Override public CharSequence subSequence(int start,int end){throw new UnsupportedOperationException("borrowed block text only");}
     }
     private long item(long item){if(item<0||item>=plan.count())throw new IndexOutOfBoundsException("SOURCE program ordinal");return item*ITEM;}

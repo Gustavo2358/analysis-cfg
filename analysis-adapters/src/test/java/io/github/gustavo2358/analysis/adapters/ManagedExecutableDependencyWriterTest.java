@@ -36,7 +36,7 @@ final class ManagedExecutableDependencyWriterTest {
                 var actual=new ByteArrayOutputStream();long before=resources.used(AnalysisResources.Pool.SCRATCH);
                 call(new DependencyJson(),new Class<?>[]{ManagedExecutableDependencyResult.class,SnapshotProgram.class,AnalysisResources.class,OutputStream.class},owner,program,resources,actual);
                 assertArrayEquals(reference.toByteArray(),actual.toByteArray(),"complete native wire bytes including all fields,metrics,coverage,programs and proofs");
-                assertEquals(48,owner.fullFactProjections(),"one complete site per programs/edges/sites section, no whole product sort or candidate-count scan");
+                assertEquals(16,owner.fullFactProjections(),"sites and edges use scoped fields; only general program aggregation retains one complete fact per site");
                 assertEquals(before,resources.used(AnalysisResources.Pool.SCRATCH));
             }
         });

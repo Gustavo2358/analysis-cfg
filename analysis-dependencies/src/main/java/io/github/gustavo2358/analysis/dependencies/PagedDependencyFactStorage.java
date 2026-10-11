@@ -27,7 +27,9 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
  * Owner expiry/read/write/denial abort retires only these tapes and controls. */
 public final class PagedDependencyFactStorage implements FactStorage<DependencySiteFact> {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DEMAND;
-    private static final int STRIDE=8;
+    // First eight columns retain their original meaning. The remaining fixed
+    // field anchors are paged, not resident objects or separate field tapes.
+    private static final int STRIDE=27;
     private final AnalysisResources resources;
     private AnalysisResources.Reservation control;
     private PagedLongArray offsets,payload;
@@ -38,6 +40,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private Projection projections;
     private SupportProjection supportProjections;
     private SupportCursor supportCursors;
+    private ReadScope readScopes;
     private Runnable ownerClose;
     synchronized void onClose(Runnable cleanup){Objects.requireNonNull(cleanup);if(ownerClose!=null)throw new IllegalStateException("fact storage owner already registered");if(closed)cleanup.run();else ownerClose=cleanup;}
     public PagedDependencyFactStorage(PageStore pages,AnalysisResources resources) {
@@ -61,18 +64,21 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private void appendFact(DependencySiteFact fact) {
         Objects.requireNonNull(fact);open();
         try {
-            int next=Math.incrementExact(count);long begin=cells;
-            id(fact.caller());id(fact.entry());id(fact.sequence());id(fact.operation());long keyEnd=cells;word(fact.offset());
-            id(fact.siteOrigin());id(fact.targetOrigin());text(fact.technology());text(fact.command());text(fact.namespace());text(fact.nameProfile());
-            long kind=cells;word(fact.targetKind().ordinal());id(fact.subject());point(fact.valuePoint());
+            int next=Math.incrementExact(count);long begin=cells,row=count*(long)STRIDE;
+            offsets.set(row+8,cells);id(fact.caller());offsets.set(row+9,cells);id(fact.entry());
+            offsets.set(row+10,cells);id(fact.sequence());offsets.set(row+11,cells);id(fact.operation());long keyEnd=cells;
+            offsets.set(row+12,cells);word(fact.offset());offsets.set(row+13,cells);id(fact.siteOrigin());offsets.set(row+14,cells);id(fact.targetOrigin());
+            offsets.set(row+15,cells);text(fact.technology());offsets.set(row+16,cells);text(fact.command());
+            offsets.set(row+17,cells);text(fact.namespace());offsets.set(row+18,cells);text(fact.nameProfile());
+            long kind=cells;word(fact.targetKind().ordinal());offsets.set(row+19,cells);id(fact.subject());offsets.set(row+20,cells);point(fact.valuePoint());
             long reach=cells;word(fact.reachability().ordinal());word(fact.targetStatus().ordinal());
-            word(fact.rawCandidates().size());for(var raw:fact.rawCandidates()){text(raw.rawValue());supports(raw.supports());}
+            offsets.set(row+21,cells);indexed(fact.rawCandidates().size(),i->{var raw=fact.rawCandidates().get(i);text(raw.rawValue());supports(raw.supports());});
             long candidates=cells;indexed(fact.candidates().size(),i->{var candidate=fact.candidates().get(i);text(candidate.referenceName());text(candidate.rawValue());supports(candidate.supports());});
             long model=cells;word(fact.modelValueRemainder()==null?0:fact.modelValueRemainder()?2:1);
             bool(fact.sourceValueRemainder());bool(fact.interpretationUnknownRemainder());bool(fact.effectiveUnknownRemainder());bool(fact.openControlRemainder());
-            ids(fact.evidence());ids(fact.provenance());ids(fact.premises());ids(fact.uncertaintyRefs());
-            long analysis=cells;word(fact.analysisStatus().ordinal());word(fact.analysisReasons().size());for(var reason:fact.analysisReasons())text(reason);
-            long row=count*(long)STRIDE;
+            offsets.set(row+22,cells);ids(fact.evidence());offsets.set(row+23,cells);ids(fact.provenance());
+            offsets.set(row+24,cells);ids(fact.premises());offsets.set(row+25,cells);ids(fact.uncertaintyRefs());
+            long analysis=cells;word(fact.analysisStatus().ordinal());offsets.set(row+26,cells);indexed(fact.analysisReasons().size(),i->text(fact.analysisReasons().get(i)));
             offsets.set(row,begin);offsets.set(row+1,cells);offsets.set(row+2,keyEnd);
             offsets.set(row+3,kind);offsets.set(row+4,reach);offsets.set(row+5,candidates);offsets.set(row+6,analysis);offsets.set(row+7,model);count=next;
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
@@ -96,7 +102,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
                   Reachability reachability,int candidates,AnalysisStatus analysisStatus,Boolean modelValueRemainder) { }
     /** Only identity prefix and fixed typed columns, never candidates/proofs/body.
      * Callback lifetime keeps both the projected complete key and carrier funded.
-     * The eight directory cells per fact are paged, not a resident side inventory. */
+     * The fixed field-directory cells are paged, not a resident side inventory. */
     synchronized <T> T withHeader(int ordinal,java.util.function.Function<Header,T> use) {
         open();Objects.checkIndex(ordinal,count);Objects.requireNonNull(use);
         try {
@@ -129,6 +135,13 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     }
     private void truncate(int first) {
         try {
+            // Expire the failed range before its cells are cleared/reused. Do
+            // not retire committed-prefix scopes or detached caller-owned DTOs.
+            long firstRow=first*(long)STRIDE;
+            for(var scope=readScopes;scope!=null;){var next=scope.next;if(scope instanceof FactCursor fact&&fact.row>=firstRow)scope.close();scope=next;}
+            for(var scope=supportCursors;scope!=null;){var next=scope.next;if(scope.factRow>=firstRow)scope.close();scope=next;}
+            for(var scope=supportProjections;scope!=null;){var next=scope.next;if(scope.ordinal>=first)scope.close();scope=next;}
+            for(var scope=projections;scope!=null;){var next=scope.next;if(scope.ordinal>=first)scope.close();scope=next;}
             long tail=first==count?cells:offsets.get(first*(long)STRIDE);
             for(int i=count-1;i>=first;i--)for(int column=STRIDE-1;column>=0;column--)offsets.set(i*(long)STRIDE+column,0);
             for(long i=cells;i>tail;)payload.set(--i,0);
@@ -138,7 +151,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private void word(long value){payload.set(cells,value);cells=Math.incrementExact(cells);}
     private void bool(boolean value){word(value?1:0);}
     private void text(String value){word(value.length());for(int i=0;i<value.length();i++)word(value.charAt(i));}
-    private void ids(List<? extends Id> values){word(values.size());for(var value:values)id(value);}
+    private void ids(List<? extends Id> values){indexed(values.size(),i->id(values.get(i)));}
     /** Count/end plus two extent cells per element, all in the existing paged
      * payload tape. Direct leaf access does not scan preceding candidate/proofs.
      * No additional fixed tape control or resident per-element directory. */
@@ -198,7 +211,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             if(scratch.amount()==0)throw new IllegalStateException("unfunded fact projection");
             var reader=new Reader(first,end);var fact=reader.fact();
             if(reader.at!=end)throw new IllegalStateException("fact payload trailing fields");
-            var projection=new Projection(fact,scratch);
+            var projection=new Projection(fact,scratch,ordinal);
             projection.next=projections;if(projections!=null)projections.previous=projection;projections=projection;
             scratch=null;projection.reservation.onOwnerClose(projection::close);
             // Native expiry may run cleanup during callback registration.
@@ -213,11 +226,12 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
      * The preflight envelope also funds this carrier and its links. Closing drops
      * this owner's DTO reference; an explicitly copied Java record cannot expire. */
     public final class Projection implements AutoCloseable {
+        private final int ordinal;
         private DependencySiteFact fact;
         private AnalysisResources.Reservation reservation;
         private Projection previous,next;
         private boolean retired;
-        private Projection(DependencySiteFact fact,AnalysisResources.Reservation reservation){this.fact=fact;this.reservation=reservation;}
+        private Projection(DependencySiteFact fact,AnalysisResources.Reservation reservation,int ordinal){this.fact=fact;this.reservation=reservation;this.ordinal=ordinal;}
         private void available(){if(retired)throw new IllegalStateException("dependency fact projection expired");open();}
         public DependencySiteFact fact(){synchronized(PagedDependencyFactStorage.this){available();return fact;}}
         long funding(){synchronized(PagedDependencyFactStorage.this){available();return reservation.amount();}}
@@ -241,7 +255,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,Math.addExact(1024,Math.multiplyExact(Math.subtractExact(range.end(),range.first()),64)),AnalysisResources.Phase.REPLAY);
             if(scratch.amount()==0)throw new IllegalStateException("unfunded support projection");
             reader=new Reader(range.first(),range.end());var value=reader.support();if(reader.at!=range.end())throw new IllegalStateException("support trailing fields");
-            var projection=new SupportProjection(value,scratch);projection.next=supportProjections;if(supportProjections!=null)supportProjections.previous=projection;supportProjections=projection;
+            var projection=new SupportProjection(value,scratch,ordinal);projection.next=supportProjections;if(supportProjections!=null)supportProjections.previous=projection;supportProjections=projection;
             scratch=null;projection.reservation.onOwnerClose(projection::close);projection.available();return projection;
         }catch(InvalidOrdinal invalid){throw new IndexOutOfBoundsException(invalid.getMessage());}
         catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
@@ -249,6 +263,216 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private static final class InvalidOrdinal extends RuntimeException {
         private static final long serialVersionUID=1L;
         InvalidOrdinal(){super("dependency nested ordinal");}
+    }
+    /** One complete fact's read metadata, not its payload. Reserve a constant
+     * envelope before construction; lists, text and typed IDs remain on tape. */
+    public synchronized FactCursor openFact(int ordinal) {
+        open();Objects.checkIndex(ordinal,count);AnalysisResources.Reservation scratch=null;
+        try {
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,1024,AnalysisResources.Phase.REPLAY);
+            var scope=new FactCursor(ordinal,scratch);scratch=null;install(scope);return scope;
+        }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    /** Intrusive live scopes,not a cardinality-sized child registry. Every
+     * constructed scope has its own fixed reservation and native expiry hook. */
+    private abstract class ReadScope implements AutoCloseable {
+        private final ReadScope parent;
+        private ReadScope previous,next,children;
+        private AnalysisResources.Reservation reservation;
+        private Runnable retirement;
+        private boolean retired;
+        ReadScope(ReadScope parent,AnalysisResources.Reservation reservation){this.parent=parent;this.reservation=reservation;}
+        final void available(){if(retired)throw new IllegalStateException("dependency field scope expired");if(parent==null)open();else parent.available();}
+        final void onRetirement(Runnable cleanup){Objects.requireNonNull(cleanup);if(retirement!=null)throw new IllegalStateException("field scope parent already registered");if(retired)cleanup.run();else retirement=cleanup;}
+        void closeFields(){ }
+        @Override public void close(){synchronized(PagedDependencyFactStorage.this){
+            if(retired)return;retired=true;Throwable failure=null;
+            while(children!=null)try{children.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            try{closeFields();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            if(previous==null){if(parent==null)readScopes=next;else parent.children=next;}else previous.next=next;
+            if(next!=null)next.previous=previous;previous=null;next=null;
+            var owned=reservation;reservation=null;try{if(owned!=null)owned.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            var expire=retirement;retirement=null;try{if(expire!=null)expire.run();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            rethrowCleanup(failure);
+        }}
+    }
+    private void install(ReadScope scope){
+        var first=scope.parent==null?readScopes:scope.parent.children;scope.next=first;if(first!=null)first.previous=scope;
+        if(scope.parent==null)readScopes=scope;else scope.parent.children=scope;
+        scope.reservation.onOwnerClose(scope::close);scope.available();
+    }
+    private TextView textView(ReadScope parent,long first,long end,Directory directory,int ordinal) {
+        AnalysisResources.Reservation scratch=null;
+        try {
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,256,AnalysisResources.Phase.REPLAY);
+            if(directory!=null){var range=new Reader(directory.body(),directory.end()).range(directory,ordinal);first=range.first();end=range.end();}
+            var reader=new Reader(first,end);long length=reader.length(),body=reader.at;
+            if(Math.addExact(body,length)!=end)throw new IllegalStateException("text field trailing cells");
+            var view=new TextView(parent,body,length,scratch);scratch=null;install(view);return view;
+        }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    private void readText(long first,long length,long offset,char[] destination,int target,int count) {
+        Objects.checkFromIndexSize(target,count,Objects.requireNonNull(destination).length);
+        if(offset<0||offset>length||count>length-offset)throw new IndexOutOfBoundsException("fact field text extent");
+        try{long at=Math.addExact(first,offset);for(int i=0;i<count;i++){long character=payload.get(Math.addExact(at,i));if(character<0||character>Character.MAX_VALUE)throw new IllegalStateException("invalid UTF16 cell");destination[target+i]=(char)character;}}
+        catch(RuntimeException|Error failure){abort(failure);throw failure;}
+    }
+    public final class TextView extends ReadScope {
+        private final long first,length;
+        private final String constant;
+        private TextView(ReadScope parent,long first,long length,AnalysisResources.Reservation reservation){super(parent,reservation);this.first=first;this.length=length;constant=null;}
+        private TextView(ReadScope parent,String constant,AnalysisResources.Reservation reservation){super(parent,reservation);this.constant=constant;first=0;length=constant.length();}
+        public long characterCount(){synchronized(PagedDependencyFactStorage.this){available();return length;}}
+        public void readCharacters(long offset,char[] destination,int target,int count){synchronized(PagedDependencyFactStorage.this){
+            available();if(constant==null){readText(first,length,offset,destination,target,count);return;}
+            Objects.checkFromIndexSize(target,count,Objects.requireNonNull(destination).length);
+            if(offset<0||offset>length||count>length-offset)throw new IndexOutOfBoundsException("fact annotation text extent");
+            try{resources.work(count,AnalysisResources.Phase.REPLAY);constant.getChars(Math.toIntExact(offset),Math.toIntExact(offset)+count,destination,target);}
+            catch(RuntimeException|Error failure){abort(failure);throw failure;}
+        }}
+        @Override public void close(){super.close();}
+    }
+    /** Only the three fixed product annotation literals,never arbitrary payload.
+     * Same256-byte funded text scope/lifetime; no resident list or fact rewrite. */
+    private TextView annotationText(ReadScope parent,int bit) {
+        AnalysisResources.Reservation scratch=null;
+        try {
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,256,AnalysisResources.Phase.REPLAY);
+            String constant=switch(bit){case 1->"PHYSICAL_PROPAGATION_DISABLED";case 2->"PARTIAL_CONTROL_PROJECTION";case 4->"UNPROVED_OPERATION_PRECONDITION";default->throw new IllegalStateException("invalid fact annotation");};
+            var view=new TextView(parent,constant,scratch);scratch=null;install(view);return view;
+        }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    public final class FactCursor extends ReadScope {
+        private final long row,end;
+        private final Directory candidates,raw,evidence,provenance,premises,uncertainties,reasons;
+        private final IdentityOwner identityOwner;
+        private int annotationFlags;
+        FactCursor annotations(int flags){synchronized(PagedDependencyFactStorage.this){available();annotationFlags=flags&7;return this;}}
+        void onClose(Runnable cleanup){synchronized(PagedDependencyFactStorage.this){onRetirement(cleanup);}}
+        private FactCursor(int ordinal,AnalysisResources.Reservation reservation){
+            super(null,reservation);row=ordinal*(long)STRIDE;end=offsets.get(row+1);identityOwner=new IdentityOwner(this::available);
+            candidates=directory(5);raw=directory(21);evidence=directory(22);provenance=directory(23);premises=directory(24);uncertainties=directory(25);reasons=directory(26);
+        }
+        private long anchor(int column){return offsets.get(row+column);}
+        private Directory directory(int column){return new Reader(anchor(column),end).directory();}
+        private long value(int column,int delta){available();try{return payload.get(Math.addExact(anchor(column),delta));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+        private <T> T tag(int column,int delta,T[] values){int ordinal=Math.toIntExact(value(column,delta));if(ordinal<0||ordinal>=values.length){var failure=new IllegalStateException("invalid fact column tag");abort(failure);throw failure;}return values[ordinal];}
+        private boolean bool(int delta){long value=value(7,delta);if(value!=0&&value!=1){var failure=new IllegalStateException("invalid fact column boolean");abort(failure);throw failure;}return value!=0;}
+        private IdentityView identity(int column,int finish,int expected,boolean nullable){
+            available();try{long first=anchor(column),last=anchor(finish);if(nullable&&payload.get(first)==0){if(last!=first+1)throw new IllegalStateException("null identity extent");return null;}return identityOwner.view(first,last,expected,null,0);}
+            catch(RuntimeException|Error failure){abort(failure);throw failure;}
+        }
+        private TextView text(int column,int finish){available();try{return textView(this,anchor(column),anchor(finish),null,0);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+        private IdentityView item(Directory directory,int ordinal,int expected){available();Objects.checkIndex(ordinal,directory.size());return identityOwner.view(0,0,expected,directory,ordinal);}
+        public IdentityView caller(){synchronized(PagedDependencyFactStorage.this){return identity(8,9,2,false);}}
+        public IdentityView entry(){synchronized(PagedDependencyFactStorage.this){return identity(9,10,3,false);}}
+        public IdentityView sequence(){synchronized(PagedDependencyFactStorage.this){return identity(10,11,4,false);}}
+        public IdentityView operation(){synchronized(PagedDependencyFactStorage.this){return identity(11,2,5,false);}}
+        public int offset(){synchronized(PagedDependencyFactStorage.this){return Math.toIntExact(value(12,0));}}
+        public IdentityView siteOrigin(){synchronized(PagedDependencyFactStorage.this){return identity(13,14,12,false);}}
+        public IdentityView targetOrigin(){synchronized(PagedDependencyFactStorage.this){return identity(14,15,12,false);}}
+        public TextView technology(){synchronized(PagedDependencyFactStorage.this){return text(15,16);}}
+        public TextView command(){synchronized(PagedDependencyFactStorage.this){return text(16,17);}}
+        public TextView namespace(){synchronized(PagedDependencyFactStorage.this){return text(17,18);}}
+        public TextView nameProfile(){synchronized(PagedDependencyFactStorage.this){return text(18,3);}}
+        public TargetKind targetKind(){synchronized(PagedDependencyFactStorage.this){return tag(3,0,TargetKind.values());}}
+        public IdentityView subject(){synchronized(PagedDependencyFactStorage.this){return identity(19,20,7,true);}}
+        public PointView valuePoint(){synchronized(PagedDependencyFactStorage.this){
+            available();AnalysisResources.Reservation scratch=null;
+            try{long first=anchor(20),last=anchor(4);if(payload.get(first)==0){if(last!=first+1)throw new IllegalStateException("null point extent");return null;}
+                scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
+                var point=new PointView(this,new Reader(first,last),scratch);scratch=null;install(point);return point;
+            }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }}
+        public Reachability reachability(){synchronized(PagedDependencyFactStorage.this){return tag(4,0,Reachability.values());}}
+        public TargetStatus targetStatus(){synchronized(PagedDependencyFactStorage.this){return tag(4,1,TargetStatus.values());}}
+        public Boolean modelValueRemainder(){synchronized(PagedDependencyFactStorage.this){return remainder(value(7,0));}}
+        public boolean sourceValueRemainder(){synchronized(PagedDependencyFactStorage.this){return bool(1);}}
+        public boolean interpretationUnknownRemainder(){synchronized(PagedDependencyFactStorage.this){return bool(2);}}
+        public boolean effectiveUnknownRemainder(){synchronized(PagedDependencyFactStorage.this){return bool(3);}}
+        public boolean openControlRemainder(){synchronized(PagedDependencyFactStorage.this){return bool(4);}}
+        public AnalysisStatus analysisStatus(){synchronized(PagedDependencyFactStorage.this){var stored=tag(6,0,AnalysisStatus.values());return annotationFlags==0?stored:AnalysisStatus.PARTIAL;}}
+        public int candidateCount(){synchronized(PagedDependencyFactStorage.this){available();return candidates.size();}}
+        public int rawCandidateCount(){synchronized(PagedDependencyFactStorage.this){available();return raw.size();}}
+        public CandidateCursor openCandidate(int ordinal){synchronized(PagedDependencyFactStorage.this){return candidate(candidates,ordinal,false);}}
+        public CandidateCursor openRawCandidate(int ordinal){synchronized(PagedDependencyFactStorage.this){return candidate(raw,ordinal,true);}}
+        private CandidateCursor candidate(Directory directory,int ordinal,boolean rawOnly){
+            available();Objects.checkIndex(ordinal,directory.size());AnalysisResources.Reservation scratch=null;
+            try{scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
+                var range=new Reader(directory.body(),directory.end()).range(directory,ordinal);var cursor=new CandidateCursor(this,new Reader(range.first(),range.end()),rawOnly,scratch);scratch=null;install(cursor);return cursor;
+            }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        public int evidenceCount(){synchronized(PagedDependencyFactStorage.this){available();return evidence.size();}}
+        public IdentityView evidence(int ordinal){synchronized(PagedDependencyFactStorage.this){return item(evidence,ordinal,0);}}
+        public int provenanceCount(){synchronized(PagedDependencyFactStorage.this){available();return provenance.size();}}
+        public IdentityView provenance(int ordinal){synchronized(PagedDependencyFactStorage.this){return item(provenance,ordinal,12);}}
+        public int premiseCount(){synchronized(PagedDependencyFactStorage.this){available();return premises.size();}}
+        public IdentityView premise(int ordinal){synchronized(PagedDependencyFactStorage.this){return item(premises,ordinal,14);}}
+        public int uncertaintyCount(){synchronized(PagedDependencyFactStorage.this){available();return uncertainties.size();}}
+        public IdentityView uncertainty(int ordinal){synchronized(PagedDependencyFactStorage.this){return item(uncertainties,ordinal,13);}}
+        public int reasonCount(){synchronized(PagedDependencyFactStorage.this){available();try{return Math.addExact(reasons.size(),Integer.bitCount(annotationFlags));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}}
+        /** Stored ordinals plus fixed owner annotations. Consumers retain the
+         * existing sorted/distinct union contract without materializing it here. */
+        public TextView reason(int ordinal){synchronized(PagedDependencyFactStorage.this){
+            available();Objects.checkIndex(ordinal,reasonCount());if(ordinal<reasons.size())return textView(this,0,0,reasons,ordinal);
+            int selected=ordinal-reasons.size();for(int bit=1;bit<=4;bit<<=1)if((annotationFlags&bit)!=0&&selected--==0)return annotationText(this,bit);
+            throw new IllegalStateException("fact annotation ordinal missing");
+        }}
+        @Override void closeFields(){identityOwner.close();}
+        @Override public void close(){super.close();}
+    }
+    public final class CandidateCursor extends ReadScope {
+        private final long factRow;
+        private final long referenceFirst,referenceLength,rawFirst,rawLength;
+        private final Directory supports;
+        private SupportCursor ownedSupports;
+        private CandidateCursor(FactCursor parent,Reader reader,boolean rawOnly,AnalysisResources.Reservation reservation){
+            super(parent,reservation);factRow=parent.row;
+            if(rawOnly){referenceLength=0;referenceFirst=0;}else{referenceLength=reader.length();referenceFirst=reader.at;reader.at=Math.addExact(reader.at,referenceLength);}
+            rawLength=reader.length();rawFirst=reader.at;reader.at=Math.addExact(reader.at,rawLength);supports=reader.directory();
+            if(supports.end()!=reader.end)throw new IllegalStateException("candidate scope trailing cells");
+        }
+        public long referenceLength(){synchronized(PagedDependencyFactStorage.this){available();return referenceLength;}}
+        public long rawLength(){synchronized(PagedDependencyFactStorage.this){available();return rawLength;}}
+        public void readReference(long offset,char[] destination,int target,int count){synchronized(PagedDependencyFactStorage.this){available();readText(referenceFirst,referenceLength,offset,destination,target,count);}}
+        public void readRaw(long offset,char[] destination,int target,int count){synchronized(PagedDependencyFactStorage.this){available();readText(rawFirst,rawLength,offset,destination,target,count);}}
+        public int supportCount(){synchronized(PagedDependencyFactStorage.this){available();return supports.size();}}
+        public SupportCursor openSupport(int ordinal){synchronized(PagedDependencyFactStorage.this){
+            available();Objects.checkIndex(ordinal,supports.size());AnalysisResources.Reservation scratch=null;
+            try {
+                scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
+                var range=new Reader(supports.body(),supports.end()).range(supports,ordinal);
+                var cursor=new SupportCursor(new Reader(range.first(),range.end()),scratch,factRow);cursor.next=supportCursors;
+                if(supportCursors!=null)supportCursors.previous=cursor;supportCursors=cursor;scratch=null;
+                cursor.readNext=ownedSupports;if(ownedSupports!=null)ownedSupports.readPrevious=cursor;ownedSupports=cursor;
+                cursor.onClose(()->unlink(cursor));cursor.reservation.onOwnerClose(cursor::close);cursor.available();return cursor;
+            }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }}
+        private void unlink(SupportCursor cursor){if(cursor.readPrevious==null)ownedSupports=cursor.readNext;else cursor.readPrevious.readNext=cursor.readNext;if(cursor.readNext!=null)cursor.readNext.readPrevious=cursor.readPrevious;cursor.readPrevious=null;cursor.readNext=null;}
+        @Override void closeFields(){Throwable failure=null;while(ownedSupports!=null)try{ownedSupports.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}rethrowCleanup(failure);}
+        @Override public void close(){super.close();}
+    }
+    public enum PointOutcome { NONE, NORMAL, EXCEPTION, OTHER_EXCEPTION, HALT, DIVERGE }
+    public final class PointView extends ReadScope {
+        private final ProgramPoint.Kind kind;
+        private final PointOutcome outcome;
+        private final long entryFirst,entryEnd,operationFirst,operationEnd,tagFirst,tagEnd;
+        private final boolean nullOperation;
+        private final IdentityOwner identityOwner;
+        private PointView(FactCursor parent,Reader reader,AnalysisResources.Reservation reservation){
+            super(parent,reservation);identityOwner=new IdentityOwner(this::available);kind=reader.tag(ProgramPoint.Kind.values(),reader.integer()-1);
+            entryFirst=reader.at;reader.skipId();entryEnd=reader.at;operationFirst=reader.at;
+            nullOperation=payload.get(reader.at)==0;if(nullOperation)reader.word();else reader.skipId();operationEnd=reader.at;
+            outcome=reader.tag(PointOutcome.values());tagFirst=reader.at;if(outcome==PointOutcome.EXCEPTION)reader.skipText();tagEnd=reader.at;
+            if(reader.at!=reader.end)throw new IllegalStateException("point scope trailing cells");
+        }
+        public ProgramPoint.Kind kind(){synchronized(PagedDependencyFactStorage.this){available();return kind;}}
+        public PointOutcome outcomeKind(){synchronized(PagedDependencyFactStorage.this){available();return outcome;}}
+        public IdentityView entry(){synchronized(PagedDependencyFactStorage.this){available();return identityOwner.view(entryFirst,entryEnd,3,null,0);}}
+        public IdentityView operation(){synchronized(PagedDependencyFactStorage.this){available();return nullOperation?null:identityOwner.view(operationFirst,operationEnd,5,null,0);}}
+        public TextView exceptionTag(){synchronized(PagedDependencyFactStorage.this){available();return outcome==PointOutcome.EXCEPTION?textView(this,tagFirst,tagEnd,null,0):null;}}
+        @Override void closeFields(){identityOwner.close();}
+        @Override public void close(){super.close();}
     }
     /** Fixed 512-byte scratch envelope per support: carrier/links/reservation/
      * callback and bounded Reader/Range/Directory probes, not premise cardinality.
@@ -261,7 +485,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             long row=ordinal*(long)STRIDE;var reader=new Reader(offsets.get(row+5),offsets.get(row+1));
             var range=reader.select(candidate);reader=new Reader(range.first(),range.end());reader.skipText();reader.skipText();
             range=reader.select(support);reader=new Reader(range.first(),range.end());
-            var cursor=new SupportCursor(reader,scratch);cursor.next=supportCursors;
+            var cursor=new SupportCursor(reader,scratch,row);cursor.next=supportCursors;
             if(supportCursors!=null)supportCursors.previous=cursor;supportCursors=cursor;scratch=null;
             cursor.reservation.onOwnerClose(cursor::close);cursor.available();return cursor;
         }catch(InvalidOrdinal invalid){if(scratch!=null)scratch.close();throw new IndexOutOfBoundsException(invalid.getMessage());}
@@ -290,16 +514,18 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         }return Long.compare(x,y);
     }
     public final class SupportCursor implements AutoCloseable {
+        private final long factRow;
         private final SupportKind kind;
         private final long producerFirst,producerEnd,originFirst,originEnd;
         private final Directory premises;
         private AnalysisResources.Reservation reservation;
         private SupportCursor previous,next;
-        private IdentityView identities;
+        private final IdentityOwner identityOwner;
+        private SupportCursor readPrevious,readNext;
         private Runnable retirement;
         private boolean retired;
-        private SupportCursor(Reader reader,AnalysisResources.Reservation reservation) {
-            this.reservation=reservation;kind=reader.tag(SupportKind.values());
+        private SupportCursor(Reader reader,AnalysisResources.Reservation reservation,long factRow) {
+            this.reservation=reservation;this.factRow=factRow;identityOwner=new IdentityOwner(this::available);kind=reader.tag(SupportKind.values());
             producerFirst=reader.at;reader.skipId();producerEnd=reader.at;
             originFirst=reader.at;reader.skipId();originEnd=reader.at;
             premises=reader.directory();if(premises.end()!=reader.end)throw new IllegalStateException("support cursor trailing fields");
@@ -322,19 +548,38 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             try {
                 scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
                 if(ordinal>=0){var range=new Reader(premises.body(),premises.end()).range(premises,ordinal);first=range.first();end=range.end();}
-                var view=new IdentityView(this,new Reader(first,end),expected,scratch);view.next=identities;
-                if(identities!=null)identities.previous=view;identities=view;scratch=null;
+                var view=new IdentityView(identityOwner,new Reader(first,end),expected,scratch);view.next=identityOwner.identities;
+                if(identityOwner.identities!=null)identityOwner.identities.previous=view;identityOwner.identities=view;scratch=null;
                 view.reservation.onOwnerClose(view::close);view.available();return view;
             }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
         }
         @Override public void close(){synchronized(PagedDependencyFactStorage.this){
             if(retired)return;retired=true;Throwable failure=null;
-            while(identities!=null)try{identities.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            try{identityOwner.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
             if(previous==null)supportCursors=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;
             var owned=reservation;reservation=null;try{if(owned!=null)owned.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
             var expire=retirement;retirement=null;try{if(expire!=null)expire.run();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
             if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;
         }}
+    }
+    /** Constant funded holder lets non-support field scopes own identity views
+     * without constructing a fake Support or a complete typed ID. */
+    private final class IdentityOwner {
+        private final Runnable alive;
+        private IdentityView identities;
+        IdentityOwner(Runnable alive){this.alive=alive;}
+        void available(){alive.run();}
+        IdentityView view(long first,long end,int expected,Directory directory,int ordinal) {
+            AnalysisResources.Reservation scratch=null;
+            try {
+                scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
+                if(directory!=null){var range=new Reader(directory.body(),directory.end()).range(directory,ordinal);first=range.first();end=range.end();}
+                var view=new IdentityView(this,new Reader(first,end),expected,scratch);view.next=identities;
+                if(identities!=null)identities.previous=view;identities=view;scratch=null;
+                view.reservation.onOwnerClose(view::close);view.available();return view;
+            }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        void close(){Throwable failure=null;while(identities!=null)try{identities.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}rethrowCleanup(failure);}
     }
     /** Fixed 512 bytes: primitive text extents, carrier/links, reservation/callback
      * and one bounded Reader. No String, typed Id, char array or premise list is
@@ -342,14 +587,14 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
      * Views borrow their parent and expire with it; caller-owned blocks are not
      * retained. Character offsets are UTF16 code units, including split pairs. */
     public final class IdentityView implements AutoCloseable {
-        private final SupportCursor parent;
+        private final IdentityOwner parent;
         private final int tag;
         private IdentityOwnerKind ownerKind=IdentityOwnerKind.NONE;
         private long publicationAt,publicationLength,unitAt,unitLength,ownerAt,ownerLength,localAt,localLength;
         private AnalysisResources.Reservation reservation;
         private IdentityView previous,next;
         private boolean retired;
-        private IdentityView(SupportCursor parent,Reader reader,int expected,AnalysisResources.Reservation reservation) {
+        private IdentityView(IdentityOwner parent,Reader reader,int expected,AnalysisResources.Reservation reservation) {
             this.parent=parent;this.reservation=reservation;tag=reader.integer();
             if(expected!=0&&tag!=expected)throw new IllegalStateException("unexpected cursor identity type");
             switch(tag) {
@@ -372,6 +617,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         private void available(){if(retired)throw new IllegalStateException("dependency identity view expired");parent.available();}
         public String domain(){synchronized(PagedDependencyFactStorage.this){available();return switch(tag){case 1->"publication";case 2->"unit";case 3->"entry";case 4->"label";case 5->"operation";case 6->"operand";case 7->"object";case 8->"storage";case 9->"resource";case 10->"artifact";case 11->"artifactRelation";case 12->"origin";case 13->"uncertainty";case 14->"premise";case 15->"completionPort";default->throw new IllegalStateException("invalid identity tag");};}}
         public IdentityOwnerKind ownerKind(){synchronized(PagedDependencyFactStorage.this){available();return ownerKind;}}
+        public int compareFullIdentity(IdentityView other,char[] left,char[] right){synchronized(PagedDependencyFactStorage.this){available();Objects.requireNonNull(other).available();return compareIdentity(this,other,left,right);}}
         public long characterCount(IdentityPart part){synchronized(PagedDependencyFactStorage.this){available();return length(Objects.requireNonNull(part));}}
         private long length(IdentityPart part){return switch(part){case PUBLICATION->publicationLength;case UNIT->unitLength;case OWNER->ownerLength;case LOCAL->localLength;};}
         private long first(IdentityPart part){return switch(part){case PUBLICATION->publicationAt;case UNIT->unitAt;case OWNER->ownerAt;case LOCAL->localAt;};}
@@ -387,8 +633,9 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         }}
     }
     public final class SupportProjection implements AutoCloseable {
+        private final int ordinal;
         private Support support;private AnalysisResources.Reservation reservation;private SupportProjection previous,next;private boolean retired;
-        private SupportProjection(Support support,AnalysisResources.Reservation reservation){this.support=support;this.reservation=reservation;}
+        private SupportProjection(Support support,AnalysisResources.Reservation reservation,int ordinal){this.support=support;this.reservation=reservation;this.ordinal=ordinal;}
         private void available(){if(retired)throw new IllegalStateException("dependency support projection expired");open();}
         public Support support(){synchronized(PagedDependencyFactStorage.this){available();return support;}}
         @Override public void close(){synchronized(PagedDependencyFactStorage.this){
@@ -439,7 +686,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             };
         }
         <T extends Id> T id(Class<T> type){return type.cast(Objects.requireNonNull(id()));}
-        <T extends Id> List<T> ids(Class<T> type){int size=length();var values=new ArrayList<T>(size);for(int i=0;i<size;i++)values.add(id(type));return values;}
+        <T extends Id> List<T> ids(Class<T> type){return indexed(reader->reader.id(type));}
         Support support(){return new Support(tag(SupportKind.values()),id(Id.class),id(OriginId.class),indexed(reader->reader.id(PremiseId.class)));}
         List<Support> supports(){return indexed(Reader::support);}
         ProgramPoint point() {
@@ -452,19 +699,22 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             var caller=id(UnitId.class);var entry=id(EntryId.class);var sequence=id(LabelId.class);var operation=id(OperationId.class);int offset=integer();
             var siteOrigin=id(OriginId.class);var targetOrigin=id(OriginId.class);var technology=text();var command=text();var namespace=text();var profile=text();
             var kind=tag(TargetKind.values());var subject=(ObjectId)id();var point=point();var reach=tag(Reachability.values());var status=tag(TargetStatus.values());
-            int rawCount=length();var raw=new ArrayList<RawCandidate>(rawCount);for(int i=0;i<rawCount;i++)raw.add(new RawCandidate(text(),supports()));
+            var raw=indexed(reader->new RawCandidate(reader.text(),reader.supports()));
             var candidates=indexed(reader->new Candidate(reader.text(),reader.text(),reader.supports()));
             Boolean model=switch(integer()){case 0->null;case 1->Boolean.FALSE;case 2->Boolean.TRUE;default->throw new IllegalStateException("invalid nullable remainder");};
             boolean source=bool(),interpretation=bool(),effective=bool(),controlOpen=bool();
             var evidence=ids(Id.class);var origins=ids(OriginId.class);var premises=ids(PremiseId.class);var uncertainties=ids(UncertaintyId.class);var analysis=tag(AnalysisStatus.values());
-            int reasonCount=length();var reasons=new ArrayList<String>(reasonCount);for(int i=0;i<reasonCount;i++)reasons.add(text());
+            var reasons=indexed(Reader::text);
             return new DependencySiteFact(caller,entry,sequence,operation,offset,siteOrigin,targetOrigin,technology,command,namespace,profile,kind,subject,point,
                 reach,status,raw,candidates,model,source,interpretation,effective,controlOpen,evidence,origins,premises,uncertainties,analysis,reasons);
         }
     }
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=primary)primary.addSuppressed(cleanup);}}
+    private static void rethrowCleanup(Throwable failure){if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;}
     @Override public synchronized void close() {
         if(closed)return;closed=true;Throwable failure=null;
+        while(readScopes!=null)try{readScopes.close();}
+            catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         while(supportCursors!=null)try{supportCursors.close();}
             catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         while(supportProjections!=null)try{supportProjections.close();}

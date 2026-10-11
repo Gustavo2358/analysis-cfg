@@ -101,6 +101,20 @@ final class JsonOutput {
         switch(domain){case "publication","unit","entry","label","object","operation","resource","storage","origin","premise","operand","uncertainty"->{}default->throw new IllegalArgumentException("ID outside result contract");}
         identityObject(view,domain,io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart.LOCAL,domain.equals("operand"),unit,domain.equals("publication"),block);
     }
+    /** DependencyJson's pre-existing artifact exception,not new WireIds admission. */
+    void dependencyIdentity(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityView view,char[] block)throws IOException {
+        if(view==null){value(null);return;}
+        if(view.domain().equals("artifact"))identityObject(view,"artifact",io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart.LOCAL,false,false,false,block);
+        else identity(view,block);
+    }
+    void factText(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.TextView view,char[] block)throws IOException {
+        if(block.length==0)throw new IllegalArgumentException("fact text buffer");
+        blockText(view.characterCount(),block,(offset,destination,count)->view.readCharacters(offset,destination,0,count),true);
+    }
+    void factCandidateText(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.CandidateCursor view,boolean raw,char[] block)throws IOException {
+        if(block.length==0)throw new IllegalArgumentException("candidate text buffer");
+        blockText(raw?view.rawLength():view.referenceLength(),block,(offset,destination,count)->{if(raw)view.readRaw(offset,destination,0,count);else view.readReference(offset,destination,0,count);},true);
+    }
     private void identityObject(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityView view,String domain,
             io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart local,boolean operand,boolean unit,boolean publication,char[] block)throws IOException {
         octet('{');string("domain");octet(':');string(domain);octet(',');string("localId");octet(':');identityText(view,local,block);
@@ -115,6 +129,11 @@ final class JsonOutput {
     }
     @FunctionalInterface private interface CharacterReader {void read(long offset,char[] destination,int count);}
     private void blockText(long length,char[] block,CharacterReader reader)throws IOException {
+        blockText(length,block,reader,false);
+    }
+    /** Fact strings preserve strict Unicode scalar wire admission; SOURCE's
+     * independent escaped-code-unit contract remains unchanged. */
+    private void blockText(long length,char[] block,CharacterReader reader,boolean strict)throws IOException {
         octet('"');char pending=0;
         for(long at=0;at<length;) {
             int count=(int)Math.min(block.length,length-at);reader.read(at,block,count);at+=count;
@@ -124,10 +143,10 @@ final class JsonOutput {
                     if(Character.isLowSurrogate(c)) {
                         int cp=Character.toCodePoint(pending,c);octet(0xf0|(cp>>>18));octet(0x80|((cp>>>12)&63));octet(0x80|((cp>>>6)&63));octet(0x80|(cp&63));pending=0;continue;
                     }
-                    escapedUnit(pending);pending=0;
+                    if(strict)throw new IllegalArgumentException("invalid Unicode scalar");escapedUnit(pending);pending=0;
                 }
                 if(Character.isHighSurrogate(c)){pending=c;continue;}
-                if(Character.isLowSurrogate(c)){escapedUnit(c);continue;}
+                if(Character.isLowSurrogate(c)){if(strict)throw new IllegalArgumentException("invalid Unicode scalar");escapedUnit(c);continue;}
                 switch(c) {
                     case '"' -> ascii("\\\"");case '\\' -> ascii("\\\\");
                     case '\b' -> ascii("\\b");case '\f' -> ascii("\\f");case '\n' -> ascii("\\n");case '\r' -> ascii("\\r");case '\t' -> ascii("\\t");
@@ -140,7 +159,7 @@ final class JsonOutput {
                 }
             }
         }
-        if(pending!=0)escapedUnit(pending);octet('"');
+        if(pending!=0){if(strict)throw new IllegalArgumentException("invalid Unicode scalar");escapedUnit(pending);}octet('"');
     }
     private void escapedUnit(char value)throws IOException {
         ascii("\\u");for(int shift=12;shift>=0;shift-=4)octet(Character.forDigit((value>>>shift)&15,16));

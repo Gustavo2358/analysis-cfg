@@ -51,10 +51,10 @@ final class ManagedSourceExecutableOwnerTest {
                 try(var result=new DependencyAnalysis().prepareLeased(input.program,cfg,input.source,SourceCorrelationSnapshotTest.links(publication,evidence),input.pages,input.execution)) {
                     var call=owner(result);assertEquals(n,result.executable().sites().size());
                     assertEquals(1,result.programs().candidateCount(0));assertEquals(n,result.programs().supportCount(0,0));
-                    assertEquals(n,call.fullFactProjections(),"only one full DTO per resolved source site; headers/support ordering must not decode full bodies n="+n);
+                    assertEquals(0,call.fullFactProjections(),"SOURCE resolution, headers and support ordering must never decode complete fact bodies n="+n);
                     var wire=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(result,input.program,input.pages,input.execution,wire);
                     assertEquals(wire.size(),input.execution.outputUsed());assertEquals(wire.size(),input.resources.outputUsed());
-                    assertEquals(4L*n,call.fullFactProjections(),"sites+edges+SOURCE executableSites each visit once; supports use scoped typed leaves n="+n);
+                    assertEquals(0,call.fullFactProjections(),"sites+edges+SOURCE executableSites and supports use scoped fields, not complete facts n="+n);
                     var json=new com.fasterxml.jackson.databind.ObjectMapper().readTree(wire.toByteArray());
                     assertEquals(n,json.path("sites").size());assertEquals(n,json.path("edges").size());
                     var candidate=json.path("dependencies").path("programs").get(0).path("candidates").get(0);

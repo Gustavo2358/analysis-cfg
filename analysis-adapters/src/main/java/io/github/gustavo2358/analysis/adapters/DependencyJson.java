@@ -6,6 +6,7 @@ import io.github.gustavo2358.analysis.dependencies.*;
 import java.io.*;
 import java.util.*;
 import io.github.gustavo2358.analysis.structure.ProgramStore;
+import io.github.gustavo2358.analysis.solver.*;
 import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
 
 /** Explicit, deterministic dependency-result mapping. No bean, enum-name or AIR parsing shortcuts. */
@@ -34,7 +35,7 @@ public final class DependencyJson {
         Objects.requireNonNull(result);Objects.requireNonNull(stream);result.requireContext(source,resources);
         try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
             if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed executable root buffer");
-            write(result.result(),source,new JsonOutput(ManagedOutputStream.metered(stream,resources)),null,null,result);result.result();
+            var out=new JsonOutput(ManagedOutputStream.metered(stream,resources));write(result.result(),source,out,null,null,result,new FactWriter(out,result.borrowedPages(),resources));result.result();
         }
     }
     /** One funded root buffer; every SOURCE section borrows its complete prepared owner. */
@@ -44,16 +45,16 @@ public final class DependencyJson {
         if(result.program()!=source)throw new IllegalArgumentException("foreign native managed result owner");
         try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
             if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed root buffer");var output=new JsonOutput(ManagedOutputStream.metered(stream,resources));
-            try(var writer=SourceSnapshotWriter.open(result.admission(),output,pages,resources)){write(result.executable(),source,output,result,writer,result.executableOwner());writer.verify();result.executable();result.programs().count();}
+            try(var writer=SourceSnapshotWriter.open(result.admission(),output,pages,resources)){write(result.executable(),source,output,result,writer,result.executableOwner(),new FactWriter(output,pages,resources));writer.verify();result.executable();result.programs().count();}
         }
     }
     private void write(DependencyResult result,OutputStream stream,ProgramStore.Structural programSource) throws IOException {
         write(result,programSource,new JsonOutput(stream),null,null);
     }
     private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer)throws IOException {
-        write(result,programSource,out,managed,writer,null);
+        write(result,programSource,out,managed,writer,null,null);
     }
-    private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer,ManagedExecutableDependencyResult executable)throws IOException {
+    private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer,ManagedExecutableDependencyResult executable,FactWriter factWriter)throws IOException {
         boolean snapshot=programSource!=null;
         // Native v3 borrows scalar headers from the existing paged catalogue.
         // Only the explicit non-native compatibility API builds a resident map.
@@ -72,10 +73,10 @@ public final class DependencyJson {
         var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->Set.of("1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(s.evidence().version())?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
-            "sites",executable!=null?managedSites(executable,siteCoverage):result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->{
+            "sites",executable!=null?managedSites(executable,factWriter):result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->{
                 var value=site(s,true);if(snapshot)value.put("coverage",Objects.requireNonNull(siteCoverage.apply(s.operation()),"missing original site coverage").name());return value;
             }),
-            "edges",executable!=null?managedEdges(executable):result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
+            "edges",executable!=null?managedEdges(executable,factWriter):result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
             "metrics",result.metrics(),"origins",orderedMetadata(result.origins(),Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
             "artifacts",orderedMetadata(result.artifacts(),Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
@@ -101,30 +102,105 @@ public final class DependencyJson {
         document.put("dependencies",dependencies);
         out.value(document);out.finish();
     }
-    private static JsonOutput.EncodedValue managedSites(ManagedExecutableDependencyResult owner,java.util.function.Function<OperationId,Evidence.CoverageStatus> coverage){return out->{
-        out.symbol('[');boolean first=true;
-        try(var cursor=owner.cursor()){while(cursor.advance()){
-            if(!first)out.symbol(',');first=false;var fact=cursor.fact();var value=site(fact,true);
-            value.put("coverage",Objects.requireNonNull(coverage.apply(fact.operation()),"missing original site coverage").name());out.value(value);
-        }}out.symbol(']');
+    private static JsonOutput.EncodedValue managedSites(ManagedExecutableDependencyResult owner,FactWriter writer){return out->{
+        out.symbol('[');for(int site=0,n=owner.result().sites().size();site<n;site++)try(var fact=owner.openFact(site)){if(site!=0)out.symbol(',');writer.site(fact,owner.siteCoverage(site).name());}out.symbol(']');
     };}
-    private static JsonOutput.EncodedValue managedEdges(ManagedExecutableDependencyResult owner){return out->{
+    private static JsonOutput.EncodedValue managedEdges(ManagedExecutableDependencyResult owner,FactWriter writer){return out->{
         out.symbol('[');boolean first=true;
-        try(var cursor=owner.cursor()){while(cursor.advance()){
-            var fact=cursor.fact();if(fact.reachability()==Reachability.UNREACHABLE_IN_MODEL)continue;
-            try(var candidates=fact.candidates().stream().sorted(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue))){
-                var items=candidates.iterator();while(items.hasNext()){
-                    if(!first)out.symbol(',');first=false;
-                    out.value(object("caller",id(fact.caller()),"entry",id(fact.entry()),"site",id(fact.operation()),"candidate",candidate(items.next()),"openSite",fact.effectiveUnknownRemainder()));
-                }
-            }
-        }}out.symbol(']');
+        for(int site=0,n=owner.result().sites().size();site<n;site++)try(var fact=owner.openFact(site)){if(fact.reachability()!=Reachability.UNREACHABLE_IN_MODEL)first=writer.edges(fact,first);}out.symbol(']');
     };}
     private static JsonOutput.EncodedValue managedPrograms(ManagedExecutableDependencyResult owner){return out->{
         out.symbol('[');for(int i=0,n=owner.result().programDependencies().size();i<n;i++){
             if(i!=0)out.symbol(',');try(var projection=owner.projectProgram(i)){out.value(program(projection.resolution()));}
         }out.symbol(']');
     };}
+    /** Fixed root-funded buffers/carrier. Collections sort into caller-owned
+     * paged ordinals; no resident candidate/support/ID/list projection. */
+    static final class FactWriter {
+        private final JsonOutput out;
+        private final PageStore pages;
+        private final AnalysisResources resources;
+        private final char[] left=new char[256],right=new char[256];
+        private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.ENCODE;
+        @FunctionalInterface private interface IdentityRead {PagedDependencyFactStorage.IdentityView open();}
+        @FunctionalInterface private interface TextOpen {PagedDependencyFactStorage.TextView open();}
+        @FunctionalInterface private interface IdentityAt {PagedDependencyFactStorage.IdentityView open(int ordinal);}
+        @FunctionalInterface private interface TextRead {void read(long offset,char[] target,int count);}
+        @FunctionalInterface private interface Row {void write(int ordinal)throws IOException;}
+        FactWriter(JsonOutput out,PageStore pages,AnalysisResources resources){this.out=out;this.pages=pages;this.resources=resources;}
+        private JsonOutput.EncodedValue identity(IdentityRead read){return ignored->{try(var view=read.open()){out.dependencyIdentity(view,left);}};}
+        private JsonOutput.EncodedValue text(TextOpen read){return ignored->{try(var view=read.open()){out.factText(view,left);}};}
+        private int compareText(long first,long second,TextRead a,TextRead b){
+            for(long at=0,n=Math.min(first,second);at<n;){int count=(int)Math.min(left.length,n-at);a.read(at,left,count);b.read(at,right,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;}
+            return Long.compare(first,second);
+        }
+        private static void requireWireDomain(String domain){switch(domain){case "publication","unit","entry","label","object","operation","resource","storage","origin","premise","operand","uncertainty"->{}default->throw new IllegalArgumentException("ID outside result contract");}}
+        private int compareIdentity(PagedDependencyFactStorage.IdentityView a,PagedDependencyFactStorage.IdentityView b){
+            var part=PagedDependencyFactStorage.IdentityPart.PUBLICATION;
+            int c=compareText(a.characterCount(part),b.characterCount(part),(at,target,n)->a.readCharacters(part,at,target,0,n),(at,target,n)->b.readCharacters(part,at,target,0,n));
+            if(c!=0)return c;
+            // Preserve WireIds.ORDER's exact short-circuit admission,including
+            // DependencyJson.id's separate artifact encoding exception.
+            requireWireDomain(a.domain());requireWireDomain(b.domain());return a.compareFullIdentity(b,left,right);
+        }
+        private void ordered(int count,PagedLongIndex.Order comparison,boolean distinct,Row write)throws IOException {
+            if(count==0)return;if(count==1){write.write(0);return;}
+            try(var order=new PagedLongIndex(pages,resources,PHASE,(a,b)->{int c=comparison.compare(a,b);return c==0&&!distinct?Long.compare(a,b):c;})){
+                for(int i=0;i<count;i++){resources.work(1,PHASE);order.intern(i,i+1L);}
+                try(var cursor=order.cursor()){while(cursor.advance())write.write(Math.toIntExact(cursor.value()-1));}
+            }
+        }
+        private void ids(int count,IdentityAt read)throws IOException {
+            out.symbol('[');boolean[] first={true};ordered(count,(a,b)->{try(var x=read.open(Math.toIntExact(a));var y=read.open(Math.toIntExact(b))){return compareIdentity(x,y);}},false,i->{if(!first[0])out.symbol(',');first[0]=false;try(var view=read.open(i)){out.dependencyIdentity(view,left);}});out.symbol(']');
+        }
+        private void reasons(PagedDependencyFactStorage.FactCursor fact)throws IOException {
+            out.symbol('[');boolean[] first={true};ordered(fact.reasonCount(),(a,b)->{try(var x=fact.reason(Math.toIntExact(a));var y=fact.reason(Math.toIntExact(b))){return compareText(x.characterCount(),y.characterCount(),(at,target,n)->x.readCharacters(at,target,0,n),(at,target,n)->y.readCharacters(at,target,0,n));}},true,i->{if(!first[0])out.symbol(',');first[0]=false;try(var value=fact.reason(i)){out.factText(value,left);}});out.symbol(']');
+        }
+        void site(PagedDependencyFactStorage.FactCursor f,String coverage)throws IOException {
+            out.value(new JsonOutput.Fields("caller",identity(f::caller),"entry",identity(f::entry),"sequence",identity(f::sequence),"operation",identity(f::operation),"offset",f.offset(),
+                "technology",text(f::technology),"command",text(f::command),"namespace",text(f::namespace),"nameProfile",text(f::nameProfile),"siteOrigin",identity(f::siteOrigin),"targetOrigin",identity(f::targetOrigin),"targetKind",f.targetKind().name(),
+                "subject",identity(f::subject),"valuePoint",(JsonOutput.EncodedValue)ignored->{try(var point=f.valuePoint()){point(point);}},"reachability",f.reachability().name(),"targetStatus",f.targetStatus().name(),
+                "rawCandidates",(JsonOutput.EncodedValue)ignored->candidates(f,true),"candidates",(JsonOutput.EncodedValue)ignored->candidates(f,false),
+                "modelValueRemainder",f.modelValueRemainder(),"sourceValueRemainder",f.sourceValueRemainder(),"interpretationUnknownRemainder",f.interpretationUnknownRemainder(),"effectiveUnknownRemainder",f.effectiveUnknownRemainder(),"openControlRemainder",f.openControlRemainder(),
+                "evidence",(JsonOutput.EncodedValue)ignored->ids(f.evidenceCount(),f::evidence),"provenance",(JsonOutput.EncodedValue)ignored->ids(f.provenanceCount(),f::provenance),"premises",(JsonOutput.EncodedValue)ignored->ids(f.premiseCount(),f::premise),"uncertaintyRefs",(JsonOutput.EncodedValue)ignored->ids(f.uncertaintyCount(),f::uncertainty),
+                "analysisStatus",f.analysisStatus().name(),"analysisReasons",(JsonOutput.EncodedValue)ignored->reasons(f),"coverage",coverage));
+        }
+        private PagedDependencyFactStorage.CandidateCursor candidate(PagedDependencyFactStorage.FactCursor fact,int ordinal,boolean raw){return raw?fact.openRawCandidate(ordinal):fact.openCandidate(ordinal);}
+        private int compareCandidates(PagedDependencyFactStorage.FactCursor fact,long a,long b,boolean raw){
+            try(var x=candidate(fact,Math.toIntExact(a),raw);var y=candidate(fact,Math.toIntExact(b),raw)){
+                int c=raw?0:compareText(x.referenceLength(),y.referenceLength(),(at,target,n)->x.readReference(at,target,0,n),(at,target,n)->y.readReference(at,target,0,n));
+                return c!=0?c:compareText(x.rawLength(),y.rawLength(),(at,target,n)->x.readRaw(at,target,0,n),(at,target,n)->y.readRaw(at,target,0,n));
+            }
+        }
+        private void candidates(PagedDependencyFactStorage.FactCursor fact,boolean raw)throws IOException {
+            out.symbol('[');boolean[] first={true};ordered(raw?fact.rawCandidateCount():fact.candidateCount(),(a,b)->compareCandidates(fact,a,b,raw),false,i->{if(!first[0])out.symbol(',');first[0]=false;try(var row=candidate(fact,i,raw)){candidate(row,raw);}});out.symbol(']');
+        }
+        private void candidate(PagedDependencyFactStorage.CandidateCursor row,boolean raw)throws IOException {
+            var fields=new JsonOutput.Fields("rawValue",(JsonOutput.EncodedValue)ignored->out.factCandidateText(row,true,left),"supports",(JsonOutput.EncodedValue)ignored->supports(row));
+            if(!raw)fields.put("referenceName",(JsonOutput.EncodedValue)ignored->out.factCandidateText(row,false,left));out.value(fields);
+        }
+        private int compareSupports(PagedDependencyFactStorage.CandidateCursor row,long a,long b){
+            try(var x=row.openSupport(Math.toIntExact(a));var y=row.openSupport(Math.toIntExact(b))){int c;try(var first=x.producer();var second=y.producer()){c=compareIdentity(first,second);}if(c==0)try(var first=x.origin();var second=y.origin()){c=compareIdentity(first,second);}return c;}
+        }
+        private void supports(PagedDependencyFactStorage.CandidateCursor row)throws IOException {
+            out.symbol('[');boolean[] first={true};ordered(row.supportCount(),(a,b)->compareSupports(row,a,b),false,i->{if(!first[0])out.symbol(',');first[0]=false;try(var support=row.openSupport(i)){out.value(new JsonOutput.Fields("kind",support.kind().name(),"producer",identity(support::producer),"origin",identity(support::origin),"premises",(JsonOutput.EncodedValue)ignored->ids(support.premiseCount(),support::premise)));}});out.symbol(']');
+        }
+        void point(PagedDependencyFactStorage.PointView point)throws IOException {
+            if(point==null){out.value(null);return;}
+            out.value(new JsonOutput.Fields("position",point.kind().name(),"entryId",identity(point::entry),"operationId",identity(point::operation),"outcome",(JsonOutput.EncodedValue)ignored->outcome(point)));
+        }
+        private void outcome(PagedDependencyFactStorage.PointView point)throws IOException {
+            if(point.outcomeKind()==PagedDependencyFactStorage.PointOutcome.NONE){out.value(null);return;}
+            String kind=switch(point.outcomeKind()){case NORMAL->"normal";case EXCEPTION->"exception";case OTHER_EXCEPTION->"other-exception";case HALT->"halt";case DIVERGE->"diverge";case NONE->throw new IllegalStateException("absent outcome");};
+            var fields=new JsonOutput.Fields("kind",kind);if(point.outcomeKind()==PagedDependencyFactStorage.PointOutcome.EXCEPTION)fields.put("tag",text(point::exceptionTag));out.value(fields);
+        }
+        boolean edges(PagedDependencyFactStorage.FactCursor f,boolean initial)throws IOException {
+            boolean[] first={initial};ordered(f.candidateCount(),(a,b)->compareCandidates(f,a,b,false),false,i->{if(!first[0])out.symbol(',');first[0]=false;try(var row=f.openCandidate(i)){out.value(new JsonOutput.Fields("caller",identity(f::caller),"entry",identity(f::entry),"site",identity(f::operation),"candidate",(JsonOutput.EncodedValue)ignored->candidate(row,false),"openSite",f.effectiveUnknownRemainder()));}});return first[0];
+        }
+        void executableSite(SourceTargetPlan.FactCursor f)throws IOException {
+            out.value(new JsonOutput.Fields("entry",identity(f::entry),"operation",identity(f::operation),"reachability",f.reachability().name(),"valuePoint",(JsonOutput.EncodedValue)ignored->{try(var point=f.valuePoint()){point(point);}},"premises",(JsonOutput.EncodedValue)ignored->ids(f.premiseCount(),f::premise),"provenance",(JsonOutput.EncodedValue)ignored->ids(f.provenanceCount(),f::provenance)));
+        }
+    }
     static Object program(TargetResolver.Resolution resolved) {
         var o=resolved.occurrence();
         var result=object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),

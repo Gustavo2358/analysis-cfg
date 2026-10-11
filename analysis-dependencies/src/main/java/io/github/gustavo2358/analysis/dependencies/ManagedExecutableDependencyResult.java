@@ -16,6 +16,7 @@ import java.util.function.ToIntFunction;
 public final class ManagedExecutableDependencyResult implements AutoCloseable {
     private SnapshotProgram program;
     private AnalysisResources resources;
+    private PageStore pages;
     private AnalysisResources.Reservation control;
     private PagedDependencyFactStorage facts;
     private PagedLongIndex index,operations;
@@ -31,7 +32,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     private boolean structural,closed,ready;
 
     ManagedExecutableDependencyResult(SnapshotProgram program,PageStore pages,AnalysisResources resources){
-        this.program=Objects.requireNonNull(program);this.resources=Objects.requireNonNull(resources);
+        this.program=Objects.requireNonNull(program);this.resources=Objects.requireNonNull(resources);this.pages=Objects.requireNonNull(pages);
         resources.requireExecutionProgram(program);program.admission();
         control=resources.reserve(AnalysisResources.Pool.RESIDENT,2048,AnalysisResources.Phase.DEMAND);
         try {
@@ -192,6 +193,22 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     public DependencyResult result(){available();return result;}
     public long fullFactProjections(){available();return projections;}
     public long typedSupportProjections(){available();return leafProjections;}
+    /** Borrowed backend for caller-owned transient read-order tapes; never close
+     * it with this result. Its native resources remain the same checked context. */
+    public PageStore borrowedPages(){available();return pages;}
+    public io.github.gustavo2358.air.model.Evidence.CoverageStatus siteCoverage(int site){
+        available();Objects.checkIndex(site,sites);
+        try{return facts.withHeader(factOrdinal(site),h->program.invokeCoverage(h.operation()).orElseThrow(()->new IllegalStateException("missing original site coverage")));}
+        catch(RuntimeException|Error failure){abort(failure);throw failure;}
+    }
+    /** Field scopes read the canonical site without a complete fact projection.
+     * The caller owns this leaf lifetime, never the borrowed AIR/backend. */
+    public PagedDependencyFactStorage.FactCursor openFact(int site){
+        available();Objects.checkIndex(site,sites);
+        try{int ordinal=factOrdinal(site);int flags=(int)(annotations.get(ordinal)&7);return facts.openFact(ordinal).annotations(flags);}
+        catch(IndexOutOfBoundsException invalid){throw invalid;}
+        catch(RuntimeException|Error failure){abort(failure);throw failure;}
+    }
     public PagedDependencyFactStorage.SupportProjection projectSupport(int site,int candidate,int support){
         available();Objects.checkIndex(site,sites);
         try{var projection=facts.projectSupport(factOrdinal(site),candidate,support);leafProjections=Math.incrementExact(leafProjections);return projection;}
@@ -264,7 +281,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         while(cursors!=null)try{cursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var owned:new AutoCloseable[]{order,annotations,operations,index,facts,control})if(owned!=null)try{owned.close();}
             catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-        order=null;annotations=null;operations=null;index=null;facts=null;control=null;program=null;result=null;resources=null;occurrences=null;soughtEntry=null;soughtOperation=null;
+        order=null;annotations=null;operations=null;index=null;facts=null;control=null;program=null;result=null;resources=null;pages=null;occurrences=null;soughtEntry=null;soughtOperation=null;
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("managed executable cleanup",failure);
     }
 }

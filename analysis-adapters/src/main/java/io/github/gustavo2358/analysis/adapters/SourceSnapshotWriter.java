@@ -134,13 +134,22 @@ final class SourceSnapshotWriter implements AutoCloseable {
             "caller",occurrence==0?plan.operation(item,0).unit().localId():encoded(()->out().sourceText(view(),view().field(unit,SourceShape.UNIT_ID,2),block())),
             "candidates",encoded(()->{out().symbol('[');for(long c=0,n=facts.candidateCount(item);c<n;c++){if(c!=0)out().symbol(',');writeProgramCandidate(facts,item,c);}out().symbol(']');}),
             "executableOperations",encoded(()->operations(facts,item)),
-            "executableSites",encoded(()->{out().symbol('[');for(long s=0,n=plan.siteCount(item);s<n;s++)try(var projection=plan.projectSite(item,s)){if(s!=0)out().symbol(',');var site=projection.fact();out().value(new JsonOutput.Fields("entry",WireIds.id(site.entry()),"operation",WireIds.id(site.operation()),"reachability",site.reachability().name(),"valuePoint",site.valuePoint()==null?null:ResultJson.point(site.valuePoint()),"premises",encoded(()->ids(site.premises())),"provenance",encoded(()->ids(site.provenance()))));}out().symbol(']');}),
+            "executableSites",encoded(()->executableSites(plan,item)),
             "interpretationRemainder",facts.interpretationRemainder(item),
             "nameProfile",occurrence==0?(standaloneCics(facts,item)?io.github.gustavo2358.analysis.dependencies.CicsNameInterpreter.PROFILE:io.github.gustavo2358.analysis.dependencies.CallNameInterpreter.PROFILE):encoded(()->out().sourceText(view(),view().field(occurrence,SourceShape.OCCURRENCE,4),block())),
             "qualifications",encoded(()->qualifications(facts,item)),
             "sourceOccurrence",occurrence==0?null:encoded(()->writeValue(view().field(occurrence,SourceShape.OCCURRENCE,0),SourceShape.STATEMENT_ID,0)),
             "targetKind",plan.targetKind(item),"technology",occurrence==0?(standaloneCics(facts,item)?"CICS":"COBOL"):encoded(()->out().sourceText(view(),view().field(occurrence,SourceShape.OCCURRENCE,1),block())),"valueRemainder",facts.valueRemainder(item));
         if(plan.sourceControlRemainder(item))fields.put("controlRemainder",true);out().value(fields);require(facts);
+    }
+    private void executableSites(io.github.gustavo2358.analysis.dependencies.SourceTargetPlan plan,long item)throws IOException {
+        out().symbol('[');
+        if(plan.hasManagedFactCursors()){
+            var writer=new DependencyJson.FactWriter(out(),pages,resources);
+            for(long s=0,n=plan.siteCount(item);s<n;s++)try(var site=plan.openFact(item,s)){if(s!=0)out().symbol(',');writer.executableSite(site);}
+        }else for(long s=0,n=plan.siteCount(item);s<n;s++)try(var projection=plan.projectSite(item,s)){
+            if(s!=0)out().symbol(',');var site=projection.fact();out().value(new JsonOutput.Fields("entry",WireIds.id(site.entry()),"operation",WireIds.id(site.operation()),"reachability",site.reachability().name(),"valuePoint",site.valuePoint()==null?null:ResultJson.point(site.valuePoint()),"premises",encoded(()->ids(site.premises())),"provenance",encoded(()->ids(site.provenance()))));
+        }out().symbol(']');
     }
     private void writeProgramCandidate(SourceProgramSnapshot facts,long item,long candidate)throws IOException {
         var fields=new JsonOutput.Fields("referenceName",encoded(()->out().programText(facts,item,candidate,false,block())),"rawValue",encoded(()->out().programText(facts,item,candidate,true,block())),"qualifications",encoded(()->qualifications(facts,item)),
