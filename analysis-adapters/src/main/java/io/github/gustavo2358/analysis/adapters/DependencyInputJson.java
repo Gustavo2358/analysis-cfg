@@ -11,6 +11,7 @@ import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.dependencies.DependencyInput;
 import io.github.gustavo2358.analysis.dependencies.SourceAdmissionSnapshot;
 import io.github.gustavo2358.analysis.dependencies.SnapshotProgram;
+import io.github.gustavo2358.analysis.dependencies.StatementCorrelations;
 import io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies;
 import io.github.gustavo2358.analysis.solver.AnalysisResources;
 
@@ -43,11 +44,12 @@ public final class DependencyInputJson {
         private SourceDescriptor descriptor;
         private SourceAdmissionSnapshot source;
         private SnapshotProgram sourceProgram;
-        private List<DependencyInput.StatementCorrelation> correlations;
+        private DependencyManifestSnapshot manifest;
+        private EmptyCorrelations empty;
         private final AnalysisResources.Reservation manifestCapacity;
         private NativeInput(DataflowAirReader.SnapshotRead read,SourceDescriptor source,
-                List<DependencyInput.StatementCorrelation> correlations,AnalysisResources.Reservation capacity) {
-            this.read=read;this.descriptor=source;this.correlations=List.copyOf(correlations);manifestCapacity=capacity;
+                DependencyManifestSnapshot manifest,AnalysisResources.Reservation capacity) {
+            this.read=read;this.descriptor=source;this.manifest=manifest;manifestCapacity=capacity;
         }
         private void open(){if(read==null)throw new IllegalStateException("native dependency input is closed");}
         public DataflowAirReader.SnapshotRead air(){open();return read;}
@@ -60,44 +62,48 @@ public final class DependencyInputJson {
             if(program.admission()!=read.checked())throw new IllegalArgumentException("foreign SOURCE input admission");
             source=SourceSnapshotInput.read(descriptor.path(),program,read.borrowedPages(),resources,read.sha256(),Optional.of(descriptor.wireSha256()),Optional.of(descriptor.documentSha256()));sourceProgram=program;return Optional.of(source);
         }
-        public List<DependencyInput.StatementCorrelation> correlations(){open();return correlations;}
-        @Override public void close(){if(read==null)return;var owned=read;var sourceOwner=source;read=null;source=null;sourceProgram=null;descriptor=null;correlations=List.of();try{if(sourceOwner!=null)sourceOwner.close();}finally{try{owned.close();}finally{manifestCapacity.close();}}}
+        /** Bound immutable data; the core admits complete correlation authority. */
+        public StatementCorrelations correlations(SnapshotProgram program,AnalysisResources resources){
+            open();Objects.requireNonNull(program);Objects.requireNonNull(resources);program.admission();resources.requireExecutionProgram(program);
+            if(program.admission()!=read.checked())throw new IllegalArgumentException("foreign correlation input admission");
+            if(manifest!=null){manifest.bind(program,resources);return manifest;}
+            if(empty==null)empty=new EmptyCorrelations(this,program);else if(empty.program()!=program)throw new IllegalArgumentException("foreign correlation input program");return empty;
+        }
+        @Override public void close(){
+            if(read==null)return;var owned=read;var sourceOwner=source;var manifestOwner=manifest;read=null;source=null;sourceProgram=null;descriptor=null;manifest=null;empty=null;Throwable failure=null;
+            for(AutoCloseable owner:new AutoCloseable[]{sourceOwner,manifestOwner,owned,manifestCapacity})if(owner!=null)try{owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("native dependency input cleanup",failure);
+        }
+    }
+    private static final class EmptyCorrelations implements StatementCorrelations {
+        private final NativeInput input;private final SnapshotProgram program;
+        private EmptyCorrelations(NativeInput input,SnapshotProgram program){this.input=input;this.program=program;}
+        private void open(){input.open();program.admission();}
+        @Override public SnapshotProgram program(){open();return program;}
+        @Override public long size(){open();return 0;}
+        @Override public long characterCount(long row,Field field){open();throw new IndexOutOfBoundsException("empty correlations");}
+        @Override public void readCharacters(long row,Field field,long offset,char[] out,int at,int count){open();throw new IndexOutOfBoundsException("empty correlations");}
+        @Override public long structuralPathCount(long row){open();throw new IndexOutOfBoundsException("empty correlations");}
+        @Override public int structuralPath(long row,long coordinate){open();throw new IndexOutOfBoundsException("empty correlations");}
     }
     private record SourceDescriptor(Path path,String wireSha256,String documentSha256){ }
     /** Preserve dependency-input@1 hashes/correlations without any resident AIR reconstruction. */
     @SuppressWarnings("try") // File-capacity leases govern lifetime, not the decoded value.
     public NativeInput readSnapshot(Path path,DataflowAirReader reader,AnalysisResources resources)throws IOException {
-        var capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,0,AnalysisResources.Phase.DECODE);
-        DataflowAirReader.SnapshotRead read=null;
+        var capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,256,AnalysisResources.Phase.DECODE);
+        DataflowAirReader.SnapshotRead read=null;DependencyManifestSnapshot manifest=null;
         try {
             resources.work(1,AnalysisResources.Phase.DECODE);
             boolean bundle;
             try(var file=resources.reserve(AnalysisResources.Pool.OPEN_FILES,1,AnalysisResources.Phase.DECODE)){bundle=isBundle(path,()->resources.work(1,AnalysisResources.Phase.DECODE));}
-            if(!bundle){read=reader.readSnapshot(path,resources);return new NativeInput(read,null,List.of(),capacity);}
-            JsonNode root;
-            try(var file=resources.reserve(AnalysisResources.Pool.OPEN_FILES,1,AnalysisResources.Phase.DECODE);
-                var input=new FilterInputStream(JsonFiles.input(path)) {
-                    @Override public int read()throws IOException{resources.work(1,AnalysisResources.Phase.DECODE);int value=in.read();if(value>=0)capacity.grow(8,AnalysisResources.Phase.DECODE);return value;}
-                    @Override public int read(byte[] bytes,int offset,int length)throws IOException{resources.work(1,AnalysisResources.Phase.DECODE);int count=in.read(bytes,offset,length);if(count>0)capacity.grow(8L*count,AnalysisResources.Phase.DECODE);return count;}
-                };
-                var parser=new com.fasterxml.jackson.core.util.JsonParserDelegate(mapper.getFactory().createParser(input)) {
-                    @Override public JsonToken nextToken()throws IOException{resources.work(1,AnalysisResources.Phase.DECODE);var token=delegate.nextToken();if(token!=null)capacity.grow(256,AnalysisResources.Phase.DECODE);return token;}
-                    @Override public String nextFieldName()throws IOException{return nextToken()==JsonToken.FIELD_NAME?currentName():null;}
-                    @Override public boolean nextFieldName(SerializableString field)throws IOException{return field.getValue().equals(nextFieldName());}
-                    @Override public JsonToken nextValue()throws IOException{var token=nextToken();return token==JsonToken.FIELD_NAME?nextToken():token;}
-                }) {
-                root=mapper.readTree(parser);
-                if(parser.nextToken()!=null)throw new IllegalArgumentException("trailing dependency input");
-            }
-            keys(root,"schema","version","air","qualifiedSource","sourceSha256","correlations");
-            if(!text(root,"schema").equals("dependency-input")||!text(root,"version").equals("1.0.0"))throw new IllegalArgumentException("unsupported dependency input");
-            var base=path.toAbsolutePath().getParent();var air=root.get("air");keys(air,"path","sha256");
-            read=reader.readSnapshot(base.resolve(text(air,"path")),resources);
-            if(!read.sha256().equals(text(air,"sha256")))throw new IllegalArgumentException("AIR digest mismatch");
-            var source=root.get("qualifiedSource");keys(source,"path","sha256");
-            var descriptor=new SourceDescriptor(base.resolve(text(source,"path")),text(source,"sha256"),text(root,"sourceSha256"));
-            return new NativeInput(read,descriptor,correlations(root),capacity);
+            if(!bundle){read=reader.readSnapshot(path,resources);return new NativeInput(read,null,null,capacity);}
+            manifest=DependencyManifestSnapshot.read(path,resources);
+            read=reader.readSnapshot(manifest.airPath(),resources,manifest.directory(),JsonFiles::input,manifest.pages());manifest.transferBackend();
+            if(!read.sha256().equals(manifest.airSha()))throw new IllegalArgumentException("AIR digest mismatch");
+            var descriptor=new SourceDescriptor(manifest.sourcePath(),manifest.sourceSha(),manifest.documentSha());
+            return new NativeInput(read,descriptor,manifest,capacity);
         }catch(IOException|RuntimeException|Error failure) {
+            if(manifest!=null)try{manifest.close();}catch(RuntimeException|Error cleanup){if(failure!=cleanup)failure.addSuppressed(cleanup);}
             if(read!=null)try{read.close();}catch(RuntimeException|Error cleanup){failure.addSuppressed(cleanup);}
             capacity.close();throw failure;
         }

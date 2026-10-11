@@ -265,3 +265,75 @@ original nominal dimensions/isolated curves, AIR-base SiteFacts/result maps and
 streams, resident manifest/correlation lists, all-store funding/spill, global
 families, E2E, legacy retirement and human review. A source-only managed vertical
 does not qualify these remaining structures or imply a universal linear bound.
+
+## Typed manifest and correlation boundary (2026-10-11; working delta)
+
+The productive dependency-input route now stages its closed wire with the official
+AirJson physical parser. DependencyManifestSnapshot retains correlation text and
+structural paths in paged records instead of a JsonNode tree or resident list of
+StatementCorrelation DTOs. Only explicitly funded file-path/digest projections
+are materialized. The manifest and checked AIR read share one physical backend,
+not two independently enlarged caches. Transfer and failure distinguish the owner
+of staging from the owner of the borrowed backend.
+
+StatementCorrelations is a read-only borrowed data port, not an admission
+certificate. Its eleven UTF-16 text fields retain full source, operation, label
+and origin identities; structural-path coordinates are exact primitives. Binding
+requires the authentic checked program/execution owner. Program/input expiry
+retires the data. SourceCorrelationSnapshot compares these fields in blocks and
+uses a paged full-operation-identity index. Duplicate/conflicting links, invalid
+owners, derived origins and literal/technology rules remain checked before READY;
+temporary preparation indices and scratch retire before downstream access.
+
+Focused manifest/input tests passed 12 methods, existing correlation regressions
+passed 15, and PipelineCliTest passed 12. All 1356 old mandatory methods are exact;
+eight new methods are registered, for 1364. Seven original compiled guards passed
+after review of only the two changed active inventories; historical SOURCE and
+other inventories, producer pin and Maven dependency direction are unchanged.
+The original FAST passed all 1364 mandatory methods, zero failures/errors/skips,
+in 1716.698s. Exact post-FAST audit compared all 1436 production classfiles from
+all nine consumer and both AIR modules with frozen03 used by the real CLIs;
+all match, with 564 Java sources, 579 fixtures, 15 runtime components and no
+helper shadow. Producer a0 remains clean/unchanged; its prior FAST is reused.
+
+Unchanged original legal manifests with 1/4/1024/4096/8192 correlations passed
+complete typed AIR/SOURCE/correlation admission under original 128 MiB heap,
+default quotas and 480-second watchdog. Every full operation identity and
+membership was checked, with all root resource pools zero after close. The former
+4096-row resident-tree HEAP/DECODE failure is preserved separately. Actual CLI
+4096 completed in 167.235s and passed a complete product oracle, including every
+unreachable synthetic site and the original reachable PROGA/PROGB candidates.
+CLI 8192 failed downstream with OOM at the executable inventory's occurrence
+projection after 331.961s; its destination sentinel remained intact. Complete
+typed admission alone did not qualify the complete product at this dimension.
+The correction visits one typed SiteView/Invoke at a time instead of
+retaining a second complete occurrence list beside the planner's facts. Borrowed
+selected index handles and existing entry/site order remain; result maps and
+SiteFacts are still resident. Sixteen product and eighteen launcher regression
+methods passed. The unchanged original 8192 manifest then completed through the
+real CLI in 352.583s with the complete independent product oracle passing; output
+31013296 bytes, SHA256
+`af131f88ff8663ee39963c3d440c38dbc73114bbcdba4903e76b97a2f9d333c5`.
+The 1/4-row control products remain byte-identical. Runtime and material-source
+integrity passed. Both original SOURCE/FILE CLI replays completed with the full
+product oracle and whole previous dependency/CFG byte equality: dependencies
+258.564s, Pipeline 308.729s for the unchanged 818022612-byte SOURCE. FAST overlaps
+these replays, so these are not isolated latency curves. Mandatory FAST and its
+exact whole-runtime audit passed. No global/all-store claim follows.
+
+The original SOURCE-forward 128000 input also timed out in an isolated replay,
+480.169s with destination sentinel preserved. Concurrent FAST is therefore not
+its sole explanation. A diagnostic JFR run at 32000 produced the byte-exact
+product; paging/resource-progress samples identify investigation targets, not a
+proven asymptotic cause. Reverse scale, AIR-base result maps, all-store funding,
+global qualification and review remain open. The small legacy resident reader
+still exists for explicit compatibility/oracle use, not this productive route.
+
+The ignored read-only admission-directory probe prototype passed the small
+mechanism law, five unmodified directory laws and original nominal32000 full
+product/whole previous byte equality. It still hit watchdog480 at128000 with FAST
+concurrent; the prior destination remained intact. It is not integrated and is
+not a closed explanation/fix for the isolated nominal timeout. A same-frozen03
+productive baseline versus single-class prototype isolated pair is running only
+after FAST and exact runtime audit. Reverse, all-store, global and review remain
+open; no new quota/cache/deadline or semantic cap was introduced.

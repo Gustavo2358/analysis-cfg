@@ -8,6 +8,7 @@ import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.List;
 import java.util.Objects;
 import static io.github.gustavo2358.air.model.AirShape.*;
+import static io.github.gustavo2358.analysis.dependencies.StatementCorrelations.Field.*;
 
 /**
  * Complete SOURCE/AIR correlation admission against two legitimate immutable
@@ -29,7 +30,9 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
     private ProgramStore.CapacityLease airLifetime;
     private PagedLongArray units,occurrences,code,ordered;
     private PagedLongArray origins,queue,mappings;
-    private PagedLongIndex sourceIndex,originIndex,mappingIndex;
+    private PagedLongIndex sourceIndex,originIndex,mappingIndex,operationIndex;
+    private StatementCorrelations input;
+    private long inputRow;
     private SourceAdmissionDirectory duplicates,ancestry;
     private QualifiedSourceDependencies.StatementId sourceProbe;
     private OriginId originProbe;
@@ -40,18 +43,29 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
     private SourceCorrelationSnapshot(SourceAdmissionSnapshot admission,SnapshotProgram program,AnalysisResources.Reservation capacity){this.admission=admission;this.program=program;control=capacity;}
     public static SourceCorrelationSnapshot prepare(SourceAdmissionSnapshot admission,SnapshotProgram program,
             List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
-        Objects.requireNonNull(admission);Objects.requireNonNull(program);Objects.requireNonNull(correlations);
+        Objects.requireNonNull(correlations);return prepare(admission,program,correlations,null,pages,resources);
+    }
+    /** Complete typed input data; never accepts a precomputed authority result. */
+    public static SourceCorrelationSnapshot prepare(SourceAdmissionSnapshot admission,SnapshotProgram program,
+            StatementCorrelations correlations,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(correlations);Objects.requireNonNull(program);Objects.requireNonNull(resources);
+        resources.requireExecutionProgram(program);if(correlations.program()!=program)throw new IllegalArgumentException("foreign correlation input program");
+        return prepare(admission,program,null,correlations,pages,resources);
+    }
+    private static SourceCorrelationSnapshot prepare(SourceAdmissionSnapshot admission,SnapshotProgram program,
+            List<DependencyInput.StatementCorrelation> correlations,StatementCorrelations typed,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(admission);Objects.requireNonNull(program);
         Objects.requireNonNull(pages);Objects.requireNonNull(resources);admission.requireContext(pages,resources);program.admission();
         var capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,2048,PHASE);SourceCorrelationSnapshot result=null;
         try {
             result=new SourceCorrelationSnapshot(admission,program,capacity);var registration=capacity;capacity=null;registration.onOwnerClose(result::close);
-            result.initialize(correlations,pages,resources);admission.attach(result,pages,resources);result.open();return result;
+            result.initialize(correlations,typed,pages,resources);admission.attach(result,pages,resources);result.open();return result;
         }catch(RuntimeException|Error failure){if(result!=null)result.abort(failure);else if(capacity!=null)try{capacity.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}throw failure;}
     }
     private PagedLongArray array(PageStore pages,AnalysisResources resources){return new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);}
-    private void initialize(List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
+    private void initialize(List<DependencyInput.StatementCorrelation> correlations,StatementCorrelations typed,PageStore pages,AnalysisResources resources) {
         if(closed)throw new IllegalStateException("SOURCE/AIR correlation expired before initialization");
-        source=admission.snapshot();air=program.admission().snapshot();left=new char[256];right=new char[256];
+        input=typed;source=admission.snapshot();air=program.admission().snapshot();left=new char[256];right=new char[256];
         // Also bind AIR expiry when SOURCE was admitted under independent resources.
         var budget=program.executionBudget();if(budget.isPresent()){airLifetime=budget.orElseThrow().reserve(ProgramStore.CapacityPool.RESIDENT,512,ProgramStore.ExecutionPhase.INDEX);airLifetime.onOwnerClose(this::close);}
         long publications=sf(source.root(),SourceShape.ROOT,4);
@@ -70,16 +84,18 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
             }
         }
         operations=program.operationDirectory().orElseThrow();code=array(pages,resources);
-        if(!correlations.isEmpty()) {
+        if(typed==null?!correlations.isEmpty():typed.size()!=0) {
+            if(typed!=null)operationIndex=new PagedLongIndex(pages,resources,PHASE,this::compareOperation);
             indexCode();origins=array(pages,resources);queue=array(pages,resources);mappings=array(pages,resources);
             originIndex=new PagedLongIndex(pages,resources,PHASE,this::compareOrigin);
             duplicates=new SourceAdmissionDirectory(pages,resources);ancestry=new SourceAdmissionDirectory(pages,resources);
             mappingIndex=new PagedLongIndex(pages,resources,PHASE,this::compareMapping);
             indexOrigins();
-            for(var link:correlations){resources.work(1,PHASE);correlate(Objects.requireNonNull(link));}
+            if(typed==null)for(var link:correlations){resources.work(1,PHASE);correlate(Objects.requireNonNull(link));}
+            else for(long row=0,n=typed.size();row<n;row++){resources.work(1,PHASE);inputRow=row;correlateTyped();}
             freezeMappings();
         }
-        retirePreparation();admission.snapshot();program.admission();if(closed)throw new IllegalStateException("SOURCE/AIR correlation expired before completion");ready=true;
+        if(typed!=null&&typed.program()!=program)throw new IllegalArgumentException("correlation input owner changed");retirePreparation();admission.snapshot();program.admission();if(closed)throw new IllegalStateException("SOURCE/AIR correlation expired before completion");ready=true;
     }
     private long sf(long row,SourceShape shape,int slot){return source.field(row,shape,slot);}
     private long ss(long list,SourceShape shape){return list==0?0:source.size(list,shape);}
@@ -98,7 +114,7 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
         }
         if(ordinal!=operations.size())throw new IllegalStateException("admitted AIR operation directory mismatch");
     }
-    private void recordCode(long ordinal,long operation,long label){long at=Math.multiplyExact(ordinal,OP_WIDTH);code.set(at,operation);code.set(at+1,label);}
+    private void recordCode(long ordinal,long operation,long label){long at=Math.multiplyExact(ordinal,OP_WIDTH);code.set(at,operation);code.set(at+1,label);if(operationIndex!=null&&operationIndex.intern(af(af(operation,0),0),Math.incrementExact(ordinal))!=ordinal+1)throw new IllegalStateException("admitted operation identity duplicate");}
     private void indexOrigins() {
         try(var rows=air.elements(af(air.root(),8),ORIGINS_ORIGIN)) {
             while(rows.advance()) {
@@ -116,14 +132,18 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
         long na=source.characterCount(a),n=Math.min(na,b.length());
         for(long at=0;at<n;){int count=(int)Math.min(left.length,n-at);source.readCharacters(a,at,left,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],b.charAt(Math.toIntExact(at+i)));if(c!=0)return c;}at+=count;}return Long.compare(na,b.length());
     }
+    private int sourceText(long a,StatementCorrelations.Field field){
+        long na=source.characterCount(a),nb=input.characterCount(inputRow,field),n=Math.min(na,nb);
+        for(long at=0;at<n;){int count=(int)Math.min(left.length,n-at);source.readCharacters(a,at,left,0,count);input.readCharacters(inputRow,field,at,right,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;}return Long.compare(na,nb);
+    }
     private int compareStatement(long a,long b) {
         if(a==b)return 0;if(a==0)return -compareStatement(b,0);
         long ua=sf(a,SourceShape.STATEMENT_ID,0);long ub=b==0?0:sf(b,SourceShape.STATEMENT_ID,0);var probe=sourceProbe;
-        int c=b==0?sourceText(sf(ua,SourceShape.UNIT_ID,0),probe.unit().compilationUnitId()):sourceText(sf(ua,SourceShape.UNIT_ID,0),sf(ub,SourceShape.UNIT_ID,0));if(c!=0)return c;
-        long pa=sf(ua,SourceShape.UNIT_ID,1),pb=b==0?0:sf(ub,SourceShape.UNIT_ID,1),na=ss(pa,SourceShape.INTEGER),nb=b==0?probe.unit().structuralPath().size():ss(pb,SourceShape.INTEGER);
-        for(long i=0,n=Math.min(na,nb);i<n;i++){int ia=source.integer(se(pa,SourceShape.INTEGER,i)),ib=b==0?probe.unit().structuralPath().get(Math.toIntExact(i)):source.integer(se(pb,SourceShape.INTEGER,i));c=Integer.compare(ia,ib);if(c!=0)return c;}c=Long.compare(na,nb);if(c!=0)return c;
-        c=b==0?sourceText(sf(ua,SourceShape.UNIT_ID,2),probe.unit().canonicalProgramName()):sourceText(sf(ua,SourceShape.UNIT_ID,2),sf(ub,SourceShape.UNIT_ID,2));if(c!=0)return c;
-        return b==0?sourceText(sf(a,SourceShape.STATEMENT_ID,1),probe.handle()):sourceText(sf(a,SourceShape.STATEMENT_ID,1),sf(b,SourceShape.STATEMENT_ID,1));
+        int c=b==0?(input==null?sourceText(sf(ua,SourceShape.UNIT_ID,0),probe.unit().compilationUnitId()):sourceText(sf(ua,SourceShape.UNIT_ID,0),SOURCE_COMPILATION_UNIT)):sourceText(sf(ua,SourceShape.UNIT_ID,0),sf(ub,SourceShape.UNIT_ID,0));if(c!=0)return c;
+        long pa=sf(ua,SourceShape.UNIT_ID,1),pb=b==0?0:sf(ub,SourceShape.UNIT_ID,1),na=ss(pa,SourceShape.INTEGER),nb=b==0?(input==null?probe.unit().structuralPath().size():input.structuralPathCount(inputRow)):ss(pb,SourceShape.INTEGER);
+        for(long i=0,n=Math.min(na,nb);i<n;i++){int ia=source.integer(se(pa,SourceShape.INTEGER,i)),ib=b==0?(input==null?probe.unit().structuralPath().get(Math.toIntExact(i)):input.structuralPath(inputRow,i)):source.integer(se(pb,SourceShape.INTEGER,i));c=Integer.compare(ia,ib);if(c!=0)return c;}c=Long.compare(na,nb);if(c!=0)return c;
+        c=b==0?(input==null?sourceText(sf(ua,SourceShape.UNIT_ID,2),probe.unit().canonicalProgramName()):sourceText(sf(ua,SourceShape.UNIT_ID,2),SOURCE_CANONICAL_PROGRAM_NAME)):sourceText(sf(ua,SourceShape.UNIT_ID,2),sf(ub,SourceShape.UNIT_ID,2));if(c!=0)return c;
+        return b==0?(input==null?sourceText(sf(a,SourceShape.STATEMENT_ID,1),probe.handle()):sourceText(sf(a,SourceShape.STATEMENT_ID,1),SOURCE_HANDLE)):sourceText(sf(a,SourceShape.STATEMENT_ID,1),sf(b,SourceShape.STATEMENT_ID,1));
     }
     private int airText(long a,long b) {
         long na=air.characterCount(a),nb=air.characterCount(b),n=Math.min(na,nb);
@@ -133,22 +153,40 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
         long na=air.characterCount(a),n=Math.min(na,b.length());
         for(long at=0;at<n;){int count=(int)Math.min(left.length,n-at);air.readCharacters(a,at,left,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],b.charAt(Math.toIntExact(at+i)));if(c!=0)return c;}at+=count;}return Long.compare(na,b.length());
     }
+    private int airText(long a,StatementCorrelations.Field field){
+        long na=air.characterCount(a),nb=input.characterCount(inputRow,field),n=Math.min(na,nb);
+        for(long at=0;at<n;){int count=(int)Math.min(left.length,n-at);air.readCharacters(a,at,left,0,count);input.readCharacters(inputRow,field,at,right,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;}return Long.compare(na,nb);
+    }
+    private int compareOperation(long a,long b){
+        if(a==b)return 0;if(a==0)return -compareOperation(b,0);long ua=af(a,0),ub=b==0?0:af(b,0);
+        int c=b==0?airText(af(af(ua,0),0),OPERATION_PUBLICATION):airText(af(af(ua,0),0),af(af(ub,0),0));if(c!=0)return c;
+        c=b==0?airText(af(ua,1),OPERATION_UNIT):airText(af(ua,1),af(ub,1));return c!=0?c:b==0?airText(af(a,1),OPERATION_LOCAL_ID):airText(af(a,1),af(b,1));
+    }
     private boolean matches(long text,String value){return airText(text,value)==0;}
     private int compareOrigin(long a,long b) {
         if(a==b)return 0;if(a==0)return -compareOrigin(b,0);
-        int c=b==0?airText(af(af(a,0),0),originProbe.publication().localId()):airText(af(af(a,0),0),af(af(b,0),0));
-        return c!=0?c:b==0?airText(af(a,1),originProbe.localId()):airText(af(a,1),af(b,1));
+        int c=b==0?(input==null?airText(af(af(a,0),0),originProbe.publication().localId()):airText(af(af(a,0),0),ORIGIN_PUBLICATION)):airText(af(af(a,0),0),af(af(b,0),0));
+        return c!=0?c:b==0?(input==null?airText(af(a,1),originProbe.localId()):airText(af(a,1),ORIGIN_LOCAL_ID)):airText(af(a,1),af(b,1));
     }
     private boolean labelMatches(long label,LabelId expected){long unit=af(label,0);return matches(af(af(unit,0),0),expected.publication().localId())&&matches(af(unit,1),expected.unit().localId())&&matches(af(label,1),expected.localId());}
+    private boolean labelMatches(long label){long unit=af(label,0);return airText(af(af(unit,0),0),LABEL_PUBLICATION)==0&&airText(af(unit,1),LABEL_UNIT)==0&&airText(af(label,1),LABEL_LOCAL_ID)==0;}
     private void correlate(DependencyInput.StatementCorrelation link) {
         long occurrence;
         sourceProbe=link.source();try{occurrence=sourceIndex.find(0);}finally{sourceProbe=null;}
         int operation=operations.ordinal(link.operation());
         if(occurrence==0||operation<0)throw new IllegalArgumentException("source/AIR correlation ownership");
-        long row=Math.multiplyExact(occurrence-1,SOURCE_WIDTH),ref=occurrences.get(row),at=Math.multiplyExact(operation,OP_WIDTH);
-        if(!source.matches(sf(ref,SourceShape.OCCURRENCE,3),"PROGRAM")||!labelMatches(code.get(at+1),link.label()))throw new IllegalArgumentException("source/AIR correlation ownership");
-        long previous=code.get(at+2);if(previous!=0&&previous!=occurrence)throw new IllegalArgumentException("conflicting source/AIR correlation");code.set(at+2,occurrence);
         long expected;originProbe=link.origin();try{expected=originIndex.find(0);}finally{originProbe=null;}
+        correlate(occurrence,operation,labelMatches(code.get(Math.multiplyExact(operation,OP_WIDTH)+1),link.label()),expected);
+    }
+    private void correlateTyped(){
+        long occurrence=sourceIndex.find(0),operation=operationIndex.find(0),expected=originIndex.find(0);
+        if(occurrence==0||operation==0)throw new IllegalArgumentException("source/AIR correlation ownership");int ordinal=Math.toIntExact(operation-1);
+        correlate(occurrence,ordinal,labelMatches(code.get(Math.multiplyExact(ordinal,OP_WIDTH)+1)),expected);
+    }
+    private void correlate(long occurrence,int operation,boolean labelMatches,long expected){
+        long row=Math.multiplyExact(occurrence-1,SOURCE_WIDTH),ref=occurrences.get(row),at=Math.multiplyExact(operation,OP_WIDTH);
+        if(!source.matches(sf(ref,SourceShape.OCCURRENCE,3),"PROGRAM")||!labelMatches)throw new IllegalArgumentException("source/AIR correlation ownership");
+        long previous=code.get(at+2);if(previous!=0&&previous!=occurrence)throw new IllegalArgumentException("conflicting source/AIR correlation");code.set(at+2,occurrence);
         long actual=originIndex.find(af(af(code.get(at),0),1));
         if(expected==0||actual==0||!derivedFrom(actual,expected))throw new IllegalArgumentException("source/AIR origin correlation");
         if(duplicates.find(occurrence,1,operation,expected)!=0)throw new IllegalArgumentException("duplicate source/AIR correlation");duplicates.intern(occurrence,1,operation,expected,ref,0);
@@ -204,8 +242,8 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
     }
     private void retirePreparation() {
         Throwable failure=null;
-        for(AutoCloseable value:new AutoCloseable[]{mappingIndex,mappings,ancestry,duplicates,originIndex,queue,origins,sourceIndex})if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
-        mappingIndex=sourceIndex=originIndex=null;mappings=queue=origins=null;ancestry=duplicates=null;sourceProbe=null;originProbe=null;
+        for(AutoCloseable value:new AutoCloseable[]{mappingIndex,mappings,ancestry,duplicates,originIndex,queue,origins,sourceIndex,operationIndex})if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+        mappingIndex=sourceIndex=originIndex=operationIndex=null;mappings=queue=origins=null;ancestry=duplicates=null;sourceProbe=null;originProbe=null;input=null;inputRow=0;
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("SOURCE correlation preparation cleanup",failure);
     }
     private void open(){if(closed||!ready)throw new IllegalStateException("SOURCE/AIR correlation expired or incomplete");admission.snapshot();program.admission();}
@@ -222,7 +260,7 @@ public final class SourceCorrelationSnapshot extends SourceAdmissionSnapshot.Dep
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){suppress(primary,cleanup);}}
     @Override public void close() {
         AutoCloseable[] owned;
-        synchronized(this){closed=true;ready=false;owned=new AutoCloseable[]{mappingIndex,mappings,ancestry,duplicates,originIndex,queue,origins,sourceIndex,ordered,code,occurrences,units,airLifetime,control};mappingIndex=sourceIndex=originIndex=null;mappings=queue=origins=ordered=code=occurrences=units=null;ancestry=duplicates=null;airLifetime=null;control=null;admission=null;program=null;source=null;air=null;operations=null;sourceProbe=null;originProbe=null;left=right=null;}
+        synchronized(this){closed=true;ready=false;owned=new AutoCloseable[]{mappingIndex,mappings,ancestry,duplicates,originIndex,queue,origins,sourceIndex,operationIndex,ordered,code,occurrences,units,airLifetime,control};mappingIndex=sourceIndex=originIndex=operationIndex=null;mappings=queue=origins=ordered=code=occurrences=units=null;ancestry=duplicates=null;airLifetime=null;control=null;admission=null;program=null;source=null;air=null;operations=null;sourceProbe=null;originProbe=null;input=null;inputRow=0;left=right=null;}
         var parent=owner;if(parent!=null)parent.release(this);Throwable failure=null;
         for(var value:owned)if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("SOURCE correlation cleanup",failure);

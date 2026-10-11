@@ -51,9 +51,15 @@ public final class DataflowAirReader {
     @FunctionalInterface interface SnapshotInput { InputStream open(Path path)throws IOException; }
     /** Package seam for deterministic physical I/O failures; takes ownership of the fresh directory. */
     SnapshotRead readSnapshot(Path path,AnalysisResources resources,Path directory,SnapshotInput source)throws IOException {
-        FilePageStore pages=null;AirSnapshot snapshot=null;SnapshotValidator.CheckedSnapshot checked=null;Throwable primary=null;boolean transferred=false;
+        return readSnapshot(path,resources,directory,source,null);
+    }
+    /** A manifest lends its existing physical backend during admission. The
+     * successful read takes backend/directory ownership; failure leaves both
+     * borrowed so the manifest can retire its own staging before their close. */
+    SnapshotRead readSnapshot(Path path,AnalysisResources resources,Path directory,SnapshotInput source,FilePageStore supplied)throws IOException {
+        FilePageStore pages=supplied;AirSnapshot snapshot=null;SnapshotValidator.CheckedSnapshot checked=null;Throwable primary=null;boolean transferred=false;
         try {
-            pages=new FilePageStore(directory,4096,decodeCachePages(resources),resources,AnalysisResources.Phase.DECODE);var digest=digest();
+            if(pages==null)pages=new FilePageStore(directory,4096,decodeCachePages(resources),resources,AnalysisResources.Phase.DECODE);var digest=digest();
             SnapshotRead result;
             try(var input=new CountedInput(source.open(path),digest)) {
                 snapshot=codec.decodeSnapshot(input,new PagedJsonInputStorage(pages,resources),new PagedAirStorage(pages,resources,AnalysisResources.Phase.DECODE));
@@ -64,7 +70,7 @@ public final class DataflowAirReader {
             transferred=true;return result;
         }catch(PageStore.Failure failure){var io=new IOException("paged AIR snapshot storage failure: "+failure.reason(),failure);primary=io;throw io;}
         catch(IOException|RuntimeException|Error failure){primary=failure;throw failure;}
-        finally {if(!transferred){try{if(checked!=null)checked.close();else if(snapshot!=null)snapshot.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{if(pages!=null)pages.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{Files.deleteIfExists(directory);}catch(IOException cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}}
+        finally {if(!transferred){try{if(checked!=null)checked.close();else if(snapshot!=null)snapshot.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}if(supplied==null){try{if(pages!=null)pages.close();}catch(RuntimeException|Error cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}try{Files.deleteIfExists(directory);}catch(IOException cleanup){if(primary!=null)primary.addSuppressed(cleanup);else throw cleanup;}}}}
     }
     /** Default route pages physical input; model admission/Publication remain resident for now. */
     public Read read(Path path) throws IOException {

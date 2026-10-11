@@ -34,7 +34,7 @@ public final class AnalysisDependencies {
                 var execution=AnalysisResources.executionFor(program);
                 var source=admitted.source(program,execution);
                 if(source.isPresent()) {
-                    try(var result=analysis.prepareLeased(program,cfg,source.orElseThrow(),admitted.correlations(),read.borrowedPages(),execution)) {
+                    try(var result=analysis.prepareLeased(program,cfg,source.orElseThrow(),admitted.correlations(program,execution),read.borrowedPages(),execution)) {
                         try{new SnapshotDependencyFileWriter().write(result,output,read.borrowedPages(),execution);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
                     }
                 }else {

@@ -122,6 +122,15 @@ public final class DependencyAnalysis {
         if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
         return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program),correlations,pages,resources);
     }
+    /** Productive typed manifest correlations; no nominal DTO projection. */
+    public ManagedDependencyResult prepareLeased(SnapshotProgram program,CfgBuildResult cfg,SourceAdmissionSnapshot source,
+            StatementCorrelations correlations,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(source);Objects.requireNonNull(correlations);
+        source.requireContext(Objects.requireNonNull(pages),Objects.requireNonNull(resources));program.admission();resources.requireExecutionProgram(program);
+        if(correlations.program()!=program)throw new IllegalArgumentException("foreign correlation input program");
+        if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
+        return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program),correlations,pages,resources);
+    }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg,SnapshotProgram metadataOwner) {
         var opened=AnalysisSession.open(cfg,publication,cfg.options().projectionPolicy(),publication.units().stream()
             .flatMap(u->u.entryViews().stream()).filter(e->e.initialLabel().isPresent()).map(ProgramStore.EntryView::id).toList());
@@ -146,11 +155,11 @@ public final class DependencyAnalysis {
             for(var batch:result.results())if(batch.batchId().analysisKey().implementation().equals("Reachability"))
                 for(var observation:batch.observations())if(observation.status()==ObservationBatch.QueryStatus.VALUE&&observation.value() instanceof ReachabilityProvider.Fact fact)
                     reachability.put(new SiteKey(observation.query().point().entry(),observation.query().point().operation()),fact);
-            for(var site:inventory(publication,session)) {
+            visitInventory(publication,session,site -> {
                 var key=new SiteKey(site.entry(),site.operationId());
                 if(!retained.containsKey(key))retained.put(key,CallDependencyConsumer.partial(site,Optional.ofNullable(reachability.get(key)),
                     List.copyOf(entryReasons.getOrDefault(site.entry(),Set.of("DEPENDENCY_PREPARATION_INCOMPLETE")))));
-            }
+            });
             var physicalNotAnalyzed=physicalDemands(session,selection);
             var sites=retained.values().stream()
                 .map(f->f.targetKind()==DependencySiteFact.TargetKind.COMPUTED&&physicalNotAnalyzed.contains(new CallDependencyPlan.SiteKey(f.entry(),f.operation()))?f.withPartialAnalysis("PHYSICAL_PROPAGATION_DISABLED"):f).map(f->session.index().partialControl(f.caller())?f.withPartialAnalysis("PARTIAL_CONTROL_PROJECTION"):f)
@@ -220,8 +229,12 @@ public final class DependencyAnalysis {
     }
     /** The admitted index is exhaustive, including cold/unreachable operations.
      * Selecting CALL handles once per Unit does not filter by reachability. */
-    private static List<SiteView> inventory(ProgramStore.Structural publication,AnalysisSession session) {
-        var result=new ArrayList<SiteView>();var resources=AnalysisResources.executionFor(publication);
+    private static void visitInventory(ProgramStore.Structural publication,AnalysisSession session,
+            java.util.function.Consumer<SiteView> visitor) {
+        // Index handles are borrowed; a typed Invoke belongs only to the current
+        // callback. Do not retain a second complete occurrence inventory alongside
+        // the planner's facts and the native AIR owner. Entry/site order is unchanged.
+        var resources=AnalysisResources.executionFor(publication);
         for(var unit:publication.units())try(var selectedCapacity=resources.reserve(AnalysisResources.Pool.SCRATCH,1024,AnalysisResources.Phase.DEMAND)) {
             var calls=new ArrayList<io.github.gustavo2358.analysis.structure.ProgramIndex.Site>();
             for(var site:session.index().sites(Operations.Invoke.class,unit.id())) {
@@ -232,10 +245,9 @@ public final class DependencyAnalysis {
             if(calls.isEmpty())continue;
             for(var entry:unit.entryViews())for(var site:calls) {
                 publication.progress(ProgramStore.ExecutionPhase.DEMAND);
-                result.add(new SiteView(entry.id(),site.sequence().label(),site.offset(),site.operation()));
+                visitor.accept(new SiteView(entry.id(),site.sequence().label(),site.offset(),site.operation()));
             }
         }
-        return List.copyOf(result);
     }
     private DependencyResult partialInventory(Publication publication,String reason) {
         return partialInventory(ProgramStore.resident(publication),reason);

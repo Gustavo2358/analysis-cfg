@@ -19,11 +19,17 @@ public final class ManagedDependencyResult extends SourceAdmissionSnapshot.Depen
     private volatile boolean closed,ready;
     private ManagedDependencyResult(SourceAdmissionSnapshot source,SnapshotProgram program,DependencyResult executable,AnalysisResources.Reservation control){admission=source;this.program=program;this.executable=executable;this.control=control;}
     static ManagedDependencyResult prepare(SnapshotProgram program,SourceAdmissionSnapshot source,DependencyResult executable,List<DependencyInput.StatementCorrelation> links,PageStore pages,AnalysisResources resources) {
+        return prepare(program,source,executable,links,null,pages,resources);
+    }
+    static ManagedDependencyResult prepare(SnapshotProgram program,SourceAdmissionSnapshot source,DependencyResult executable,StatementCorrelations links,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(links);return prepare(program,source,executable,null,links,pages,resources);
+    }
+    private static ManagedDependencyResult prepare(SnapshotProgram program,SourceAdmissionSnapshot source,DependencyResult executable,List<DependencyInput.StatementCorrelation> links,StatementCorrelations typed,PageStore pages,AnalysisResources resources) {
         source.requireContext(pages,resources);program.admission();if(!executable.publication().equals(program.publicationId()))throw new IllegalArgumentException("foreign executable publication");
         var capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,2048,AnalysisResources.Phase.DEMAND);ManagedDependencyResult result=null;
         try {
             result=new ManagedDependencyResult(source,program,executable,capacity);var registration=capacity;capacity=null;registration.onOwnerClose(result::close);
-            result.correlations=SourceCorrelationSnapshot.prepare(source,program,links,pages,resources);result.qualified=SourceQualifiedSnapshot.prepare(source,pages,resources);
+            result.correlations=typed==null?SourceCorrelationSnapshot.prepare(source,program,links,pages,resources):SourceCorrelationSnapshot.prepare(source,program,typed,pages,resources);result.qualified=SourceQualifiedSnapshot.prepare(source,pages,resources);
             result.plan=SourceTargetPlan.prepare(result.correlations,result.qualified,executable,pages,resources);result.programs=SourceProgramSnapshot.prepare(result.plan,result.qualified,pages,resources);
             for(long u=0,n=result.qualified.unitCount();u<n;u++)result.nativeFiles=Math.addExact(result.nativeFiles,result.qualified.count(u,SourceQualifiedSnapshot.Kind.NATIVE_FILE));
             result.ready=true;source.attach(result,pages,resources);result.open();return result;
