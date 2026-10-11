@@ -117,13 +117,24 @@ final class SourceProgramSnapshotTest {
                 assertNotNull(pressure);assertThrows(AnalysisResources.Exhausted.class,()->SourceProgramSnapshot.prepare(plan,qualified,input.pages,input.execution));assertEquals(baseline,input.pages.statistics().livePages());assertTrue(plan.count()>0);
             }assertEquals(resident,input.execution.heapUsed());
         }
-        for(int fault=0;fault<4;fault++)try(var input=fixture.new NativeCase(publication,evidence,true);var correlations=SourceCorrelationSnapshot.prepare(input.source,input.program,List.of(),input.backend,input.execution);var qualified=SourceQualifiedSnapshot.prepare(input.source,input.backend,input.execution)) {
+        for(int fault=0;fault<4;fault++)try(var input=fixture.new NativeCase(publication,evidence,true);var correlations=SourceCorrelationSnapshot.prepare(input.source,input.program,List.of(),input.backend,input.execution)) {
+            long beforeQualified=input.pages.statistics().livePages();
+            try(var qualified=SourceQualifiedSnapshot.prepare(input.source,input.backend,input.execution)) {
+            long qualifiedPages=input.pages.statistics().livePages()-beforeQualified;
             long beforePlan=input.pages.statistics().livePages();try(var plan=SourceTargetPlan.prepare(correlations,qualified,SourceTargetPlanTest.result(publication,List.of()),input.backend,input.execution)) {
             var port=(SourceCorrelationSnapshotTest.FaultPages)input.backend;long baseline=input.pages.statistics().livePages();
             if(fault<3){port.arm(fault);assertSame(port.primary,assertThrows(PageStore.Failure.class,()->SourceProgramSnapshot.prepare(plan,qualified,port,input.execution)));}
             else try(var result=SourceProgramSnapshot.prepare(plan,qualified,port,input.execution)){port.arm(1);assertSame(port.primary,assertThrows(PageStore.Failure.class,()->result.candidateCount(0)));assertThrows(IllegalStateException.class,result::count);}
-            try{input.source.snapshot();try{plan.count();assertEquals(baseline,input.pages.statistics().livePages());}catch(IllegalStateException expiredPlan){assertEquals(beforePlan,input.pages.statistics().livePages(),"failed borrowed plan retires only its own pages");}}catch(IllegalStateException expired){assertEquals(0,input.pages.statistics().livePages());}
+            try {
+                input.source.snapshot();long retiredQualified=0;
+                try{qualified.admission();assertTrue(qualified.unitCount()>0);}
+                catch(IllegalStateException expiredQualified){retiredQualified=qualifiedPages;assertThrows(IllegalStateException.class,qualified::unitCount);}
+                try{plan.count();assertEquals(baseline-retiredQualified,input.pages.statistics().livePages(),"only failed borrowed owners retire their own pages");}
+                catch(IllegalStateException expiredPlan){assertEquals(beforePlan-retiredQualified,input.pages.statistics().livePages(),"failed borrowed plan retires only its own pages");}
+                assertEquals(0,correlations.operationCount(0,0));assertTrue(input.source.unitCount()>0);
+            }catch(IllegalStateException expired){assertEquals(0,input.pages.statistics().livePages());}
             assertFalse(port.closed);assertEquals(publication.id(),input.program.publicationId());long borrowed=input.pages.allocate();input.pages.release(borrowed);
+            }
             }
         }
     }

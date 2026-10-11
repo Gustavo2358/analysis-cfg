@@ -11,24 +11,36 @@ public final class PagedJsonInputStorage implements AirJson.InputStorage {
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation resident;
     private PagedLongArray[] columns;
+    private long[] cachedIndexes,cachedValues;
+    private byte[] cachedColumns;
     private PagedLongArray values, containers;
     private long blocks, nameIds;
     private PagedLongIndex names;
     private boolean closed,failed;
     public PagedJsonInputStorage(PageStore pages,AnalysisResources resources) {
-        Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);resident=resources.reserve(AnalysisResources.Pool.RESIDENT,512,PHASE);
+        Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);resident=resources.reserve(AnalysisResources.Pool.RESIDENT,10240,PHASE);
         try {
+            cachedIndexes=new long[512];cachedValues=new long[512];cachedColumns=new byte[512];
             columns=new PagedLongArray[3];for(int i=0;i<3;i++)columns[i]=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
             values=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);containers=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
             names=new PagedLongIndex(pages,resources,PHASE,this::compareNames);
         }catch(RuntimeException|Error failure){closeSuppressed(failure);throw failure;}
     }
     private long base(long token){if(token<=0||token>Long.MAX_VALUE/8)throw new IllegalArgumentException("JSON token address capacity");return (token-1)*8;}
-    private long word(long token,int field){return columns[0].get(base(token)+field);}
-    private int character(long index){return (int)((columns[1].get(index>>>2)>>>((index&3)*16))&65535);}
+    private long word(long token,int field){return get(Column.NODES,base(token)+field);}
+    private int character(long index){return (int)((get(Column.CHARACTERS,index>>>2)>>>((index&3)*16))&65535);}
     private int compareNames(long a,long b){if(a==b)return 0;long n=word(a,5),m=word(b,5),x=word(a,4),y=word(b,4);for(long i=0,limit=Math.min(n,m);i<limit;i++){int c=Integer.compare(character(x+i),character(y+i));if(c!=0)return c;}return Long.compare(n,m);}
-    @Override public synchronized long get(Column column,long index){open();try{return columns[Objects.requireNonNull(column).ordinal()].get(index);}catch(RuntimeException|Error failure){failed=true;throw failure;}}
-    @Override public synchronized void set(Column column,long index,long value){open();try{columns[Objects.requireNonNull(column).ordinal()].set(index,value);}catch(RuntimeException|Error failure){failed=true;throw failure;}}
+    @Override public synchronized long get(Column column,long index){open();try{
+        Objects.requireNonNull(column);if(cacheable(column,index)){int slot=cacheSlot(column,index);
+            if(cachedColumns[slot]==column.ordinal()+1&&cachedIndexes[slot]==index){resources.work(1,PHASE);return cachedValues[slot];}}
+        long value=columns[column.ordinal()].get(index);remember(column,index,value);return value;
+    }catch(RuntimeException|Error failure){failed=true;throw failure;}}
+    @Override public synchronized void set(Column column,long index,long value){open();try{
+        columns[Objects.requireNonNull(column).ordinal()].set(index,value);remember(column,index,value);
+    }catch(RuntimeException|Error failure){failed=true;throw failure;}}
+    private boolean cacheable(Column column,long index){return column!=Column.FRAMES&&index>=0&&index<Long.MAX_VALUE;}
+    private int cacheSlot(Column column,long index){return (int)((index^(index>>>32))*2+column.ordinal())&511;}
+    private void remember(Column column,long index,long value){if(cacheable(column,index)){int slot=cacheSlot(column,index);cachedIndexes[slot]=index;cachedValues[slot]=value;cachedColumns[slot]=(byte)(column.ordinal()+1);}}
     // Each parent owns child-root/height/count and name-membership-root/height.
     private long container(long parent){if(parent<=0||parent>Long.MAX_VALUE/5)throw new IllegalArgumentException("JSON parent address capacity");return (parent-1)*5;}
     private long block(){if(blocks==Long.MAX_VALUE/16)throw new IllegalStateException("JSON ordinal vector address capacity");return ++blocks;}
@@ -64,7 +76,7 @@ public final class PagedJsonInputStorage implements AirJson.InputStorage {
     @Override public synchronized AirSnapshotBuilder.Lease claim(long bytes){open();try{var lease=resources.reserve(AnalysisResources.Pool.SCRATCH,bytes,PHASE);return lease::close;}catch(RuntimeException|Error failure){failed=true;throw failure;}}
     private void open(){if(closed||failed)throw new IllegalStateException("paged JSON staging closed or aborted");}
     private void closeSuppressed(Throwable failure){try{close();}catch(RuntimeException|Error cleanup){if(failure!=cleanup)failure.addSuppressed(cleanup);}}
-    @Override public synchronized void close(){if(closed)return;closed=true;Throwable failure=null;
+    @Override public synchronized void close(){if(closed)return;closed=true;cachedIndexes=null;cachedValues=null;cachedColumns=null;Throwable failure=null;
         AutoCloseable[] owners={names,values,containers};for(var owner:owners)if(owner!=null)try{owner.close();}catch(Exception|Error error){if(failure==null)failure=error;else if(error!=failure)failure.addSuppressed(error);}
         if(columns!=null)for(var column:columns)if(column!=null)try{column.close();}catch(RuntimeException|Error error){if(failure==null)failure=error;else if(error!=failure)failure.addSuppressed(error);}
         columns=null;names=null;values=null;containers=null;resident.close();if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("JSON staging cleanup",failure);

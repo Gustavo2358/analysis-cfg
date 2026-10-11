@@ -16,6 +16,7 @@ final class SourceSnapshotJson implements AutoCloseable {
     private final AnalysisResources.Reservation control;
     private SourceSnapshotBuilder builder;
     private PagedLongArray frames;
+    private long[] frameHead;
     private long[] fields;
     private TextView text;
     private long depth;
@@ -23,8 +24,8 @@ final class SourceSnapshotJson implements AutoCloseable {
     private SourceSnapshotJson(PageStore pages,AnalysisResources resources) {
         this.resources=Objects.requireNonNull(resources);Objects.requireNonNull(pages);
         // Includes the mapper, fixed recipe, UTF16 block and its single reusable view.
-        control=resources.reserve(AnalysisResources.Pool.RESIDENT,2048,PHASE);
-        try {fields=new long[30];text=new TextView();frames=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);builder=new SourceSnapshotBuilder(pages,resources);}
+        control=resources.reserve(AnalysisResources.Pool.RESIDENT,6656,PHASE);
+        try {frameHead=new long[512];fields=new long[30];text=new TextView();frames=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);builder=new SourceSnapshotBuilder(pages,resources);}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     static SourceSnapshot decode(InputStream input,PageStore pages,AnalysisResources resources)throws IOException {
@@ -43,6 +44,9 @@ final class SourceSnapshotJson implements AutoCloseable {
         }
         return snapshot;
     }
+    // Fixed prefix only; the full original address space remains page-backed.
+    private long frameGet(long index){if(index>=0&&index<frameHead.length){resources.work(1,PHASE);return frameHead[(int)index];}return frames.get(index);}
+    private void frameSet(long index,long value){if(index>=0&&index<frameHead.length){resources.work(1,PHASE);frameHead[(int)index]=value;}else frames.set(index,value);}
     private long base(){return Math.multiplyExact(depth-1,WIDTH);}
     private void push(AirJson.StagedInput input,long token,SourceShape type,SourceShape element,int parentSlot) {
         long base=Math.multiplyExact(depth,WIDTH);
@@ -58,38 +62,38 @@ final class SourceSnapshotJson implements AutoCloseable {
         if(!valid)throw new IllegalArgumentException("source field physical shape");
         long count=type.record()||type==SourceShape.LIST?input.childCount(token):0;
         if(type.record()&&count>type.fieldCount())throw new IllegalArgumentException("closed source fields");
-        frames.set(base,token);frames.set(base+1,type.tag());frames.set(base+2,element==null?0:element.tag());
-        frames.set(base+4,count);frames.set(base+7,parentSlot);
-        if(type==SourceShape.LIST)frames.set(base+6,builder.beginList(Objects.requireNonNull(element)));
+        frameSet(base,token);frameSet(base+1,type.tag());frameSet(base+2,element==null?0:element.tag());
+        frameSet(base+4,count);frameSet(base+7,parentSlot);
+        if(type==SourceShape.LIST)frameSet(base+6,builder.beginList(Objects.requireNonNull(element)));
         depth=Math.incrementExact(depth);
     }
     private SourceSnapshot bind(AirJson.StagedInput input) {
         push(input,input.root(),SourceShape.ROOT,null,0);
         while(depth!=0) {
-            resources.work(1,PHASE);long base=base(),token=frames.get(base);
-            var type=SourceShape.forTag(Math.toIntExact(frames.get(base+1)));
-            long next=frames.get(base+3),count=frames.get(base+4),result;
+            resources.work(1,PHASE);long base=base(),token=frameGet(base);
+            var type=SourceShape.forTag(Math.toIntExact(frameGet(base+1)));
+            long next=frameGet(base+3),count=frameGet(base+4),result;
             if(type.record()||type==SourceShape.LIST) {
                 if(next<count) {
-                    long child=input.child(token,next);frames.set(base+3,next+1);
-                    if(type==SourceShape.LIST)push(input,child,SourceShape.forTag(Math.toIntExact(frames.get(base+2))),null,0);
+                    long child=input.child(token,next);frameSet(base+3,next+1);
+                    if(type==SourceShape.LIST)push(input,child,SourceShape.forTag(Math.toIntExact(frameGet(base+2))),null,0);
                     else {
                         long name=input.name(child);int slot=-1;
                         for(int i=0;i<type.fieldCount();i++)if(input.matches(name,type.field(i).name())){slot=i;break;}
                         if(slot<0)throw new IllegalArgumentException("closed source fields");
-                        long bit=1L<<slot,seen=frames.get(base+5);
+                        long bit=1L<<slot,seen=frameGet(base+5);
                         if((seen&bit)!=0)throw new IllegalArgumentException("duplicate source field");
-                        frames.set(base+5,seen|bit);var field=type.field(slot);
+                        frameSet(base+5,seen|bit);var field=type.field(slot);
                         push(input,child,field.shape(),field.shape()==SourceShape.LIST?field.element():null,slot);
                     }
                     continue;
                 }
-                if(type==SourceShape.LIST)result=builder.finishList(frames.get(base+6));
+                if(type==SourceShape.LIST)result=builder.finishList(frameGet(base+6));
                 else {
-                    long seen=frames.get(base+5);
+                    long seen=frameGet(base+5);
                     for(int i=0;i<type.fieldCount();i++) {
                         if((seen&(1L<<i))==0&&!type.field(i).optional())throw new IllegalArgumentException("required source field");
-                        fields[i]=frames.get(base+FIELDS+i);
+                        fields[i]=frameGet(base+FIELDS+i);
                     }
                     result=builder.record(type,fields,0,type.fieldCount());
                 }
@@ -98,11 +102,12 @@ final class SourceSnapshotJson implements AutoCloseable {
             } else if(type==SourceShape.INTEGER)result=builder.integer(integer(input,token));
             else if(type==SourceShape.BOOLEAN)result=builder.bool(input.kind(token)==AirJson.PhysicalKind.TRUE);
             else throw new IllegalStateException("source closed shape");
-            int parentSlot=Math.toIntExact(frames.get(base+7));
-            for(int i=0;i<WIDTH;i++)frames.set(base+i,0);depth--;
+            int parentSlot=Math.toIntExact(frameGet(base+7));
+            int clearCount=type.record()?FIELDS+type.fieldCount():FIELDS;
+            for(int i=0;i<clearCount;i++)frameSet(base+i,0);depth--;
             if(depth==0)return builder.build(result);
-            long parent=base();if(frames.get(parent+1)==SourceShape.LIST.tag())builder.append(frames.get(parent+6),result);
-            else frames.set(parent+FIELDS+parentSlot,result);
+            long parent=base();if(frameGet(parent+1)==SourceShape.LIST.tag())builder.append(frameGet(parent+6),result);
+            else frameSet(parent+FIELDS+parentSlot,result);
         }
         throw new IllegalStateException("missing source root");
     }
@@ -133,7 +138,7 @@ final class SourceSnapshotJson implements AutoCloseable {
     }
     private void abort(Throwable failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}}
     @Override public void close() {
-        if(closed)return;closed=true;fields=null;if(text!=null)text.clear();text=null;Throwable failure=null;
+        if(closed)return;closed=true;frameHead=null;fields=null;if(text!=null)text.clear();text=null;Throwable failure=null;
         for(AutoCloseable owner:new AutoCloseable[]{frames,builder,control})if(owner!=null)try{owner.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         frames=null;builder=null;depth=0;
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("source mapping cleanup",failure);

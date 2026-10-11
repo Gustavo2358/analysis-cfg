@@ -1,6 +1,64 @@
 # Managed source storage boundary
 
 AS-W07/09 IN_PROGRESS; source1.0--1.6 unchanged, no AIR/CFG model invented.
+
+## Bounded hot metadata (2026-10-11; local qualification, global PARTIAL)
+
+Three fixed private controls avoid re-reading stable primitive metadata. They
+are not canonical identity tables, admission certificates or semantic cutoffs:
+
+- Physical JSON storage retains 512 exact words, 256 each for NODES and packed
+  UTF16 CHARACTERS. Full 64-bit indices and column tags identify entries. Setters
+  persist successfully before updating a memo; FRAMES remains paged. Full UTF16
+  name equality is unchanged. Control10240B replaces512B, a funded fixed9728B delta.
+- SOURCE mapping retains the first512 frame words, with the original paged tail
+  and complete address range. Control6656B replaces2048B, a fixed4608B delta;
+  every resident get/set charges INDEX work. Pop clears only controls and the
+  fields that the closed shape could write; other suffix cells remain zero.
+- Immutable recipes retain64 full-row fingerprint keys and16 rows of32 selected
+  full-word cells with validity masks. Control7168B replaces768B, a fixed6400B
+  delta. Cold misses read the original paged recipes; every cell hit charges
+  INDEX work. A matching fingerprint still compares tag and all30 fields. Fresh
+  recipe addresses never repeat, so unwritten zero fields need no zero setter.
+
+The additional fixed20736B is reserved before allocating these arrays, within
+the original heap/quotas and4096x4096 shared physical page cache. Keys, values and
+presence bits are exact; collisions and eviction cannot discard canonical rows.
+Closed/failed owners reject memo access, and close detaches the arrays. Fixed
+memo sizes do not bound program cardinality, nesting, candidates or semantics.
+
+Three formal mechanism laws fail for their specific storage operations on the
+previous productive runtime and pass on the qualified copies. The unchanged33
+physical/SOURCE neighbors plus those three laws pass on actual productive target
+classes,36 tests/zero skips. The ignored-copy original128000 CLI completed in
+396.674s with the independent whole-product oracle;32000 retained the old output
+bytes exactly. Actual productive128000 replay completed in419.063s with the whole
+independent oracle. Productive8192 correlation and both818022612-byte SOURCE-file
+CLIs also passed their complete oracles; these are finite capacity witnesses.
+
+The first original complete FAST1367 failed the borrowed-owner oracle when a
+qualified snapshot correctly expired its own pages during an injected read fault.
+Raw failure reports and the preceding oracle are preserved. The corrected oracle
+measures each independently constructed owner's actual pages, checks surviving
+owners and keeps the primary failure and borrowed backend intact. A separate
+five-owner page-handle law exposed a real missing abort on the second paged read
+in SourceTargetPlan.requestsAnyQuery. That accessor now uses the existing abort
+path; successful instructions and every other method remain bytecode-equivalent.
+All22 neighboring ownership methods pass on actual classes with the five-owner law.
+
+Five fresh productive CLI products pass their full oracles after that failure-only
+guard; the prior128000/8192 large successes are explicitly reused through exact
+successful-instruction and whole-other-runtime equivalence, not relabeled as new.
+The fresh original FAST passes all1368 mandatory methods, zero failures/errors/
+skips, in1423.102s. Exact audit compares1436 production classfiles across all nine
+consumer modules and both AIR modules,568 Java sources and579 fixtures, with no
+helper shadow. Producer a0aeb827ef53765815aa501c4687f197be77ac73 stays clean and
+unchanged. Audit01's summary accidentally overwrote its method count with a CLI
+count; that immutable record is retained and audit02 independently confirms1368.
+
+These finite witnesses do not prove global complexity, all-store funding,
+reverse-order qualification,21-family coverage or completion of AS-W00--AS-W10.
+
 SourceShape lists the41 existing record shapes and4 primitive/container shapes
 from QualifiedSourceDependencies,NominalValueEvidence and NominalValues. Typed
 storage is NOT a successful admission/certificate. All existing local constraints,

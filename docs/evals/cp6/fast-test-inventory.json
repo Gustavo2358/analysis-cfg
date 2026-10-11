@@ -465,6 +465,15 @@
       "unfinishedReuseAndDoubleFinishNeverBecomeSuccessfulEmptyEvidence",
       "deniedConstructionReturnsEveryTransferredLease"
     ],
+    "io.github.gustavo2358.analysis.adapters.PagedJsonWordMemoTest": [
+      "exactPhysicalWordsRemainCoherentAndWorkChecked"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceBindingFrameHeadTest": [
+      "fixedFramePrefixKeepsAuthenticRootAndOriginalPagedTailExact"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceRecordCellMemoTest": [
+      "fixedImmutableCellsPreserveFullCollisionAuthorityAndWorkDenial"
+    ],
     "io.github.gustavo2358.analysis.adapters.PagedJsonInputStorageTest": [
       "coldOrdinalsAndDecodedNameEqualityAreExactWithoutQueryInsertion",
       "officialReaderUsesColdPagesAndPreservesFullAdmissionAndDigest",
@@ -597,6 +606,9 @@
       "wideCandidateGeometryAndPhysicalPermutationsKeepFixedResidentDeliveryControls",
       "preallocationAndNestedFundingDenialsNeverPublishOrLeakAndCallbacksKeepPrimary",
       "primitiveSortingAndQueryFailuresPreservePrimaryAndRetireOnlyOwnedPages"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceProgramBorrowedFaultOwnershipTest": [
+      "eachActualFailedOwnerReleasesItsExactPagesWithoutStealingSurvivingOwners"
     ],
     "io.github.gustavo2358.analysis.adapters.SourceProgramSnapshotTest": [
       "allFourNominalLiteralsPreserveCompleteProgramResolutionAndStandaloneExecutableInventory",

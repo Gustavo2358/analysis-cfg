@@ -146,7 +146,7 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     public long queryCount(long unit){open();try{if(unit<0||unit>=parent().unitCount())throw new IndexOutOfBoundsException("target-plan source unit ordinal");return queryRanges.get(unit*2+1);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public boolean requestsQuery(long unit,long query){open();try{if(query<0||query>=queryCount(unit))throw new IndexOutOfBoundsException("target-plan nominal query ordinal");return requested.get(queryRanges.get(unit*2)+query)!=0;}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public long conditionalRuns(){open();return conditionalRuns;}
-    public boolean requestsAnyQuery(long unit){queryCount(unit);return requested.get(totalQueries+unit)!=0;}
+    public boolean requestsAnyQuery(long unit){try{queryCount(unit);return requested.get(totalQueries+unit)!=0;}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public long conditionalQueries(){open();return conditionalQueries;}
     private static void suppress(Throwable primary,Throwable cleanup){if(primary!=cleanup)primary.addSuppressed(cleanup);}
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){suppress(primary,cleanup);}}
