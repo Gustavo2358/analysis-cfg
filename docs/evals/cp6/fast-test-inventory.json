@@ -540,6 +540,105 @@
       "parentExpiryDuringFlushRetiresFramesBeforeQueryAndCannotReturnSuccess",
       "outputQuotaIsEnforcedBeforeBorrowedBytesAndDoesNotExpireAdmission"
     ],
+    "io.github.gustavo2358.analysis.adapters.SourceCorrelationSnapshotTest": [
+      "allSortedExecutableCorrelationsAndReverseRegistrationMatchIndependentResidentPort",
+      "emptyAndPartialCorrelationsNeverInferExecutableAuthorityFromSourceNames",
+      "duplicateForeignOperationLabelOriginAndFullSourceOwnerRejectBeforeFactsEscape",
+      "deepSharedDerivedOriginIsExactAndIndependentSiblingCannotAuthorizeAnySite",
+      "nativeOwnerExpiryRetiresSourceAndCorrelationPagesBeforeAnotherQuery",
+      "literalAgreementIsFullUtf16NotProfileInterpretationAndAllTargetRejectionsMatchResident",
+      "fullSourceTupleAndCollidingHandlesSelectExactlyOneOccurrenceAndConflictingOwnersReject",
+      "nonInvokeCorrelationIsValidatedButCannotMarkOrYieldAnExecutableDependency",
+      "correlationControlsStayFixedUnderForcedEvictionAndSuccessfulCloseBorrowsBothOwners",
+      "foreignContextAndPreallocationDenialDoNotClaimEitherAdmission",
+      "sourceExpiryAndInvalidOrdinalRetireOnlyDerivedMappingsBeforeAnotherQuery",
+      "primitiveFailurePreservesPrimaryAndNeverClosesBorrowedBackendOrPublishesPartialMappings",
+      "equalLocalOperationIdsInDistinctUnitsNeverUnifyAndHavePermutationIndependentTypedTie",
+      "differentValidOriginAnchorsDoNotDuplicateASiteAndForeignPublicationNeverMatches",
+      "successfulAncestryMemoCannotAuthorizeUnrelatedVisitedSiblingOnAnotherOperation"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceNominalDemandTest": [
+      "everyExistingNominalLiteralMatchesResidentAndIndependentClosure",
+      "assignmentConditionSharedDagKeepsDirectionAndFullSymbolIdentity",
+      "permutationsCyclesAndAllOrAlternativesMatchIndependentSetFixpoint",
+      "reverseChainAndWideConditionSpillWithFixedControlsAndLinearIncidence",
+      "foreignContextPreallocationDenialAndInvalidQueryNeverStealParent",
+      "parentStorageExpiryRetiresDemandBeforeAnySubsequentQuery",
+      "nativeCommonOwnerExpiryRetiresDemandWithoutAQuery",
+      "primitiveConstructionAndQueryFaultsPreservePrimaryAndBorrowedBackend",
+      "fullCollidingNamesCanonicalReferencesAndQueryBoundariesAreExact"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceSnapshotExpressionsTest": [
+      "allEightContextsChoiceDuplicatesUnknownAndUtf16MatchIndependentAndResidentPrograms",
+      "deepPhysicalUnaryInputUsesPagedFramesAndFixedControlsWithoutRecursiveResidentAst",
+      "sharedDagAndWideChoiceHaveLinearStoredIncidenceAndCanonicalPermutation",
+      "foreignContextAndInvalidHandleAbortOnlyDerivedProgramWhileParentExpiryIsImmediate",
+      "oddWidePermutationsAndNestedChoiceVectorsKeepExactCanonicalArguments",
+      "preallocationDenialsAndNativeOwnerCloseNeverLeakOrStealBorrowedStorage",
+      "everyPrimitiveCompilationAndQueryFaultPreservesPrimaryAndRetiresDerivedState"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceNominalSnapshotTest": [
+      "completeOverwriteSnapshotModelTableChoiceAndTransformLawsMatchIndependentValuesAndResidentSupports",
+      "conditionalEqualityFigurativeNestedLogicAndModelTableFiltersRemainExact",
+      "everyExistingNominalLiteralPreservesCompleteOrderedEvidenceAssumptionsUncertaintiesAndQueries",
+      "noRequestedQueryAndUnobservedTailNeverAllocatePrivateIndexesOrChangeSupports",
+      "callerPresenceAndUnusedVersusUsedUnknownControlKeepDistinctNominalPremises",
+      "fullProofTuplesWithSeparatorsNeverAliasAndRetainCompleteOrderedProvenance",
+      "growingProofHistoryUsesFixedResidentControlsAndRetiresStateRootsBeforeReady",
+      "foreignOwnersDenialAndCallbackFailuresPreserveParentsAndOriginalPrimary",
+      "nativeAndSourceOwnerExpiryRetirePreparedValuesBeforeAnyOtherQuery",
+      "eachPrimitivePrepareAndResultFaultCannotPublishPartialValuesOrCloseBorrowedBackend"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceNominalCandidatesTest": [
+      "orderedCandidatesFullEvidenceDedupAndAssumptionsMatchManualAndResidentOracles",
+      "fullProofKeyOrderDeduplicatesEqualDeclarationEvidenceWithoutLosingIncludeDuplicates",
+      "emptySelectionAndExpiredOwnersNeverExposePrivateValuesOrCloseBorrowedBackend",
+      "invalidRangesAndForeignContextAbortOnlyDerivedOwner",
+      "wideCandidateGeometryAndPhysicalPermutationsKeepFixedResidentDeliveryControls",
+      "preallocationAndNestedFundingDenialsNeverPublishOrLeakAndCallbacksKeepPrimary",
+      "primitiveSortingAndQueryFailuresPreservePrimaryAndRetireOnlyOwnedPages"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceProgramSnapshotTest": [
+      "allFourNominalLiteralsPreserveCompleteProgramResolutionAndStandaloneExecutableInventory",
+      "executableAndConditionalCandidatesMergeExactSupportsAndRetainPremisesWithStableTies",
+      "literalAndConditionalProfilesPreserveKnownPlusRemainderWithoutInventingNames",
+      "foreignPreparedSourceAndOwnerExpiryCannotPublishOrLeakDerivedProgramResults",
+      "completeSourceInventoryAndCandidateSupportWidthsSpillWithFixedResidentControls",
+      "finalFlushExpiryAndRootQuotaCannotCertifyOrConsumeBorrowedProgramFacts",
+      "fundingDenialAndEveryPrimitiveFaultRetainPrimaryAndBorrowedBackend"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceSnapshotInputTest": [
+      "typedInputBindsWireDocumentAirAndPublicationWithoutResidentSourceProjection",
+      "everyIdentityAndHashContradictionRejectsBeforeAdmissionAndRetiresStagedPages",
+      "nativeBundleDefersOneSourceAdmissionToTheExactProgramAndExpiresWithItsOwner",
+      "nativeDecodeAndValidationExhaustionKeepProductivePhaseAndAuthenticBudgetIdentity"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ManagedSourceResultTest": [
+      "completeNativeApplicationPreservesEveryLegacyProductFieldAcrossSixSourceFamilies",
+      "atomicPublicationPreservesDestinationOnOwnerExpiryAndForeignSourceFailsBeforeDerivation"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceTargetPlanTest": [
+      "closedExecutableRefutationsAndOpenQueriesMatchTheExactTargetResolverSelectionLaw",
+      "partialAndMissingCorrelationsKeepEveryStandaloneExecutableOccurrenceInOriginalAirOrder",
+      "sourceControlPossibilityPreservesNominalDemandDespiteClosedExecutableSubset",
+      "foreignResultContextInvalidQueriesAndOwnerExpiryCannotLeakPlanOrStealParents",
+      "equalQueryHandlesInDifferentFullUnitsNeverShareDemandAndUnavailableControlCannotRequestValues",
+      "growingSiteIncidenceKeepsFixedResidentPlanControlsAndPreservesEverySelectedSite"
+    ],
+    "io.github.gustavo2358.analysis.adapters.SourceNominalDeliveryTest": [
+      "allFourNominalLiteralsEmitEveryQueryCandidateSupportAssumptionAndUncertainty",
+      "largeUtf16CandidateStreamsWithoutWholeStringProjectionAndKeepsExactRawAndSupport",
+      "foreignAdmissionAndLastFlushExpiryCannotCertifyBorrowedNominalResults",
+      "rootOutputMeterIsBorrowedOnceAndQuotaFailurePreservesPreparedCandidates"
+    ],
+    "io.github.gustavo2358.analysis.dependencies.SourceLiteralViewTest": [
+      "everyTransformFitAndUtf16BoundaryMatchesIndependentScalarOracle",
+      "borrowedCharacterCandidatesKeepAllFlagsProofsPaddingTruthAndCanonicalValues",
+      "largeLiteralExceedsProjectionScratchButFullBorrowedInputAndDictionaryViewsStayBounded",
+      "foreignContextDenialWrongShapeAndParentExpiryNeverLeakViewCapacity",
+      "exactDictionaryContextScratchDenialAndSingleSpaceNeverManufacturePartialCandidates",
+      "nativeOwnerExpiryAndPrimitiveReadFailureExpireViewWithoutClosingBorrowedBackend"
+    ],
     "io.github.gustavo2358.analysis.adapters.SourceSnapshotCompositionTest": [
       "all53LiteralsComposeCompleteEvidenceOccurrencesAndFilesInOneRootBuffer",
       "sharedEmitterNeverChargesTheExistingRootMeterTwice",

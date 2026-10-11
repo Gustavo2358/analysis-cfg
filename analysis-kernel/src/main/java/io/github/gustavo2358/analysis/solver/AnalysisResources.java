@@ -127,9 +127,16 @@ public final class AnalysisResources {
         return new AnalysisResources(new Limits(Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE,Long.MAX_VALUE),0,()->0,
             phase->program.progress(executionPhase(phase)),program.executionBudget().orElse(null));
     }
+    /** Identity check for native outer adapters; equal limits do not confer ownership. */
+    public void requireExecutionProgram(ProgramStore program) {
+        Objects.requireNonNull(program);
+        if(executionBudget==null||executionBudget!=program.executionBudget().orElse(null))throw new IllegalArgumentException("foreign native execution resources");
+    }
     private static ProgramStore.ExecutionPhase executionPhase(Phase phase) {
         return switch(phase){
-                case DECODE,VALIDATION,INDEX->ProgramStore.ExecutionPhase.INDEX;
+                case DECODE->ProgramStore.ExecutionPhase.DECODE;
+                case VALIDATION->ProgramStore.ExecutionPhase.VALIDATION;
+                case INDEX->ProgramStore.ExecutionPhase.INDEX;
                 case DEMAND->ProgramStore.ExecutionPhase.DEMAND;
                 case CONTROL->ProgramStore.ExecutionPhase.CONTROL;
                 case DOMAIN->ProgramStore.ExecutionPhase.DOMAIN;

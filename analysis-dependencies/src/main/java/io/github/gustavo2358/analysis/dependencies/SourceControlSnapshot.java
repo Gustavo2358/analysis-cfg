@@ -143,6 +143,7 @@ public final class SourceControlSnapshot extends SourceAdmissionSnapshot.Depende
         }
     }
     private void open(){if(closed||!ready)throw new IllegalStateException("source control consumer expired or incomplete");parent().snapshot();}
+    void requireAdmission(SourceAdmissionSnapshot admission){open();if(parent()!=admission)throw new IllegalArgumentException("SOURCE control owner mismatch");}
     private long fact(long unitOrdinal,long itemOrdinal,int namespace,SourceShape shape,int fieldOrdinal) {
         var current=parent();if(unitOrdinal<0||unitOrdinal>=current.unitCount())throw new IndexOutOfBoundsException("source unit ordinal");
         long unit=current.unit(unitOrdinal),list=field(unit,UNIT,fieldOrdinal);

@@ -104,29 +104,26 @@ public final class AnalysisPipeline {
             if(validation.status()!=ValidationResult.Status.STRUCTURALLY_VALID) {
                 err.println("PIPELINE_INPUT_INVALID");return 3;
             }
-            QualifiedSourceDependencies evidence=null;
-            if(source!=null) {
-                resources.work(1,AnalysisResources.Phase.DECODE);
-                var sourceHandle=resources.reserve(AnalysisResources.Pool.OPEN_FILES,1,AnalysisResources.Phase.DECODE);
-                try(var stream=JsonFiles.input(source)) {
-                    evidence=new QualifiedSourceJson().decode(stream,resources);
-                } finally {sourceHandle.close();}
-                if(evidence.air().size()!=1||!evidence.air().getFirst().sha256().equals(read.sha256()))
-                    throw new IllegalArgumentException("AIR digest mismatch");
-            }
+            if(source!=null)resources.work(1,AnalysisResources.Phase.DECODE);
             try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),resources)) {
-                var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
-                if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
-                // Complete analysis preparation before replacing either existing product.
-                var analysis=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
-                var result=evidence==null?analysis.prepareLeased(program,built):analysis.prepareLeased(program,built,evidence,List.of(),read.borrowedPages(),resources);
-                try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
-                        bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
-                catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
-                catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
-                program.releaseCfgProjection(built.options().projectionPolicy());
-                try {new SnapshotDependencyFileWriter().write(result,program,dependencies,resources);}
-                catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
+                var execution=AnalysisResources.executionFor(program);
+                try(var evidence=source==null?null:SourceSnapshotInput.read(source,program,read.borrowedPages(),execution,read.sha256(),Optional.empty(),Optional.empty())) {
+                    var built=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
+                    if(built.status()!=CfgBuildResult.Status.CFG_BUILT){err.println("CFG "+built.status());return 4;}
+                    // Complete analysis preparation before replacing either existing product.
+                    var analysis=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
+                    var result=evidence==null?null:analysis.prepareLeased(program,built,evidence,List.of(),read.borrowedPages(),execution);
+                    try(result) {
+                        var executable=evidence==null?analysis.prepareLeased(program,built):null;
+                        try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
+                                bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
+                        catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
+                        catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
+                        program.releaseCfgProjection(built.options().projectionPolicy());
+                        try {if(result!=null)new SnapshotDependencyFileWriter().write(result,dependencies,read.borrowedPages(),execution);else new SnapshotDependencyFileWriter().write(executable,program,dependencies,resources);}
+                        catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
+                    }
+                }
             }
             return 0;
         } catch(AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}

@@ -74,9 +74,31 @@ final class JsonOutput {
     /** Exact interpreted prefix, leaving the arbitrarily large raw value in managed SOURCE. */
     void sourceText(io.github.gustavo2358.analysis.dependencies.source.SourceSnapshot source,long reference,long length,char[] block)throws IOException {
         if(length<0||length>source.characterCount(reference)||block.length==0)throw new IllegalArgumentException("SOURCE text prefix");
+        blockText(length,block,(offset,destination,count)->source.readCharacters(reference,offset,destination,0,count));
+    }
+    /** Exact nominal dictionary payload, with no detached String projection. */
+    void nominalText(io.github.gustavo2358.analysis.dependencies.SourceNominalCandidates source,long query,long candidate,char[] block)throws IOException {
+        long length=source.rawLength(query,candidate);if(block.length==0)throw new IllegalArgumentException("nominal text buffer");
+        blockText(length,block,(offset,destination,count)->source.readRaw(query,candidate,offset,destination,0,count));
+    }
+    void programText(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long item,long candidate,boolean raw,char[] block)throws IOException {
+        long length=raw?source.rawLength(item,candidate):source.referenceLength(item,candidate);
+        blockText(length,block,(offset,destination,count)->{if(raw)source.readRaw(item,candidate,offset,destination,0,count);else source.readReference(item,candidate,offset,destination,0,count);});
+    }
+    void programReason(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long item,long ordinal,char[] block)throws IOException {
+        blockText(source.reasonLength(item,ordinal),block,(offset,destination,count)->source.readReason(item,ordinal,offset,destination,0,count));
+    }
+    void globalProgramReason(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long ordinal,char[] block)throws IOException {
+        blockText(source.globalReasonLength(ordinal),block,(offset,destination,count)->source.readGlobalReason(ordinal,offset,destination,0,count));
+    }
+    void programMetricName(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long ordinal,char[] block)throws IOException {
+        blockText(source.metricNameLength(ordinal),block,(offset,destination,count)->source.readMetricName(ordinal,offset,destination,0,count));
+    }
+    @FunctionalInterface private interface CharacterReader {void read(long offset,char[] destination,int count);}
+    private void blockText(long length,char[] block,CharacterReader reader)throws IOException {
         octet('"');char pending=0;
         for(long at=0;at<length;) {
-            int count=(int)Math.min(block.length,length-at);source.readCharacters(reference,at,block,0,count);at+=count;
+            int count=(int)Math.min(block.length,length-at);reader.read(at,block,count);at+=count;
             for(int i=0;i<count;i++) {
                 char c=block[i];
                 if(pending!=0) {

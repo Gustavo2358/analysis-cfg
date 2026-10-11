@@ -69,18 +69,30 @@ final class PipelineCliTest {
         var limits=new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
             64_000_000,64_000_000,0,256_000_000,4,Long.MAX_VALUE,64_000_000);
         var measured=new io.github.gustavo2358.analysis.solver.AnalysisResources(limits);
+        long validationBoundary;
         try(var admitted=new DataflowAirReader().readSnapshot(input,measured)) {
             assertTrue(admitted.checked().result().isStructurallyValid());
-        }
-        long[] decoded={0};var boundary=new IllegalStateException("source validation boundary");
-        try(var stream=JsonFiles.input(source)) {
-            assertSame(boundary,assertThrows(IllegalStateException.class,
-                ()->new QualifiedSourceJson().decode(stream,()->decoded[0]++,()->{throw boundary;})));
+            measured.work(1,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE);
+            try(var program=new SnapshotProgram(admitted.checked(),admitted.newIdentityStorage(),admitted.newOrderStorage(),measured)) {
+                var execution=io.github.gustavo2358.analysis.solver.AnalysisResources.executionFor(program);program.admission();execution.requireExecutionProgram(program);
+                io.github.gustavo2358.analysis.dependencies.source.SourceSnapshot staged;
+                try(var control=execution.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,1024,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE);
+                    var file=execution.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.OPEN_FILES,1,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.DECODE);
+                    var stream=JsonFiles.input(source)) {
+                    assertEquals(1024,control.amount());assertEquals(1,file.amount());staged=new QualifiedSourceJson().decodeSnapshot(stream,admitted.borrowedPages(),execution);
+                }
+                try(staged) {
+                    var root=staged.root();var air=staged.field(root,io.github.gustavo2358.analysis.dependencies.source.SourceShape.ROOT,4);
+                    assertEquals(1,staged.size(air,io.github.gustavo2358.analysis.dependencies.source.SourceShape.AIR_CORRELATION));var correlation=staged.element(air,io.github.gustavo2358.analysis.dependencies.source.SourceShape.AIR_CORRELATION,0);
+                    assertTrue(staged.matches(staged.field(correlation,io.github.gustavo2358.analysis.dependencies.source.SourceShape.AIR_CORRELATION,0),program.publicationId().localId()));
+                    assertTrue(staged.matches(staged.field(correlation,io.github.gustavo2358.analysis.dependencies.source.SourceShape.AIR_CORRELATION,1),admitted.sha256()));program.admission();validationBoundary=measured.workUsed();
+                }
+            }
         }
         var budget=new io.github.gustavo2358.analysis.solver.AnalysisResources(
             new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(
                 limits.heapBytes(),limits.scratchBytes(),limits.directBytes(),limits.temporaryBytes(),
-                limits.openFiles(),Math.addExact(measured.workUsed(),Math.addExact(1,decoded[0])),limits.outputBytes()));
+                limits.openFiles(),validationBoundary,limits.outputBytes()));
         var cfg=dir.resolve("validation.cfg");var dependencies=dir.resolve("validation.dependencies");
         Files.writeString(cfg,"cfg-sentinel");Files.writeString(dependencies,"dependencies-sentinel");
         var errors=new ByteArrayOutputStream();

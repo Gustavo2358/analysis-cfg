@@ -201,3 +201,67 @@ are preserved in the campaign archive,without binaries or caches. This qualifies
 complete SOURCE admission locally,not the still-resident production SOURCE
 consumer/CLI/output route or the campaign-wide obligations. Earlier foundation
 FAST remains historical and is not relabeled as this delta's FAST.
+
+## Productive SOURCE route (2026-10-10; global PARTIAL)
+
+The preceding sections describe their frozen foundation checkpoints. The current
+production SOURCE routes in AnalysisDependencies and AnalysisPipeline now consume
+typed storage/admission directly. NativeInput delays SOURCE until its exact checked
+SnapshotProgram exists; SourceSnapshotInput checks execution-budget identity before
+allocating, decodes and hashes one stream, closes physical staging, verifies the
+AIR/document correlations, then transfers storage to the private admission factory.
+An equal configuration is not an authentic owner. DECODE and VALIDATION retain their
+actual diagnostic phase through the execution facade rather than becoming INDEX.
+
+SourceCorrelationSnapshot indexes explicit links and origin ancestry. The prepared
+SourceQualifiedSnapshot shares its control facts with the nominal planner, so
+qualification is not solved again per consumer. SourceTargetPlan selects queries
+using the existing TargetResolver law, including model refutation, executable
+closure and weaker SOURCE evidence. SourceNominalDemand, SourceSnapshotExpressions,
+SourceLiteralView and SourceNominalCandidates retain variable facts/text/proofs in
+pages. Bounds, collisions and full ordered provenance remain semantic properties,
+not fingerprints or truncated strings.
+
+SourceProgramSnapshot assembles complete result records without reconstructing
+QualifiedDependencyOccurrence or SOURCE DTO lists. It evaluates a requested unit
+once, copies its necessary candidate/proof facts, then retires the unit owner.
+Candidate identity/order follows the existing length-prefixed reference/raw key;
+support identity includes kind, full IDs and original ordered premises. Existing
+first-contribution duplicates remain legal; merging contributions performs exact
+dedup. Authorities, interpretation/value remainder and reasons remain independent.
+Unsupported name interpretation does not erase an independently known executable
+candidate or fabricate an interpreted SOURCE name.
+
+ManagedDependencyResult is a private-factory read-only dependent of that admission.
+SourceSnapshotWriter streams programs, raw/reference text, conditional evidence,
+native files, reasons and metrics through one funded root JsonOutput buffer and one
+output meter. Per-row wire fields are fixed-size frames; variable ID ordering uses
+paged indices. Verification after the last flush and after stream finalization
+precedes atomic move. Operational failure cannot replace the prior destination or
+turn quota exhaustion into a semantic COMPLETE/PARTIAL result. Borrowed owners and
+PageStore are never closed by the writer.
+
+The stable focused product family passed 43 tests and the launcher family passed
+14, including full small resident-oracle comparisons, known plus unknown,
+full-identity/support cases, fixed-control geometries, owner expiry, page faults,
+source/AIR hashes and preservation of both destinations at validation failure.
+The original 818022612-byte SOURCE / 8192-FILE input passed both real CLIs under
+128 MiB heap, unchanged default quotas/cache and 480-second watchdog. Independent
+oracles compared every certificate token, FILE row and original AIR semantic field.
+The 1364173307-byte dependencies files are byte-identical between the two routes,
+SHA256 `475154d5f5ed0f36674e1c40ad054a166e2c59f135d85ae8818e25c2273d7bb6`.
+Observed times are 232.198s and 258.500s; the latter overlaps FAST and is not an
+isolated performance curve. That fixture has no nominal queries, so it cannot
+qualify nominal scale. Original OOM evidence remains unchanged in the local campaign.
+
+Seven original compiled boundary guards passed after exact capability review;
+1279 old required methods are unchanged and 77 new methods are registered. The
+current repository FAST passed all 1356 required methods, zero failures/errors/
+skips, in 1720.547s. The entire 1433-production-class runtime is byte-exact to
+the frozen real-CLI runtime, including all nine consumer and both AIR modules;
+561 Java sources and 579 fixtures are unchanged, with no helper shadow. Producer a0 is unchanged and its
+previous FAST is reused, not rerun. Complete campaign qualification is still open:
+original nominal dimensions/isolated curves, AIR-base SiteFacts/result maps and
+streams, resident manifest/correlation lists, all-store funding/spill, global
+families, E2E, legacy retirement and human review. A source-only managed vertical
+does not qualify these remaining structures or imply a universal linear bound.

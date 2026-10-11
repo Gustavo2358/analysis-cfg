@@ -180,6 +180,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         // the actual productive phase is reported, without a physical read.
         if(runtime==null){snapshot.shape(snapshot.root());return;}
         runtime.work(1,switch(phase) {
+            case DECODE->AnalysisResources.Phase.DECODE;case VALIDATION->AnalysisResources.Phase.VALIDATION;
             case INDEX->AnalysisResources.Phase.INDEX;case DEMAND->AnalysisResources.Phase.DEMAND;
             case CONTROL->AnalysisResources.Phase.CONTROL;case DOMAIN->AnalysisResources.Phase.DOMAIN;
             case REPLAY->AnalysisResources.Phase.REPLAY;case SORT->AnalysisResources.Phase.SORT;

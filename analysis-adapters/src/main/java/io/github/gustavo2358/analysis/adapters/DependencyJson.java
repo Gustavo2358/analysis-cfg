@@ -19,7 +19,20 @@ public final class DependencyJson {
         if(!source.publicationId().equals(result.publication()))throw new IllegalArgumentException("foreign snapshot result source");
         write(result,stream,source);
     }
+    /** One funded root buffer; every SOURCE section borrows its complete prepared owner. */
+    public void writeSnapshot(ManagedDependencyResult result,SnapshotProgram source,io.github.gustavo2358.analysis.solver.PageStore pages,
+            io.github.gustavo2358.analysis.solver.AnalysisResources resources,OutputStream stream)throws IOException {
+        Objects.requireNonNull(result);Objects.requireNonNull(source);Objects.requireNonNull(stream);result.admission().snapshot(pages,resources);
+        if(result.program()!=source)throw new IllegalArgumentException("foreign native managed result owner");
+        try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
+            if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed root buffer");var output=new JsonOutput(stream);
+            try(var writer=SourceSnapshotWriter.open(result.admission(),output,pages,resources)){write(result.executable(),source,output,result,writer);writer.verify();result.programs().count();}
+        }
+    }
     private void write(DependencyResult result,OutputStream stream,ProgramStore.Structural programSource) throws IOException {
+        write(result,programSource,new JsonOutput(stream),null,null);
+    }
+    private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer)throws IOException {
         boolean snapshot=programSource!=null;
         // Coverage is required by the existing native v3 contract. One header scan, not
         // a per-site program rescan; no Unit/Sequence/operation aggregate is retained.
@@ -28,7 +41,6 @@ public final class DependencyJson {
             var terminator=sequence.terminator();
             if(terminator instanceof Operations.Invoke)coverage.put(terminator.header().id(),terminator.header().coverage());
         }
-        var out=new JsonOutput(stream);
         var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->Set.of("1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(s.evidence().version())?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
@@ -39,11 +51,11 @@ public final class DependencyJson {
             "metrics",result.metrics(),"origins",orderedMetadata(result.origins(),Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
             "artifacts",orderedMetadata(result.artifacts(),Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
-        document.put("analysisStatus",result.partial()?"PARTIAL":"COMPLETE");document.put("analysisReasons",result.analysisReasons().stream().distinct().sorted());
+        boolean partial=managed==null?result.partial():managed.partial();document.put("analysisStatus",partial?"PARTIAL":"COMPLETE");document.put("analysisReasons",managed==null?result.analysisReasons().stream().distinct().sorted():writer.globalReasons(managed.programs()));
         if(snapshot) {
             document.put("version","3.0.0");document.put("modelScope","VALIDATED_SNAPSHOT_DEPENDENCY");
-            document.put("analysisStatus",result.partial()||result.publicationInventory()!=Evidence.InventoryStatus.COMPLETE?"PARTIAL":"COMPLETE");
-            document.put("generalAnalysisMetrics",result.metrics());
+            document.put("analysisStatus",partial||result.publicationInventory()!=Evidence.InventoryStatus.COMPLETE?"PARTIAL":"COMPLETE");
+            document.put("generalAnalysisMetrics",managed==null?result.metrics():writer.metrics(managed.programs()));
             document.put("metrics",object("sites",(long)result.sites().size(),"candidates",result.sites().stream().mapToLong(s->s.candidates().size()).sum()));
         }
         document.put("analysisBoundary","COBOL_SOURCE_ONLY");document.put("fileDependencies",FileDependencyJson.value(result.fileDependencies()));
@@ -52,14 +64,16 @@ public final class DependencyJson {
             "analysisBoundary","NON_EXECUTABLE_SOURCE","evidence",QualifiedSourceJson.value(source.evidence()),
             "occurrences",source.occurrences().stream().map(o->object("occurrence",QualifiedSourceJson.value(o.occurrence()),"status",o.status().name(),"valueRemainder",o.valueRemainder(),"interpretationRemainder",o.interpretationRemainder(),
                 "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())))))));
-        var dependencies=object("programs",result.programDependencies().stream().map(DependencyJson::program));
+        if(managed!=null)document.put("sourceQualifiedDependencies",writer.qualified(managed.qualified()));
+        var dependencies=object("programs",managed==null?result.programDependencies().stream().map(DependencyJson::program):writer.programs(managed.programs()));
+        if(managed!=null&&managed.nativeFileCount()>0)dependencies.put("files",writer.nativeFiles(managed.qualified()));
         result.sourceQualifiedDependencies().filter(s->!s.nativeFiles().isEmpty()).ifPresent(s->dependencies.put("files",s.nativeFiles().stream().map(f->object(
             "analysisBoundary","NON_EXECUTABLE_SOURCE","source",QualifiedSourceJson.value(f.source()),"status",f.status().name(),"remainder",f.remainder(),
             "candidates",f.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"qualifications",c.qualifications()))))));
         document.put("dependencies",dependencies);
         out.value(document);out.finish();
     }
-    private static Object program(TargetResolver.Resolution resolved) {
+    static Object program(TargetResolver.Resolution resolved) {
         var o=resolved.occurrence();
         var result=object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),
             "technology",o.technology(),"nameProfile",o.nameProfile(),"targetKind",o.targetKind(),"authorities",resolved.authorities(),

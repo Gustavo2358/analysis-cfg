@@ -31,9 +31,16 @@ public final class AnalysisDependencies {
             try(var program=new SnapshotProgram(read.checked(),read.newIdentityStorage(),read.newOrderStorage(),resources)) {
                 var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(program,read.checked(),BuildOptions.defaults());
                 var analysis=new DependencyAnalysis();
-                var result=admitted.source().isEmpty()?analysis.prepareLeased(program,cfg):analysis.prepareLeased(program,cfg,
-                    admitted.source().orElseThrow(),admitted.correlations(),read.borrowedPages(),resources);
-                try{new SnapshotDependencyFileWriter().write(result,program,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
+                var execution=AnalysisResources.executionFor(program);
+                var source=admitted.source(program,execution);
+                if(source.isPresent()) {
+                    try(var result=analysis.prepareLeased(program,cfg,source.orElseThrow(),admitted.correlations(),read.borrowedPages(),execution)) {
+                        try{new SnapshotDependencyFileWriter().write(result,output,read.borrowedPages(),execution);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
+                    }
+                }else {
+                    var result=analysis.prepareLeased(program,cfg);
+                    try{new SnapshotDependencyFileWriter().write(result,program,output,resources);}catch(IOException|IllegalArgumentException failure){err.println("OUTPUT_FAILURE: "+failure.getMessage());return 6;}
+                }
             }
             return 0;
         }catch(AnalysisResources.Exhausted failure){err.println((failure.resource()==AnalysisResources.Resource.TIME?"ANALYSIS_TIME_LIMIT: ":"ANALYSIS_RESOURCE_LIMIT: ")+failure.getMessage());return 7;}

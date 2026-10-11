@@ -113,6 +113,8 @@ public final class SourceQualifiedSnapshot extends SourceAdmissionSnapshot.Depen
     private void open(){if(closed||!ready)throw new IllegalStateException("SOURCE candidates expired or incomplete");parent().snapshot();}
     /** Successful admission that owns these prepared facts; never a caller-provided certificate. */
     public SourceAdmissionSnapshot admission(){open();return parent();}
+    /** Borrow the already prepared control facts; no second control solve per unit. */
+    SourceControlSnapshot controlForNominal(){open();return facts();}
     public long unitCount(){open();return parent().unitCount();}
     public long count(long unit,Kind kind){open();try{return unitRows().get(range(unit,kind)+1);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     private long range(long unit,Kind kind){Objects.requireNonNull(kind);if(unit<0||unit>=parent().unitCount())throw new IndexOutOfBoundsException("SOURCE unit ordinal");return Math.addExact(Math.multiplyExact(unit,4),kind.ordinal()*2);}

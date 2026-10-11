@@ -21,12 +21,16 @@ final class SourceValueStore implements AutoCloseable {
     private final PersistentLongMap maps;
     private final SourceTextDictionary texts;
     private final LongBinaryOperator supportUnion, valueUnion;
+    private final AnalysisResources resources;
+    private final PageStore pages;
     private boolean closed;
     private long predicateClassVisits;
     private final long[] joinLeft,joinRight,joinResult;
 
     SourceValueStore(PageStore pages, AnalysisResources resources) {
         Objects.requireNonNull(resources); Objects.requireNonNull(pages);
+        this.resources=resources;
+        this.pages=pages;
         controlCapacity = resources.reserve(AnalysisResources.Pool.RESIDENT, 2560, AnalysisResources.Phase.DOMAIN);
         CanonicalTupleArena records = null; PersistentLongMap index = null;SourceTextDictionary dictionary=null;
         try {
@@ -53,6 +57,16 @@ final class SourceValueStore implements AutoCloseable {
         long support = evidence == 0 ? 0 : maps.put(0, evidence, 1);
         long key=textId(text),classes=maps.put(0,textId(normalized(text)),1);
         return value(flags,maps.putReference(0,key,support),figure(text),classes);
+    }
+    /** Borrows a stable scoped sequence; no payload or prefix String is reconstructed. */
+    long literal(CharSequence text,int flags,long evidence) {
+        open();checkFlags(flags);Objects.requireNonNull(text);
+        if(evidence<0)throw new IllegalArgumentException("nonnegative source evidence atom required");
+        try(var capacity=resources.reserve(AnalysisResources.Pool.SCRATCH,128,AnalysisResources.Phase.DOMAIN)) {
+            if(capacity.amount()!=128)throw new IllegalStateException("nominal borrowed prefix control funding");
+            long support=evidence==0?0:maps.put(0,evidence,1),key=texts.intern(text),classes=maps.put(0,texts.intern(normalized(text)),1);
+            return value(flags,maps.putReference(0,key,support),figure(text),classes);
+        }
     }
     long join(long left, long right) {
         open(); requireValue(left); requireValue(right);
@@ -104,15 +118,35 @@ final class SourceValueStore implements AutoCloseable {
         return value(flags(source),maps.putReference(root,key,combined),(int)arena.field(source,3)|figure(text),
             maps.put(arena.field(source,4),textId(normalized(text)),1));
     }
+    /** Same complete candidate/support/flag law, with a borrowed character payload. */
+    long addCandidate(long source,CharSequence text,long support) {
+        open();Objects.requireNonNull(text);
+        try(var capacity=resources.reserve(AnalysisResources.Pool.SCRATCH,128,AnalysisResources.Phase.DOMAIN)) {
+            if(capacity.amount()!=128)throw new IllegalStateException("nominal borrowed prefix control funding");
+            long key=texts.intern(text),root=candidatesRoot(source),previous=maps.get(root,key);
+            long combined=maps.contains(root,key)?supportUnion.applyAsLong(previous,support):support;
+            return value(flags(source),maps.putReference(root,key,combined),(int)arena.field(source,3)|figure(text),maps.put(arena.field(source,4),texts.intern(normalized(text)),1));
+        }
+    }
     long oneCandidate(long source, long text, long support) {
         try(var projection=projectText(text)) {
         String raw=projection.value();
         return value(flags(source)&~OPEN,maps.putReference(0,text,support),figure(raw),maps.put(0,textId(normalized(raw)),1));
         }
     }
+    long oneCandidate(long source,long text,long support,SourceLiteralView view) {
+        open();requireValue(source);view.selectValue(this,text,0,-1);
+        try(var capacity=resources.reserve(AnalysisResources.Pool.SCRATCH,128,AnalysisResources.Phase.DOMAIN)) {
+            if(capacity.amount()!=128)throw new IllegalStateException("nominal borrowed prefix control funding");
+            return value(flags(source)&~OPEN,maps.putReference(0,text,support),figure(view),maps.put(0,texts.intern(normalized(view)),1));
+        }
+    }
     PersistentLongMap.Cursor candidates(long value) { open(); return maps.cursor(candidatesRoot(value)); }
     PersistentLongMap.Cursor supports(long root) { open(); return maps.cursor(root); }
     SourceTextDictionary.Projection projectText(long id){open();return texts.project(id);}
+    int characterCount(long id){open();return texts.characterCount(id);}
+    void readCharacters(long id,long offset,char[] destination,int at,int count){open();texts.readCharacters(id,offset,destination,at,count);}
+    void requireContext(PageStore pages,AnalysisResources resources){open();if(this.pages!=pages||this.resources!=resources)throw new IllegalArgumentException("nominal value store context");}
     /** Explicit detached String for legacy final List output; not a managed output guarantee. */
     String text(long id) {try(var projection=projectText(id)){return projection.value();}}
     long retain(long root) { open(); return arena.retain(root); }
@@ -148,6 +182,18 @@ final class SourceValueStore implements AutoCloseable {
     private static String normalized(String text) {
         int end=text.length();while(end>0&&text.charAt(end-1)==' ')end--;
         return end==text.length()?text:text.substring(0,end);
+    }
+    private record Prefix(CharSequence borrowed,int end) implements CharSequence {
+        @Override public int length(){return end;}
+        @Override public char charAt(int at){Objects.checkIndex(at,end);return borrowed.charAt(at);}
+        @Override public CharSequence subSequence(int start,int end){throw new UnsupportedOperationException("borrowed nominal prefix");}
+    }
+    private static CharSequence normalized(CharSequence text) {
+        int end=text.length();while(end>0&&text.charAt(end-1)==' ')end--;return end==text.length()?text:new Prefix(text,end);
+    }
+    private static int figure(CharSequence text) {
+        if(text.length()==0)return TextPredicate.BOTH;int scalar=Character.codePointAt(text,0);
+        for(int at=Character.charCount(scalar);at<text.length();) {int next=Character.codePointAt(text,at);if(next!=scalar)return TextPredicate.FALSE;at+=Character.charCount(next);}return TextPredicate.BOTH;
     }
     private static int figure(String text) {
         if(text.isEmpty())return TextPredicate.BOTH;

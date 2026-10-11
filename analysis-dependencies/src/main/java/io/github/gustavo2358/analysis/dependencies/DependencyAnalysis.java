@@ -114,6 +114,14 @@ public final class DependencyAnalysis {
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg) {
         return prepareExecutable(publication,cfg,null);
     }
+    /** Successful SOURCE admission composes with exactly one general executable analysis. */
+    public ManagedDependencyResult prepareLeased(SnapshotProgram program,CfgBuildResult cfg,SourceAdmissionSnapshot source,
+            List<DependencyInput.StatementCorrelation> correlations,PageStore pages,AnalysisResources resources) {
+        Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(source);Objects.requireNonNull(correlations);
+        source.requireContext(Objects.requireNonNull(pages),Objects.requireNonNull(resources));program.admission();
+        if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
+        return ManagedDependencyResult.prepare(program,source,prepareExecutable(program,cfg,program),correlations,pages,resources);
+    }
     private DependencyResult prepareExecutable(ProgramStore.Structural publication,CfgBuildResult cfg,SnapshotProgram metadataOwner) {
         var opened=AnalysisSession.open(cfg,publication,cfg.options().projectionPolicy(),publication.units().stream()
             .flatMap(u->u.entryViews().stream()).filter(e->e.initialLabel().isPresent()).map(ProgramStore.EntryView::id).toList());

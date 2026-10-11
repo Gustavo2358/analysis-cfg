@@ -10,7 +10,7 @@ import java.math.BigInteger;
 public interface ProgramStore {
     /** Operational safepoints, never a semantic cutoff or a reduced answer.
      * The resident compatibility route has no managed execution owner. */
-    enum ExecutionPhase { INDEX, DEMAND, CONTROL, DOMAIN, REPLAY, SORT, ENCODE }
+    enum ExecutionPhase { INDEX, DEMAND, CONTROL, DOMAIN, REPLAY, SORT, ENCODE, DECODE, VALIDATION }
     default void progress(ExecutionPhase phase) { Objects.requireNonNull(phase); }
     /** Native execution capacity borrows the same admitted lifetime and quotas.
      * Empty is explicit caller-managed resident compatibility, not a native fallback. */

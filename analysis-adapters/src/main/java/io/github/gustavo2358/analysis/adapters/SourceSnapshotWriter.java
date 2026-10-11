@@ -2,10 +2,15 @@ package io.github.gustavo2358.analysis.adapters;
 
 import io.github.gustavo2358.analysis.dependencies.SourceAdmissionSnapshot;
 import io.github.gustavo2358.analysis.dependencies.SourceQualifiedSnapshot;
+import io.github.gustavo2358.analysis.dependencies.SourceNominalCandidates;
+import io.github.gustavo2358.analysis.dependencies.SourceValuesProvider;
+import io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot;
+import io.github.gustavo2358.air.model.Ids.Id;
 import io.github.gustavo2358.analysis.dependencies.source.*;
 import io.github.gustavo2358.analysis.solver.*;
 import java.io.*;
 import java.util.Objects;
+import java.util.List;
 
 /** Closed canonical SOURCE mapping; explicit paged frames, never a resident certificate tree. */
 final class SourceSnapshotWriter implements AutoCloseable {
@@ -17,8 +22,13 @@ final class SourceSnapshotWriter implements AutoCloseable {
     private char[] characters;
     private PagedLongArray frames;
     private AnalysisResources.Reservation control;
+    private AnalysisResources.Reservation programControl;
     private SourceAdmissionSnapshot.ConsumerLease lifetime;
     private SourceQualifiedSnapshot qualified;
+    private SourceNominalCandidates nominal;
+    private SourceProgramSnapshot programs;
+    private PageStore pages;
+    private AnalysisResources resources;
     private volatile boolean closed;
     private long depth=-1;
     private SourceSnapshotWriter(SourceAdmissionSnapshot admission,SourceSnapshot source,AnalysisResources.Reservation control){this.admission=admission;this.source=source;this.control=control;}
@@ -51,10 +61,10 @@ final class SourceSnapshotWriter implements AutoCloseable {
         }
     }
     private void initialize(JsonOutput stream,PageStore pages,AnalysisResources resources) {
-        open();output=stream;characters=new char[256];frames=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
+        open();output=stream;this.pages=pages;this.resources=resources;characters=new char[256];frames=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
         lifetime=admitted().attachResource(this,pages,resources);open();
     }
-    void verify(){admitted().snapshot();var facts=qualified;if(facts!=null)require(facts);}
+    void verify(){admitted().snapshot();var facts=qualified;if(facts!=null)require(facts);var values=nominal;if(values!=null)require(values);var resolved=programs;if(resolved!=null)require(resolved);}
     private void require(SourceQualifiedSnapshot facts) {
         if(Objects.requireNonNull(facts).admission()!=admitted())throw new IllegalArgumentException("foreign SOURCE candidate admission");
         if(qualified!=null&&qualified!=facts)throw new IllegalArgumentException("multiple SOURCE candidate owners");qualified=facts;
@@ -63,7 +73,85 @@ final class SourceSnapshotWriter implements AutoCloseable {
     JsonOutput.EncodedValue evidence(){open();return target->{same(target);writeValue(view().root(),SourceShape.ROOT,0);};}
     JsonOutput.EncodedValue qualified(SourceQualifiedSnapshot facts){require(facts);return target->{same(target);writeQualified(facts);};}
     JsonOutput.EncodedValue nativeFiles(SourceQualifiedSnapshot facts){require(facts);return target->{same(target);writeItems(facts,SourceQualifiedSnapshot.Kind.NATIVE_FILE);};}
+    private void require(SourceNominalCandidates facts) {
+        if(Objects.requireNonNull(facts).admission()!=admitted())throw new IllegalArgumentException("foreign nominal SOURCE admission");
+        if(nominal!=null&&nominal!=facts)throw new IllegalArgumentException("multiple nominal SOURCE owners in one wire scope");nominal=facts;
+    }
+    JsonOutput.EncodedValue nominalRaw(SourceNominalCandidates facts,long query,long candidate) {
+        require(facts);facts.rawLength(query,candidate);return target->{same(target);require(facts);out().nominalText(facts,query,candidate,block());require(facts);};
+    }
+    /** Existing program-candidate conditionalSupport wire, without a resident support tree. */
+    JsonOutput.EncodedValue conditionalSupport(SourceNominalCandidates facts,long query,long candidate) {
+        require(facts);facts.evidenceCount(query,candidate);return target->{same(target);writeConditionalSupport(facts,query,candidate);};
+    }
+    private void writeConditionalSupport(SourceNominalCandidates facts,long query,long candidate)throws IOException {
+        require(facts);out().symbol('{');field("analysisBoundary");out().value("NON_EXECUTABLE_SOURCE");out().symbol(',');field("assumptions");out().symbol('[');
+        for(int i=0,n=facts.assumptionCount(query,candidate);i<n;i++){if(i!=0)out().symbol(',');out().value(facts.assumption(query,candidate,i));}out().symbol(']');
+        out().symbol(',');field("evidence");out().symbol('[');
+        for(long i=0,n=facts.evidenceCount(query,candidate);i<n;i++) {
+            if(i!=0)out().symbol(',');out().symbol('{');field("kind");out().value(facts.evidenceKind(query,candidate,i));out().symbol(',');
+            field("provenance");writeValue(facts.evidenceProvenance(query,candidate,i),SourceShape.PROVENANCE,0);out().symbol(',');
+            field("reference");out().sourceText(view(),facts.evidenceReference(query,candidate,i),block());out().symbol('}');
+        }out().symbol(']');out().symbol(',');field("provider");out().value(SourceValuesProvider.PROFILE);out().symbol(',');field("uncertainties");out().symbol('[');
+        for(long i=0,n=facts.uncertaintyCount();i<n;i++){if(i!=0)out().symbol(',');writeValue(facts.uncertainty(i),SourceShape.UNCERTAINTY,0);}out().symbol(']');out().symbol('}');require(facts);
+    }
     private void field(String name)throws IOException{out().string(name);out().symbol(':');}
+    private void require(SourceProgramSnapshot facts) {
+        if(Objects.requireNonNull(facts).admission()!=admitted())throw new IllegalArgumentException("foreign SOURCE program admission");
+        if(programs!=null&&programs!=facts)throw new IllegalArgumentException("multiple SOURCE program owners");
+        if(programControl==null){programControl=resources.reserve(AnalysisResources.Pool.RESIDENT,8192,PHASE);programControl.onOwnerClose(this::close);}programs=facts;
+    }
+    JsonOutput.EncodedValue programs(SourceProgramSnapshot facts){require(facts);return target->{same(target);require(facts);out().symbol('[');for(long i=0,n=facts.count();i<n;i++){if(i!=0)out().symbol(',');writeProgram(facts,i);}out().symbol(']');require(facts);};}
+    JsonOutput.EncodedValue globalReasons(SourceProgramSnapshot facts){require(facts);return target->{same(target);out().symbol('[');for(long i=0,n=facts.globalReasonCount();i<n;i++){if(i!=0)out().symbol(',');out().globalProgramReason(facts,i,block());}out().symbol(']');require(facts);};}
+    JsonOutput.EncodedValue metrics(SourceProgramSnapshot facts){require(facts);return target->{same(target);out().symbol('{');for(long i=0,n=facts.metricCount();i<n;i++){if(i!=0)out().symbol(',');out().programMetricName(facts,i,block());out().symbol(':');out().value(facts.metricValue(i));}out().symbol('}');require(facts);};}
+    private JsonOutput.EncodedValue encoded(Io action){return target->{same(target);action.write();};}
+    @FunctionalInterface private interface Io {void write()throws IOException;}
+    private void ids(List<? extends Id> values)throws IOException {
+        // The borrowed list is not copied or stream-sorted into an unmetered array.
+        try(var order=new PagedLongIndex(pages,resources,PHASE,(a,b)->{int c=WireIds.ORDER.compare(values.get(Math.toIntExact(a)),values.get(Math.toIntExact(b)));return c==0?Long.compare(a,b):c;})) {
+            for(int i=0,n=values.size();i<n;i++){resources.work(1,PHASE);order.intern(i,i+1L);}
+            out().symbol('[');boolean first=true;try(var cursor=order.cursor()){while(cursor.advance()){if(!first)out().symbol(',');first=false;out().value(WireIds.id(values.get(Math.toIntExact(cursor.value()-1))));}}out().symbol(']');
+        }
+    }
+    private void operations(SourceProgramSnapshot facts,long item)throws IOException {
+        var plan=facts.plan();try(var order=new PagedLongIndex(pages,resources,PHASE,(a,b)->{int c=WireIds.ORDER.compare(plan.operation(item,a),plan.operation(item,b));return c==0?Long.compare(a,b):c;})) {
+            for(long i=0,n=plan.operationCount(item);i<n;i++)order.intern(i,i+1);
+            out().symbol('[');boolean first=true;try(var cursor=order.cursor()){while(cursor.advance()){if(!first)out().symbol(',');first=false;out().value(WireIds.id(plan.operation(item,cursor.value()-1)));}}out().symbol(']');
+        }
+    }
+    private void qualifications(SourceProgramSnapshot facts,long item)throws IOException {
+        var plan=facts.plan();if(plan.qualified(item))writeValue(view().field(plan.sourceOccurrence(item),SourceShape.OCCURRENCE,9),SourceShape.LIST,SourceShape.TEXT.tag());else{out().symbol('[');out().symbol(']');}
+    }
+    private boolean standaloneCics(SourceProgramSnapshot facts,long item) {
+        var plan=facts.plan();var air=plan.program().admission().snapshot();long invoke=plan.standaloneInvoke(item),target=air.field(invoke,io.github.gustavo2358.air.model.AirShape.OPERATIONS_INVOKE,2),namespace=air.field(target,air.shape(target),1);
+        if(air.characterCount(namespace)!=12)return false;air.readCharacters(namespace,0,block(),0,12);String name="cics.program";for(int i=0;i<12;i++)if(block()[i]!=name.charAt(i))return false;return true;
+    }
+    private void writeProgram(SourceProgramSnapshot facts,long item)throws IOException {
+        require(facts);var plan=facts.plan();long occurrence=plan.sourceOccurrence(item),unit=occurrence==0?0:view().field(view().field(occurrence,SourceShape.OCCURRENCE,0),SourceShape.STATEMENT_ID,0);
+        var fields=new JsonOutput.Fields("analysisReasons",encoded(()->{out().symbol('[');for(long r=0,n=facts.reasonCount(item);r<n;r++){if(r!=0)out().symbol(',');out().programReason(facts,item,r,block());}out().symbol(']');}),
+            "authorities",encoded(()->{out().symbol('[');for(int a=0,n=facts.authorityCount(item);a<n;a++){if(a!=0)out().symbol(',');out().value(facts.authority(item,a));}out().symbol(']');}),
+            "caller",occurrence==0?plan.operation(item,0).unit().localId():encoded(()->out().sourceText(view(),view().field(unit,SourceShape.UNIT_ID,2),block())),
+            "candidates",encoded(()->{out().symbol('[');for(long c=0,n=facts.candidateCount(item);c<n;c++){if(c!=0)out().symbol(',');writeProgramCandidate(facts,item,c);}out().symbol(']');}),
+            "executableOperations",encoded(()->operations(facts,item)),
+            "executableSites",encoded(()->{out().symbol('[');for(long s=0,n=plan.siteCount(item);s<n;s++){if(s!=0)out().symbol(',');var site=plan.site(item,s);out().value(new JsonOutput.Fields("entry",WireIds.id(site.entry()),"operation",WireIds.id(site.operation()),"reachability",site.reachability().name(),"valuePoint",site.valuePoint()==null?null:ResultJson.point(site.valuePoint()),"premises",encoded(()->ids(site.premises())),"provenance",encoded(()->ids(site.provenance()))));}out().symbol(']');}),
+            "interpretationRemainder",facts.interpretationRemainder(item),
+            "nameProfile",occurrence==0?(standaloneCics(facts,item)?io.github.gustavo2358.analysis.dependencies.CicsNameInterpreter.PROFILE:io.github.gustavo2358.analysis.dependencies.CallNameInterpreter.PROFILE):encoded(()->out().sourceText(view(),view().field(occurrence,SourceShape.OCCURRENCE,4),block())),
+            "qualifications",encoded(()->qualifications(facts,item)),
+            "sourceOccurrence",occurrence==0?null:encoded(()->writeValue(view().field(occurrence,SourceShape.OCCURRENCE,0),SourceShape.STATEMENT_ID,0)),
+            "targetKind",plan.targetKind(item),"technology",occurrence==0?(standaloneCics(facts,item)?"CICS":"COBOL"):encoded(()->out().sourceText(view(),view().field(occurrence,SourceShape.OCCURRENCE,1),block())),"valueRemainder",facts.valueRemainder(item));
+        if(plan.sourceControlRemainder(item))fields.put("controlRemainder",true);out().value(fields);require(facts);
+    }
+    private void writeProgramCandidate(SourceProgramSnapshot facts,long item,long candidate)throws IOException {
+        var fields=new JsonOutput.Fields("referenceName",encoded(()->out().programText(facts,item,candidate,false,block())),"rawValue",encoded(()->out().programText(facts,item,candidate,true,block())),"qualifications",encoded(()->qualifications(facts,item)),
+            "supports",encoded(()->{out().symbol('[');for(long s=0,n=facts.supportCount(item,candidate);s<n;s++){if(s!=0)out().symbol(',');var support=facts.support(item,candidate,s);out().value(new JsonOutput.Fields("kind",support.kind().name(),"producer",WireIds.id(support.producer()),"origin",WireIds.id(support.origin()),"premises",encoded(()->ids(support.premises()))));}out().symbol(']');}));
+        if(facts.hasConditionalSupport(item,candidate))fields.put("conditionalSupports",encoded(()->{out().symbol('[');writeProgramConditional(facts,item,candidate);out().symbol(']');}));out().value(fields);
+    }
+    private void writeProgramConditional(SourceProgramSnapshot facts,long item,long candidate)throws IOException {
+        out().value(new JsonOutput.Fields("analysisBoundary","NON_EXECUTABLE_SOURCE","provider",SourceValuesProvider.PROFILE,
+            "assumptions",encoded(()->{out().symbol('[');for(int a=0,n=facts.conditionalAssumptionCount(item,candidate);a<n;a++){if(a!=0)out().symbol(',');out().value(facts.conditionalAssumption(item,candidate,a));}out().symbol(']');}),
+            "evidence",encoded(()->{out().symbol('[');for(long e=0,n=facts.conditionalEvidenceCount(item,candidate);e<n;e++){if(e!=0)out().symbol(',');long ordinal=e;out().value(new JsonOutput.Fields("kind",facts.conditionalEvidenceKind(item,candidate,e),"reference",encoded(()->out().sourceText(view(),facts.conditionalEvidenceReference(item,candidate,ordinal),block())),"provenance",encoded(()->writeValue(facts.conditionalEvidenceProvenance(item,candidate,ordinal),SourceShape.PROVENANCE,0))));}out().symbol(']');}),
+            "uncertainties",encoded(()->{out().symbol('[');for(long u=0,n=facts.conditionalUncertaintyCount(item,candidate);u<n;u++){if(u!=0)out().symbol(',');writeValue(facts.conditionalUncertainty(item,candidate,u),SourceShape.UNCERTAINTY,0);}out().symbol(']');})));
+    }
     private void writeQualified(SourceQualifiedSnapshot facts)throws IOException {
         require(facts);out().symbol('{');field("analysisBoundary");out().value("NON_EXECUTABLE_SOURCE");out().symbol(',');field("evidence");writeValue(view().root(),SourceShape.ROOT,0);
         out().symbol(',');field("occurrences");writeItems(facts,SourceQualifiedSnapshot.Kind.OCCURRENCE);out().symbol('}');require(facts);
@@ -150,10 +238,10 @@ final class SourceSnapshotWriter implements AutoCloseable {
         @Override public void write(byte[] values,int at,int count)throws IOException{resources.output(count,PHASE);out.write(values,at,count);}
     }
     @Override public void close() {
-        PagedLongArray work;AnalysisResources.Reservation capacity;SourceAdmissionSnapshot.ConsumerLease link;
-        synchronized(this){if(closed)return;closed=true;work=frames;frames=null;capacity=control;control=null;link=lifetime;lifetime=null;admission=null;source=null;characters=null;output=null;qualified=null;depth=-1;}
+        PagedLongArray work;AnalysisResources.Reservation capacity,programCapacity;SourceAdmissionSnapshot.ConsumerLease link;
+        synchronized(this){if(closed)return;closed=true;work=frames;frames=null;capacity=control;control=null;programCapacity=programControl;programControl=null;link=lifetime;lifetime=null;admission=null;source=null;characters=null;output=null;qualified=null;nominal=null;programs=null;pages=null;resources=null;depth=-1;}
         Throwable failure=null;
-        for(AutoCloseable value:new AutoCloseable[]{link,work,capacity})if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+        for(AutoCloseable value:new AutoCloseable[]{link,work,programCapacity,capacity})if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
         if(failure!=null)throw new IllegalStateException("SOURCE wire cleanup",failure);
     }
