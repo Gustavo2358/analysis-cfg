@@ -94,6 +94,25 @@ final class JsonOutput {
     void programMetricName(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long ordinal,char[] block)throws IOException {
         blockText(source.metricNameLength(ordinal),block,(offset,destination,count)->source.readMetricName(ordinal,offset,destination,0,count));
     }
+    /** Same closed WireIds contract/lexical field order from borrowed text extents.
+     * This does not admit the other sealed codec IDs into the published wire. */
+    void identity(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityView view,char[] block)throws IOException {
+        String domain=view.domain();boolean unit=switch(domain){case "entry","label","object","operation","operand"->true;default->false;};
+        switch(domain){case "publication","unit","entry","label","object","operation","resource","storage","origin","premise","operand","uncertainty"->{}default->throw new IllegalArgumentException("ID outside result contract");}
+        identityObject(view,domain,io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart.LOCAL,domain.equals("operand"),unit,domain.equals("publication"),block);
+    }
+    private void identityObject(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityView view,String domain,
+            io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart local,boolean operand,boolean unit,boolean publication,char[] block)throws IOException {
+        octet('{');string("domain");octet(':');string(domain);octet(',');string("localId");octet(':');identityText(view,local,block);
+        if(operand){octet(',');string("owner");octet(':');String owner=switch(view.ownerKind()){case ENTRY->"entry";case OPERATION->"operation";case NONE->throw new IllegalStateException("operand owner absent");};identityObject(view,owner,io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart.OWNER,false,true,false,block);}
+        if(!publication){octet(',');string("publication");octet(':');identityText(view,io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart.PUBLICATION,block);}
+        if(unit){octet(',');string("unit");octet(':');identityText(view,io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart.UNIT,block);}octet('}');
+    }
+    private void identityText(io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityView view,
+            io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage.IdentityPart part,char[] block)throws IOException {
+        if(block.length==0)throw new IllegalArgumentException("identity text buffer");
+        blockText(view.characterCount(part),block,(offset,destination,count)->view.readCharacters(part,offset,destination,0,count));
+    }
     @FunctionalInterface private interface CharacterReader {void read(long offset,char[] destination,int count);}
     private void blockText(long length,char[] block,CharacterReader reader)throws IOException {
         octet('"');char pending=0;

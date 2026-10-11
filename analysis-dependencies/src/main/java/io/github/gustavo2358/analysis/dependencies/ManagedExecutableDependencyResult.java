@@ -40,6 +40,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
             order=new PagedLongArray(pages,Long.MAX_VALUE,resources,AnalysisResources.Phase.SORT);
             index=new PagedLongIndex(pages,resources,AnalysisResources.Phase.SORT,this::compare);
             operations=new PagedLongIndex(pages,resources,AnalysisResources.Phase.SORT,this::compareOperation);
+            facts.onClose(this::close);
             control.onOwnerClose(this::close);
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
@@ -194,6 +195,14 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     public PagedDependencyFactStorage.SupportProjection projectSupport(int site,int candidate,int support){
         available();Objects.checkIndex(site,sites);
         try{var projection=facts.projectSupport(factOrdinal(site),candidate,support);leafProjections=Math.incrementExact(leafProjections);return projection;}
+        catch(IndexOutOfBoundsException invalid){throw invalid;}
+        catch(RuntimeException|Error failure){abort(failure);throw failure;}
+    }
+    /** Bounded borrowed support/identity scopes. Facts owns their native expiry;
+     * this port deliberately does not increment complete DTO projection counts. */
+    public PagedDependencyFactStorage.SupportCursor openSupport(int site,int candidate,int support){
+        available();Objects.checkIndex(site,sites);
+        try{return facts.openSupport(factOrdinal(site),candidate,support);}
         catch(IndexOutOfBoundsException invalid){throw invalid;}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }

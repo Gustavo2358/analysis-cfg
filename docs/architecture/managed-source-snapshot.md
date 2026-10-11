@@ -570,3 +570,51 @@ FILE results, observations, plain qualification, common WORK accounting, all-sto
 and global families/new gaps, original dimensions/isolated curves, integrated E2E,
 legacy retirement, human review and external integration remain pending. Earlier
 large products remain historical, not fresh qualification of this OUTPUT wave.
+
+## Native support and identity cursor qualification (2026-10-11)
+
+Native SOURCE support comparison and publication now borrow funded support and
+identity scopes instead of projecting complete support DTOs. Premise directories
+remain inline in the same two paged fact tapes. A support scope reserves 512 bytes,
+each live identity view another 512, and its SOURCE plan wrapper 256, before
+constructing carriers or read probes. UTF16 identity components are read into
+caller-owned fixed blocks; all sealed identity shapes and existing wire admission
+are preserved. Canonical wire premise order uses paged ordinals with duplicate
+ties, not a resident premise list or ordinal emission mistaken for canonical order.
+
+Intrusive ownership expires child identity views with the support and raw scopes
+with their SOURCE wrappers. Late read failure retires the owned CALL result and
+wrappers immediately, preserves the primary failure and never closes borrowed AIR
+or page backends. Invalid caller ordinals/text ranges remain non-destructive.
+Explicit resident projection compatibility is unchanged. API-missing, SOURCE
+projection, residual-wrapper, live-CALL and invalid-ordinal RED attempts remain
+preserved with assertions not reached distinguished from the subsequent GREEN.
+
+The consolidated 73-method family, 18 original CLI contracts, seven original
+compiled guards and five actual complete-product CLI oracles passed. All five
+products remain byte-exact to the earlier products. SOURCE32000 took 70.380311s;
+this is one observation, not an isolated repeated latency curve. A stale reactor
+JAR caused the first architecture capture to fail; the original package/dependency
+goals restored the current JAR with every 903 productive consumer classfile and
+source byte-exact. No guard, source-registration, quota, cache or pin policy changed.
+Only reviewed active core/outer inventories changed; 87 old public owner methods
+are preserved, with five additive owner read ports.
+
+The original complete FAST passed all 1424 mandatory methods, including every
+unchanged prior 1411 method, zero failures/errors/skips, in 1540.152s. Audit proved
+all 1458 productive classfiles across nine consumer and both AIR paths, 589 Java
+sources, 579 fixtures and 15 runtime components exact to the frozen real-CLI inputs,
+without helper shadow. Producer `a0aeb827ef53765815aa501c4687f197be77ac73` remains
+clean and unchanged. Earlier leaf/family captures are history; the consolidated
+family and complete FAST include the final invalid-ordinal correction.
+
+This closes support-leaf materialization in the native SOURCE comparator/writer,
+not full-fact, program or provider retention. The five SOURCE geometries still
+project four complete facts per site, even though typed support projections are
+zero. The next prospective laws target every candidate and block text of one
+large fact; they have not executed at this qualification point. Complete fact
+fields, provider/program assembly, FILE, observations, plain qualification, common
+WORK accounting, all-store/global families and new gaps, original dimensions and
+isolated repeated curves, integrated E2E, legacy retirement, human review and
+external integration remain pending. No campaign completion or fresh qualification
+of older large products is claimed.

@@ -20,6 +20,7 @@ final class SourceSnapshotWriter implements AutoCloseable {
     private SourceSnapshot source;
     private JsonOutput output;
     private char[] characters;
+    private char[] comparisonCharacters;
     private PagedLongArray frames;
     private AnalysisResources.Reservation control;
     private AnalysisResources.Reservation programControl;
@@ -99,7 +100,7 @@ final class SourceSnapshotWriter implements AutoCloseable {
     private void require(SourceProgramSnapshot facts) {
         if(Objects.requireNonNull(facts).admission()!=admitted())throw new IllegalArgumentException("foreign SOURCE program admission");
         if(programs!=null&&programs!=facts)throw new IllegalArgumentException("multiple SOURCE program owners");
-        if(programControl==null){programControl=resources.reserve(AnalysisResources.Pool.RESIDENT,8192,PHASE);programControl.onOwnerClose(this::close);}programs=facts;
+        if(programControl==null){programControl=resources.reserve(AnalysisResources.Pool.RESIDENT,8192,PHASE);programControl.onOwnerClose(this::close);open();comparisonCharacters=new char[256];}programs=facts;
     }
     JsonOutput.EncodedValue programs(SourceProgramSnapshot facts){require(facts);return target->{same(target);require(facts);out().symbol('[');for(long i=0,n=facts.count();i<n;i++){if(i!=0)out().symbol(',');writeProgram(facts,i);}out().symbol(']');require(facts);};}
     JsonOutput.EncodedValue globalReasons(SourceProgramSnapshot facts){require(facts);return target->{same(target);out().symbol('[');for(long i=0,n=facts.globalReasonCount();i<n;i++){if(i!=0)out().symbol(',');out().globalProgramReason(facts,i,block());}out().symbol(']');require(facts);};}
@@ -143,8 +144,27 @@ final class SourceSnapshotWriter implements AutoCloseable {
     }
     private void writeProgramCandidate(SourceProgramSnapshot facts,long item,long candidate)throws IOException {
         var fields=new JsonOutput.Fields("referenceName",encoded(()->out().programText(facts,item,candidate,false,block())),"rawValue",encoded(()->out().programText(facts,item,candidate,true,block())),"qualifications",encoded(()->qualifications(facts,item)),
-            "supports",encoded(()->{out().symbol('[');for(long s=0,n=facts.supportCount(item,candidate);s<n;s++)try(var projection=facts.projectSupport(item,candidate,s)){if(s!=0)out().symbol(',');var support=projection.support();out().value(new JsonOutput.Fields("kind",support.kind().name(),"producer",WireIds.id(support.producer()),"origin",WireIds.id(support.origin()),"premises",encoded(()->ids(support.premises()))));}out().symbol(']');}));
+            "supports",encoded(()->writeProgramSupports(facts,item,candidate)));
         if(facts.hasConditionalSupport(item,candidate))fields.put("conditionalSupports",encoded(()->{out().symbol('[');writeProgramConditional(facts,item,candidate);out().symbol(']');}));out().value(fields);
+    }
+    private void writeProgramSupports(SourceProgramSnapshot facts,long item,long candidate)throws IOException {
+        out().symbol('[');for(long s=0,n=facts.supportCount(item,candidate);s<n;s++){
+            if(s!=0)out().symbol(',');
+            if(facts.plan().hasManagedSupportCursors())try(var support=facts.openSupport(item,candidate,s)){
+                out().symbol('{');field("kind");out().value(support.kind().name());out().symbol(',');field("origin");try(var origin=support.origin()){out().identity(origin,block());}
+                out().symbol(',');field("premises");writePremises(support);out().symbol(',');field("producer");try(var producer=support.producer()){out().identity(producer,block());}out().symbol('}');
+            }else try(var projection=facts.projectSupport(item,candidate,s)){
+                var support=projection.support();out().value(new JsonOutput.Fields("kind",support.kind().name(),"producer",WireIds.id(support.producer()),"origin",WireIds.id(support.origin()),"premises",encoded(()->ids(support.premises()))));
+            }
+        }out().symbol(']');
+    }
+    private void writePremises(io.github.gustavo2358.analysis.dependencies.SourceTargetPlan.SupportCursor support)throws IOException {
+        // Full canonical identity plus original ordinal tie keeps duplicate bytes.
+        // O(P log P) sort is separate from O(1) direct premise extent lookup.
+        try(var order=new PagedLongIndex(pages,resources,PHASE,(a,b)->{int c=support.comparePremises(Math.toIntExact(a),Math.toIntExact(b),block(),comparisonCharacters);return c==0?Long.compare(a,b):c;})){
+            for(int i=0,n=support.premiseCount();i<n;i++){resources.work(1,PHASE);order.intern(i,i+1L);}
+            out().symbol('[');boolean first=true;try(var cursor=order.cursor()){while(cursor.advance())try(var premise=support.premise(Math.toIntExact(cursor.value()-1))){if(!first)out().symbol(',');first=false;out().identity(premise,block());}}out().symbol(']');
+        }
     }
     private void writeProgramConditional(SourceProgramSnapshot facts,long item,long candidate)throws IOException {
         out().value(new JsonOutput.Fields("analysisBoundary","NON_EXECUTABLE_SOURCE","provider",SourceValuesProvider.PROFILE,
@@ -233,7 +253,7 @@ final class SourceSnapshotWriter implements AutoCloseable {
     private static void suppress(Throwable primary,Throwable cleanup){if(primary!=cleanup)primary.addSuppressed(cleanup);}
     @Override public void close() {
         PagedLongArray work;AnalysisResources.Reservation capacity,programCapacity;SourceAdmissionSnapshot.ConsumerLease link;
-        synchronized(this){if(closed)return;closed=true;work=frames;frames=null;capacity=control;control=null;programCapacity=programControl;programControl=null;link=lifetime;lifetime=null;admission=null;source=null;characters=null;output=null;qualified=null;nominal=null;programs=null;pages=null;resources=null;depth=-1;}
+        synchronized(this){if(closed)return;closed=true;work=frames;frames=null;capacity=control;control=null;programCapacity=programControl;programControl=null;link=lifetime;lifetime=null;admission=null;source=null;characters=comparisonCharacters=null;output=null;qualified=null;nominal=null;programs=null;pages=null;resources=null;depth=-1;}
         Throwable failure=null;
         for(AutoCloseable value:new AutoCloseable[]{link,work,programCapacity,capacity})if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;

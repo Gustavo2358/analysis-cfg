@@ -21,7 +21,9 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
  * explicit detached compatibility and releases that envelope on return. Callers
  * retaining detached facts are not managed cursor qualification. A complete fact
  * can also project a complete typed support leaf through paged inline directories.
- * One huge support/premise list or text still needs finer-grained cursors.
+ * SupportCursor reads indexed premises and full identities in caller-owned text
+ * blocks with fixed funded carriers. Complete fact/program projections remain
+ * compatibility; their cardinality is not bounded by this leaf read API.
  * Owner expiry/read/write/denial abort retires only these tapes and controls. */
 public final class PagedDependencyFactStorage implements FactStorage<DependencySiteFact> {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DEMAND;
@@ -35,6 +37,9 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private Transaction active;
     private Projection projections;
     private SupportProjection supportProjections;
+    private SupportCursor supportCursors;
+    private Runnable ownerClose;
+    synchronized void onClose(Runnable cleanup){Objects.requireNonNull(cleanup);if(ownerClose!=null)throw new IllegalStateException("fact storage owner already registered");if(closed)cleanup.run();else ownerClose=cleanup;}
     public PagedDependencyFactStorage(PageStore pages,AnalysisResources resources) {
         Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);
         control=resources.reserve(AnalysisResources.Pool.RESIDENT,1024,PHASE);
@@ -143,7 +148,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         for(int i=0;i<size;i++){long first=cells;append.accept(i);payload.set(directory+2L*i,first);payload.set(directory+2L*i+1,cells);}
         payload.set(endCell,cells);
     }
-    private void supports(List<Support> values){indexed(values.size(),i->{var value=values.get(i);word(value.kind().ordinal());id(value.producer());id(value.origin());ids(value.premises());});}
+    private void supports(List<Support> values){indexed(values.size(),i->{var value=values.get(i);word(value.kind().ordinal());id(value.producer());id(value.origin());indexed(value.premises().size(),p->id(value.premises().get(p)));});}
     /** Explicit tags describe all sealed AIR identities, including both Operand owners. */
     private void id(Id value) {
         if(value==null){word(0);return;}
@@ -245,6 +250,142 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         private static final long serialVersionUID=1L;
         InvalidOrdinal(){super("dependency nested ordinal");}
     }
+    /** Fixed 512-byte scratch envelope per support: carrier/links/reservation/
+     * callback and bounded Reader/Range/Directory probes, not premise cardinality.
+     * The private directory uses the existing payload tape, no extra cache/store.
+     * Opening/reading/operational denial aborts owned tapes; invalid ordinals do not. */
+    public synchronized SupportCursor openSupport(int ordinal,int candidate,int support) {
+        open();Objects.checkIndex(ordinal,count);AnalysisResources.Reservation scratch=null;
+        try {
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
+            long row=ordinal*(long)STRIDE;var reader=new Reader(offsets.get(row+5),offsets.get(row+1));
+            var range=reader.select(candidate);reader=new Reader(range.first(),range.end());reader.skipText();reader.skipText();
+            range=reader.select(support);reader=new Reader(range.first(),range.end());
+            var cursor=new SupportCursor(reader,scratch);cursor.next=supportCursors;
+            if(supportCursors!=null)supportCursors.previous=cursor;supportCursors=cursor;scratch=null;
+            cursor.reservation.onOwnerClose(cursor::close);cursor.available();return cursor;
+        }catch(InvalidOrdinal invalid){if(scratch!=null)scratch.close();throw new IndexOutOfBoundsException(invalid.getMessage());}
+        catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    public enum IdentityPart { PUBLICATION, UNIT, OWNER, LOCAL }
+    public enum IdentityOwnerKind { NONE, ENTRY, OPERATION }
+    /** Established full typed identity order,using caller-funded fixed blocks.
+     * Unit itself has no wire unit key. Operand owner kind precedes owner local.
+     * Do not compare hashes or join owner/text components into a resident key. */
+    static int compareIdentity(IdentityView a,IdentityView b,char[] left,char[] right) {
+        if(left.length==0||right.length==0)throw new IllegalArgumentException("identity comparison needs nonempty blocks");
+        int c=compareIdentityPart(a,b,IdentityPart.PUBLICATION,left,right,false);
+        if(c==0)c=a.domain().compareTo(b.domain());
+        if(c==0)c=compareIdentityPart(a,b,IdentityPart.UNIT,left,right,true);
+        if(c==0&&a.ownerKind()!=IdentityOwnerKind.NONE&&b.ownerKind()!=IdentityOwnerKind.NONE){
+            c=a.ownerKind().compareTo(b.ownerKind());if(c==0)c=compareIdentityPart(a,b,IdentityPart.OWNER,left,right,false);
+        }
+        return c==0?compareIdentityPart(a,b,IdentityPart.LOCAL,left,right,false):c;
+    }
+    private static int compareIdentityPart(IdentityView a,IdentityView b,IdentityPart part,char[] left,char[] right,boolean wireUnit) {
+        long x=wireUnit&&a.domain().equals("unit")?0:a.characterCount(part),y=wireUnit&&b.domain().equals("unit")?0:b.characterCount(part);
+        for(long at=0,n=Math.min(x,y);at<n;){int count=(int)Math.min(Math.min(left.length,right.length),n-at);
+            a.readCharacters(part,at,left,0,count);b.readCharacters(part,at,right,0,count);
+            for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;
+        }return Long.compare(x,y);
+    }
+    public final class SupportCursor implements AutoCloseable {
+        private final SupportKind kind;
+        private final long producerFirst,producerEnd,originFirst,originEnd;
+        private final Directory premises;
+        private AnalysisResources.Reservation reservation;
+        private SupportCursor previous,next;
+        private IdentityView identities;
+        private Runnable retirement;
+        private boolean retired;
+        private SupportCursor(Reader reader,AnalysisResources.Reservation reservation) {
+            this.reservation=reservation;kind=reader.tag(SupportKind.values());
+            producerFirst=reader.at;reader.skipId();producerEnd=reader.at;
+            originFirst=reader.at;reader.skipId();originEnd=reader.at;
+            premises=reader.directory();if(premises.end()!=reader.end)throw new IllegalStateException("support cursor trailing fields");
+        }
+        private void available(){if(retired)throw new IllegalStateException("dependency support cursor expired");open();}
+        void onClose(Runnable cleanup){synchronized(PagedDependencyFactStorage.this){Objects.requireNonNull(cleanup);if(retirement!=null)throw new IllegalStateException("support cursor parent already registered");if(retired)cleanup.run();else retirement=cleanup;}}
+        public SupportKind kind(){synchronized(PagedDependencyFactStorage.this){available();return kind;}}
+        public int premiseCount(){synchronized(PagedDependencyFactStorage.this){available();return premises.size();}}
+        public IdentityView producer(){synchronized(PagedDependencyFactStorage.this){available();return identity(producerFirst,producerEnd,0);}}
+        public IdentityView origin(){synchronized(PagedDependencyFactStorage.this){available();return identity(originFirst,originEnd,12);}}
+        public IdentityView premise(int ordinal){synchronized(PagedDependencyFactStorage.this){
+            available();Objects.checkIndex(ordinal,premises.size());
+            // Reserve before the directory/read metadata and view are constructed.
+            return identity(ordinal);
+        }}
+        private IdentityView identity(int ordinal){return identity(0,0,14,ordinal);}
+        private IdentityView identity(long first,long end,int expected){return identity(first,end,expected,-1);}
+        private IdentityView identity(long first,long end,int expected,int ordinal) {
+            AnalysisResources.Reservation scratch=null;
+            try {
+                scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,512,AnalysisResources.Phase.REPLAY);
+                if(ordinal>=0){var range=new Reader(premises.body(),premises.end()).range(premises,ordinal);first=range.first();end=range.end();}
+                var view=new IdentityView(this,new Reader(first,end),expected,scratch);view.next=identities;
+                if(identities!=null)identities.previous=view;identities=view;scratch=null;
+                view.reservation.onOwnerClose(view::close);view.available();return view;
+            }catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        @Override public void close(){synchronized(PagedDependencyFactStorage.this){
+            if(retired)return;retired=true;Throwable failure=null;
+            while(identities!=null)try{identities.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            if(previous==null)supportCursors=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;
+            var owned=reservation;reservation=null;try{if(owned!=null)owned.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            var expire=retirement;retirement=null;try{if(expire!=null)expire.run();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;
+        }}
+    }
+    /** Fixed 512 bytes: primitive text extents, carrier/links, reservation/callback
+     * and one bounded Reader. No String, typed Id, char array or premise list is
+     * decoded here. At most four sealed identity levels; text payload stays cold.
+     * Views borrow their parent and expire with it; caller-owned blocks are not
+     * retained. Character offsets are UTF16 code units, including split pairs. */
+    public final class IdentityView implements AutoCloseable {
+        private final SupportCursor parent;
+        private final int tag;
+        private IdentityOwnerKind ownerKind=IdentityOwnerKind.NONE;
+        private long publicationAt,publicationLength,unitAt,unitLength,ownerAt,ownerLength,localAt,localLength;
+        private AnalysisResources.Reservation reservation;
+        private IdentityView previous,next;
+        private boolean retired;
+        private IdentityView(SupportCursor parent,Reader reader,int expected,AnalysisResources.Reservation reservation) {
+            this.parent=parent;this.reservation=reservation;tag=reader.integer();
+            if(expected!=0&&tag!=expected)throw new IllegalStateException("unexpected cursor identity type");
+            switch(tag) {
+                case 1->{capture(reader,IdentityPart.PUBLICATION);localAt=publicationAt;localLength=publicationLength;}
+                case 2->{publication(reader);capture(reader,IdentityPart.UNIT);localAt=unitAt;localLength=unitLength;}
+                case 3,4,5,7,15->{unit(reader);capture(reader,IdentityPart.LOCAL);}
+                case 6->{int owner=reader.integer();int expectedOwner=switch(owner){case 1->{ownerKind=IdentityOwnerKind.OPERATION;yield 5;}case 2->{ownerKind=IdentityOwnerKind.ENTRY;yield 3;}default->throw new IllegalStateException("invalid operand owner");};requireTag(reader,expectedOwner);unit(reader);capture(reader,IdentityPart.OWNER);capture(reader,IdentityPart.LOCAL);}
+                case 8,9,10,11,12,13,14->{publication(reader);capture(reader,IdentityPart.LOCAL);}
+                default->throw new IllegalStateException("invalid cursor identity tag");
+            }
+            if(reader.at!=reader.end)throw new IllegalStateException("identity cursor trailing fields");
+        }
+        private void requireTag(Reader reader,int expected){if(reader.integer()!=expected)throw new IllegalStateException("invalid nested identity tag");}
+        private void publication(Reader reader){requireTag(reader,1);capture(reader,IdentityPart.PUBLICATION);}
+        private void unit(Reader reader){requireTag(reader,2);publication(reader);capture(reader,IdentityPart.UNIT);}
+        private void capture(Reader reader,IdentityPart part){long length=reader.length(),first=reader.at;reader.at=Math.addExact(first,length);switch(part){
+            case PUBLICATION->{publicationAt=first;publicationLength=length;}case UNIT->{unitAt=first;unitLength=length;}
+            case OWNER->{ownerAt=first;ownerLength=length;}case LOCAL->{localAt=first;localLength=length;}
+        }}
+        private void available(){if(retired)throw new IllegalStateException("dependency identity view expired");parent.available();}
+        public String domain(){synchronized(PagedDependencyFactStorage.this){available();return switch(tag){case 1->"publication";case 2->"unit";case 3->"entry";case 4->"label";case 5->"operation";case 6->"operand";case 7->"object";case 8->"storage";case 9->"resource";case 10->"artifact";case 11->"artifactRelation";case 12->"origin";case 13->"uncertainty";case 14->"premise";case 15->"completionPort";default->throw new IllegalStateException("invalid identity tag");};}}
+        public IdentityOwnerKind ownerKind(){synchronized(PagedDependencyFactStorage.this){available();return ownerKind;}}
+        public long characterCount(IdentityPart part){synchronized(PagedDependencyFactStorage.this){available();return length(Objects.requireNonNull(part));}}
+        private long length(IdentityPart part){return switch(part){case PUBLICATION->publicationLength;case UNIT->unitLength;case OWNER->ownerLength;case LOCAL->localLength;};}
+        private long first(IdentityPart part){return switch(part){case PUBLICATION->publicationAt;case UNIT->unitAt;case OWNER->ownerAt;case LOCAL->localAt;};}
+        public void readCharacters(IdentityPart part,long offset,char[] destination,int target,int count){synchronized(PagedDependencyFactStorage.this){
+            available();Objects.requireNonNull(part);Objects.checkFromIndexSize(target,count,Objects.requireNonNull(destination).length);
+            long length=length(part);if(offset<0||offset>length||count>length-offset)throw new IndexOutOfBoundsException("identity text block extent");
+            try{long first=Math.addExact(first(part),offset);for(int i=0;i<count;i++){long character=payload.get(Math.addExact(first,i));if(character<0||character>Character.MAX_VALUE)throw new IllegalStateException("invalid UTF16 cell");destination[target+i]=(char)character;}}
+            catch(RuntimeException|Error failure){abort(failure);throw failure;}
+        }}
+        @Override public void close(){synchronized(PagedDependencyFactStorage.this){
+            if(retired)return;retired=true;if(previous==null)parent.identities=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;
+            var owned=reservation;reservation=null;if(owned!=null)owned.close();
+        }}
+    }
     public final class SupportProjection implements AutoCloseable {
         private Support support;private AnalysisResources.Reservation reservation;private SupportProjection previous,next;private boolean retired;
         private SupportProjection(Support support,AnalysisResources.Reservation reservation){this.support=support;this.reservation=reservation;}
@@ -268,6 +409,14 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         <T> T tag(T[] values,int tag){if(tag<0||tag>=values.length)throw new IllegalStateException("invalid fact tag");return values[tag];}
         String text(){int size=length();char[] value=new char[size];for(int i=0;i<size;i++){long character=word();if(character<0||character>Character.MAX_VALUE)throw new IllegalStateException("invalid UTF16 cell");value[i]=(char)character;}return new String(value);}
         void skipText(){int size=length();at=Math.addExact(at,size);}
+        void skipId(){switch(integer()){
+            case 1->skipText();case 2->{requireIdentityTag(1);skipText();skipText();}
+            case 3,4,5,7,15->{requireIdentityTag(2);requireIdentityTag(1);skipText();skipText();skipText();}
+            case 6->{int owner=integer();requireIdentityTag(switch(owner){case 1->5;case 2->3;default->throw new IllegalStateException("invalid operand owner");});requireIdentityTag(2);requireIdentityTag(1);skipText();skipText();skipText();skipText();}
+            case 8,9,10,11,12,13,14->{requireIdentityTag(1);skipText();skipText();}
+            default->throw new IllegalStateException("invalid nonnull cursor identity tag");
+        }}
+        void requireIdentityTag(int expected){if(integer()!=expected)throw new IllegalStateException("invalid nested cursor identity tag");}
         Directory directory(){int size=length();long finish=word(),body=Math.addExact(at,2L*size);if(body>finish||finish>end||size==0&&body!=finish)throw new IllegalStateException("invalid nested fact directory");return new Directory(size,at,body,finish);}
         Range range(Directory directory,int ordinal){long first=payload.get(directory.at()+2L*ordinal),last=payload.get(directory.at()+2L*ordinal+1);if(first<directory.body()||last<=first||last>directory.end())throw new IllegalStateException("invalid nested fact extent");return new Range(first,last);}
         Range select(int ordinal){var directory=directory();if(ordinal<0||ordinal>=directory.size())throw new InvalidOrdinal();return range(directory,ordinal);}
@@ -291,7 +440,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         }
         <T extends Id> T id(Class<T> type){return type.cast(Objects.requireNonNull(id()));}
         <T extends Id> List<T> ids(Class<T> type){int size=length();var values=new ArrayList<T>(size);for(int i=0;i<size;i++)values.add(id(type));return values;}
-        Support support(){return new Support(tag(SupportKind.values()),id(Id.class),id(OriginId.class),ids(PremiseId.class));}
+        Support support(){return new Support(tag(SupportKind.values()),id(Id.class),id(OriginId.class),indexed(reader->reader.id(PremiseId.class)));}
         List<Support> supports(){return indexed(Reader::support);}
         ProgramPoint point() {
             int kind=integer();if(kind==0)return null;
@@ -316,6 +465,8 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=primary)primary.addSuppressed(cleanup);}}
     @Override public synchronized void close() {
         if(closed)return;closed=true;Throwable failure=null;
+        while(supportCursors!=null)try{supportCursors.close();}
+            catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         while(supportProjections!=null)try{supportProjections.close();}
             catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         while(projections!=null)try{projections.close();}
@@ -323,6 +474,8 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         for(var owned:new AutoCloseable[]{payload,offsets,control})if(owned!=null)try{owned.close();}
             catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         payload=null;offsets=null;control=null;active=null;count=0;cells=0;
+        var expire=ownerClose;ownerClose=null;if(expire!=null)try{expire.run();}
+            catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("fact storage cleanup",failure);
     }
 }

@@ -523,6 +523,25 @@
       "deniedLaterProjectionAbortsOwnedStorageAndExistingLeasesWithoutClosingBorrowedPages",
       "workDenialOnScopedFactKeepsPrimaryAndImmediatelyRetiresEveryLiveProjection"
     ],
+    "io.github.gustavo2358.analysis.adapters.PagedDependencySupportCursorTest": [
+      "oneWideSupportProjectsEveryRepeatedPremiseOrdinalWithConstantFundedScopesAcrossFiveGeometries",
+      "everySealedProducerOwnerAndLargeUtf16IdentityUsesBlocksWithoutWholeIdProjection",
+      "parentCursorCloseExpiresIdentityViewsAndDenialPreservesPrimaryAndBorrowedBackend",
+      "blockReadFaultExpiresAllScopesKeepsPrimaryAndLeavesBorrowedBackendAlive",
+      "nativeProgramExpiryRetiresCursorAndIdentityFundingWithoutClosingBorrowedCheckedAirOrBackend"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeSourceSupportCursorTest": [
+      "nativeSourcePreparationSortsFullSupportsWithoutCompleteLeafProjection",
+      "nativeSourceWireReadsPremisesWithoutCompleteLeafProjectionAndPreservesKnownCandidates",
+      "planOwnedSupportCursorExpiresItsIdentityViewsWithoutClosingBorrowedGeneralCall",
+      "lateIdentityReadFaultImmediatelyRetiresPlanWrapperFundingAndGeneralCallNotBorrowedInput",
+      "lateIdentityReadFaultImmediatelyExpiresGeneralCallResultWithoutWaitingForAnotherReadOrClose",
+      "invalidSourceSupportAndTextRangesDoNotAbortLiveBorrowedOwnersOrProgramCatalog"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ManagedSupportIdentityWireTest": [
+      "everyExistingWireIdentityRetainsExactBytesAndUnsupportedSealedIdsStayRejectedWithLargeUtf16Blocks",
+      "blockComparatorRetainsEverySealedFullIdentityAndRepeatedCollidingPremiseOrder"
+    ],
     "io.github.gustavo2358.analysis.adapters.ManagedSourceExecutableOwnerTest": [
       "planningAndColdSupportSortingNeverDecodeWholeUnrelatedFactBodies",
       "admittedSourceOwnsGeneralCallCursorAndExpiresItWithoutClosingBorrowedAir",

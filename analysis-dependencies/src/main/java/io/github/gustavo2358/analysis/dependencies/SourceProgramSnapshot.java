@@ -12,9 +12,10 @@ import java.util.Objects;
  * existing immutable site ordinal. Only one selected unit's nominal solve lives
  * at a time. No resident SOURCE, candidate or support tree is reconstructed.
  * Interpretation and union laws match TargetResolver; open evidence never
- * replaces known candidates. Native support sorting/writing projects funded
- * typed leaves through paged directories, not entire cold site bodies. This is
- * not a bounded cursor for an individually huge fact or support/premise list.
+ * replaces known candidates. Native support sorting/writing uses funded scopes
+ * and full text blocks through paged directories,not complete support DTOs.
+ * Resolve still projects a complete site; this is not bounded fullfact/provider
+ * or whole-program qualification. Resident support compatibility stays explicit.
  */
 public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Dependent {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.SORT;
@@ -131,6 +132,7 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         if(last==0)candidates.set(base+2,row);else supports.set(last*SUPPORT+4,row);candidates.set(base+3,row);
     }
     private SourceTargetPlan.SupportProjection projectSupportRow(long row){long at=row*SUPPORT;return plan.projectSupport(supports.get(at),supports.get(at+1),Math.toIntExact(supports.get(at+2)),Math.toIntExact(supports.get(at+3)));}
+    private SourceTargetPlan.SupportCursor openSupportRow(long row){long at=row*SUPPORT;return plan.openSupport(supports.get(at),supports.get(at+1),Math.toIntExact(supports.get(at+2)),Math.toIntExact(supports.get(at+3)));}
     private void orderSupports(long candidate) {
         long at=candidate*CANDIDATE;candidates.set(at+6,supportCount);
         try(var distinct=new PagedLongIndex(pages,resources,PHASE,this::compareSupportIdentity);var order=new PagedLongIndex(pages,resources,PHASE,this::compareSupportWire)) {
@@ -156,8 +158,26 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         for(int at=0;at<n;){resources.work(1,PHASE);int count=Math.min(left.length,n-at);text.readCharacters(a,at,left,0,count);text.readCharacters(b,at,right,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;}return Integer.compare(na,nb);
     }
     private int compareCandidate(long a,long b){if(a==b)return 0;long x=candidates.get(a*CANDIDATE),y=candidates.get(b*CANDIDATE);int c=(Integer.toString(text.characterCount(x))+":").compareTo(Integer.toString(text.characterCount(y))+":");if(c==0)c=compareText(x,y);return c==0?compareText(candidates.get(a*CANDIDATE+1),candidates.get(b*CANDIDATE+1)):c;}
-    private int compareSupportIdentity(long a,long b){if(a==b)return 0;try(var first=projectSupportRow(a);var second=projectSupportRow(b)){var x=first.support();var y=second.support();int c=x.kind().compareTo(y.kind());if(c==0)c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());for(int i=0,n=Math.min(x.premises().size(),y.premises().size());c==0&&i<n;i++)c=compareId(x.premises().get(i),y.premises().get(i));return c==0?Integer.compare(x.premises().size(),y.premises().size()):c;}}
-    private int compareSupportWire(long a,long b){if(a==b)return 0;try(var first=projectSupportRow(a);var second=projectSupportRow(b)){var x=first.support();var y=second.support();int c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());return c==0?Long.compare(a,b):c;}}
+    private int compareSupportIdentity(long a,long b){
+        if(a==b)return 0;
+        if(plan.hasManagedSupportCursors())try(var first=openSupportRow(a);var second=openSupportRow(b)){
+            int c=first.kind().compareTo(second.kind());if(c==0)c=compareSupportId(first,second,false);if(c==0)c=compareSupportId(first,second,true);
+            for(int i=0,n=Math.min(first.premiseCount(),second.premiseCount());c==0&&i<n;i++)try(var x=first.premise(i);var y=second.premise(i)){c=PagedDependencyFactStorage.compareIdentity(x,y,left,right);}
+            return c==0?Integer.compare(first.premiseCount(),second.premiseCount()):c;
+        }
+        // Explicit resident compatibility,not a hidden paged staging bridge.
+        try(var first=projectSupportRow(a);var second=projectSupportRow(b)){var x=first.support();var y=second.support();int c=x.kind().compareTo(y.kind());if(c==0)c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());for(int i=0,n=Math.min(x.premises().size(),y.premises().size());c==0&&i<n;i++)c=compareId(x.premises().get(i),y.premises().get(i));return c==0?Integer.compare(x.premises().size(),y.premises().size()):c;}
+    }
+    private int compareSupportWire(long a,long b){
+        if(a==b)return 0;
+        if(plan.hasManagedSupportCursors())try(var first=openSupportRow(a);var second=openSupportRow(b)){
+            int c=compareSupportId(first,second,false);if(c==0)c=compareSupportId(first,second,true);return c==0?Long.compare(a,b):c;
+        }
+        try(var first=projectSupportRow(a);var second=projectSupportRow(b)){var x=first.support();var y=second.support();int c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());return c==0?Long.compare(a,b):c;}
+    }
+    private int compareSupportId(SourceTargetPlan.SupportCursor a,SourceTargetPlan.SupportCursor b,boolean origin){
+        try(var first=origin?a.origin():a.producer();var second=origin?b.origin():b.producer()){return PagedDependencyFactStorage.compareIdentity(first,second,left,right);}
+    }
     /** Full typed identity in the established wire order; no hash-only equality. */
     private static int compareId(Id a,Id b){int c=a.publication().localId().compareTo(b.publication().localId());if(c==0)c=domain(a).compareTo(domain(b));if(c==0)c=unit(a).compareTo(unit(b));if(c==0&&a instanceof OperandId x&&b instanceof OperandId y){c=Integer.compare(x.owner() instanceof EntryOwner?0:1,y.owner() instanceof EntryOwner?0:1);if(c==0)c=owner(x).compareTo(owner(y));}return c==0?a.localId().compareTo(b.localId()):c;}
     private static String owner(OperandId id){return switch(id.owner()){case OperationOwner v->v.operation().localId();case EntryOwner v->v.entry().localId();};}
@@ -188,7 +208,10 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
     public void readReference(long item,long candidate,long offset,char[] destination,int at,int count){read(()->{text.readCharacters(textId(item,candidate,false),offset,destination,at,count);return 0;});}
     public long supportCount(long item,long candidate){return read(()->candidates.get(candidate(item,candidate)+7));}
     public SourceTargetPlan.SupportProjection projectSupport(long item,long candidate,long ordinal){open();try{long row=candidate(item,candidate);if(ordinal<0||ordinal>=candidates.get(row+7))throw new IndexOutOfBoundsException("SOURCE program support ordinal");return projectSupportRow(supportOrder.get(candidates.get(row+6)+ordinal));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
-    /** Explicit detached compatibility; productive writer uses projectSupport. */
+    /** Borrowed plan-owned scope; close after use,expires with its owning plan.
+     * Invalid read ordinals are caller errors,not an interrupted derivation. */
+    public SourceTargetPlan.SupportCursor openSupport(long item,long candidate,long ordinal){open();try{long row=candidate(item,candidate);if(ordinal<0||ordinal>=candidates.get(row+7))throw new IndexOutOfBoundsException("SOURCE program support ordinal");return openSupportRow(supportOrder.get(candidates.get(row+6)+ordinal));}catch(IndexOutOfBoundsException invalid){throw invalid;}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+    /** Explicit detached compatibility; the native productive writer uses openSupport. */
     public DependencySiteFact.Support support(long item,long candidate,long ordinal){try(var projection=projectSupport(item,candidate,ordinal)){return projection.support();}}
     public boolean hasConditionalSupport(long item,long candidate){return read(()->candidates.get(candidate(item,candidate)+5))!=0;}
     public int conditionalAssumptionCount(long item,long candidate){return Math.toIntExact(read(()->Long.bitCount(conditionals.get(conditional(item,candidate)))));}

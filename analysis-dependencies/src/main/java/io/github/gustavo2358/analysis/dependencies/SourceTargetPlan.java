@@ -16,7 +16,8 @@ import static io.github.gustavo2358.air.model.AirShape.*;
  * unmapped AIR order are preserved. This is planning, not resolved candidates,
  * product serialization or an all-store qualification. Native identity/flags use
  * funded headers; derived site/support scopes expire with this plan. The CALL
- * root and shared backend remain borrowed. One huge fact/support still has a DTO.
+ * root and shared backend remain borrowed. Native support identity reads are
+ * blocked/funded; a complete site projection still materializes one whole fact.
  */
 public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DEMAND;
@@ -28,6 +29,8 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private ManagedExecutableDependencyResult managed;
     private SiteProjection siteProjections;
     private SupportProjection supportProjections;
+    private SupportCursor supportCursors;
+    private AnalysisResources resources;
     private ProgramStore.OperationDirectory directory;
     private PagedLongArray rows,operations,sites,queryRanges,requested;
     private AnalysisResources.Reservation control;
@@ -60,7 +63,7 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private PagedLongArray array(PageStore pages,AnalysisResources resources){return new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);}
     private long sf(long row,SourceShape shape,int column){return source.field(row,shape,column);}
     private void initialize(SourceCorrelationSnapshot correlations,SourceQualifiedSnapshot qualified,PageStore pages,AnalysisResources resources) {
-        if(closed)throw new IllegalStateException("target plan expired before initialization");source=parent().snapshot();directory=program.operationDirectory().orElseThrow();
+        if(closed)throw new IllegalStateException("target plan expired before initialization");this.resources=resources;source=parent().snapshot();directory=program.operationDirectory().orElseThrow();
         var budget=program.executionBudget();if(budget.isPresent()){airLifetime=budget.orElseThrow().reserve(ProgramStore.CapacityPool.RESIDENT,512,ProgramStore.ExecutionPhase.DEMAND);airLifetime.onOwnerClose(this::close);}
         rows=array(pages,resources);operations=array(pages,resources);sites=array(pages,resources);queryRanges=array(pages,resources);requested=array(pages,resources);
         try(var heads=array(pages,resources);var next=array(pages,resources);var queries=new SourceAdmissionDirectory(pages,resources)) {
@@ -181,6 +184,48 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
         public DependencySiteFact.Support support(){if(retired)throw new IllegalStateException("SOURCE support projection expired");open();return projection==null?resident:projection.support();}
         @Override public void close(){if(retired)return;retired=true;if(previous==null)supportProjections=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;resident=null;var owned=projection;projection=null;if(owned!=null)owned.close();}
     }
+    public boolean hasManagedSupportCursors(){open();return managed!=null;}
+    /** Native read port only; resident callers keep explicit projectSupport.
+     * Fund the plan-owned wrapper before constructing/linking it. Its close
+     * retires underlying identities,never the borrowed general CALL owner. */
+    public SupportCursor openSupport(long item,long ordinal,int candidate,int support){
+        open();if(managed==null)throw new UnsupportedOperationException("resident support compatibility requires projectSupport");
+        AnalysisResources.Reservation scratch=null;PagedDependencyFactStorage.SupportCursor cursor=null;
+        try {
+            long row=row(item);if(ordinal<0||ordinal>=rows.get(row+6))throw new IndexOutOfBoundsException("target-plan site ordinal");
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,256,AnalysisResources.Phase.REPLAY);
+            cursor=managed.openSupport(Math.toIntExact(sites.get(rows.get(row+5)+ordinal)),candidate,support);
+            var scope=new SupportCursor(cursor,scratch);cursor=null;scratch=null;
+            scope.cursor.onClose(scope::close);scope.available();
+            scope.reservation.onOwnerClose(scope::close);scope.available();return scope;
+        }catch(IndexOutOfBoundsException invalid){
+            if(cursor!=null)try{cursor.close();}catch(RuntimeException|Error cleanup){suppress(invalid,cleanup);}
+            if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){suppress(invalid,cleanup);}throw invalid;
+        }catch(RuntimeException|Error failure){
+            abort(failure);if(cursor!=null)try{cursor.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}
+            if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}throw failure;
+        }
+    }
+    public final class SupportCursor implements AutoCloseable {
+        private PagedDependencyFactStorage.SupportCursor cursor;
+        private AnalysisResources.Reservation reservation;
+        private SupportCursor previous,next;private boolean retired;
+        private SupportCursor(PagedDependencyFactStorage.SupportCursor cursor,AnalysisResources.Reservation reservation){this.cursor=cursor;this.reservation=reservation;next=supportCursors;if(supportCursors!=null)supportCursors.previous=this;supportCursors=this;}
+        private void available(){if(retired)throw new IllegalStateException("SOURCE support cursor expired");open();}
+        public DependencySiteFact.SupportKind kind(){available();return cursor.kind();}
+        public int premiseCount(){available();return cursor.premiseCount();}
+        public PagedDependencyFactStorage.IdentityView producer(){available();return cursor.producer();}
+        public PagedDependencyFactStorage.IdentityView origin(){available();return cursor.origin();}
+        public PagedDependencyFactStorage.IdentityView premise(int ordinal){available();return cursor.premise(ordinal);}
+        public int comparePremises(int a,int b,char[] left,char[] right){available();try(var first=cursor.premise(a);var second=cursor.premise(b)){return PagedDependencyFactStorage.compareIdentity(first,second,left,right);}}
+        @Override public void close(){
+            if(retired)return;retired=true;if(previous==null)supportCursors=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;
+            var owned=cursor;cursor=null;var capacity=reservation;reservation=null;Throwable failure=null;
+            try{if(owned!=null)owned.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+            try{if(capacity!=null)capacity.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+            if(failure instanceof RuntimeException runtime)throw runtime;if(failure instanceof Error error)throw error;
+        }
+    }
     public DependencySiteFact site(long item,long ordinal){open();try{long row=row(item);if(ordinal<0||ordinal>=rows.get(row+6))throw new IndexOutOfBoundsException("target-plan site ordinal");return executable.sites().get(Math.toIntExact(sites.get(rows.get(row+5)+ordinal)));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public long queryCount(long unit){open();try{if(unit<0||unit>=parent().unitCount())throw new IndexOutOfBoundsException("target-plan source unit ordinal");return queryRanges.get(unit*2+1);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public boolean requestsQuery(long unit,long query){open();try{if(query<0||query>=queryCount(unit))throw new IndexOutOfBoundsException("target-plan nominal query ordinal");return requested.get(queryRanges.get(unit*2)+query)!=0;}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
@@ -191,10 +236,11 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){suppress(primary,cleanup);}}
     @Override public void close() {
         AutoCloseable[] owned;
-        synchronized(this){if(closed)return;closed=true;ready=false;owned=new AutoCloseable[]{requested,queryRanges,sites,operations,rows,airLifetime,control};requested=queryRanges=sites=operations=rows=null;airLifetime=null;control=null;source=null;admission=null;program=null;directory=null;executable=null;managed=null;}
+        synchronized(this){if(closed)return;closed=true;ready=false;owned=new AutoCloseable[]{requested,queryRanges,sites,operations,rows,airLifetime,control};requested=queryRanges=sites=operations=rows=null;airLifetime=null;control=null;source=null;admission=null;program=null;directory=null;executable=null;managed=null;resources=null;}
         var parent=owner;if(parent!=null)parent.release(this);Throwable failure=null;
         while(siteProjections!=null)try{siteProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         while(supportProjections!=null)try{supportProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+        while(supportCursors!=null)try{supportCursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         for(var value:owned)if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("target-plan cleanup",failure);
     }
