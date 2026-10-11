@@ -34,7 +34,7 @@ public final class DependencyJson {
         Objects.requireNonNull(result);Objects.requireNonNull(stream);result.requireContext(source,resources);
         try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
             if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed executable root buffer");
-            write(result.result(),source,new JsonOutput(stream),null,null,result);result.result();
+            write(result.result(),source,new JsonOutput(ManagedOutputStream.metered(stream,resources)),null,null,result);result.result();
         }
     }
     /** One funded root buffer; every SOURCE section borrows its complete prepared owner. */
@@ -43,7 +43,7 @@ public final class DependencyJson {
         Objects.requireNonNull(result);Objects.requireNonNull(source);Objects.requireNonNull(stream);result.admission().snapshot(pages,resources);
         if(result.program()!=source)throw new IllegalArgumentException("foreign native managed result owner");
         try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
-            if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed root buffer");var output=new JsonOutput(stream);
+            if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed root buffer");var output=new JsonOutput(ManagedOutputStream.metered(stream,resources));
             try(var writer=SourceSnapshotWriter.open(result.admission(),output,pages,resources)){write(result.executable(),source,output,result,writer,result.executableOwner());writer.verify();result.executable();result.programs().count();}
         }
     }

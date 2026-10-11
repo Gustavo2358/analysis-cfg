@@ -23,7 +23,7 @@ MUTABLE = {
 }
 NEW_VALUES = 'analysis-values/src/main/java/io/github/gustavo2358/analysis/values/ForeignEffectTransfer.java'
 NEW_W5 = {'analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/'+n+'.java' for n in (
-    'DependencyJson','DependencyFileWriter','FileDependencyJson','SourceDependencyJson','QualifiedSourceJson','SourceSnapshotJson','SourceSnapshotWriter','SourceSnapshotInput','DependencyInputJson','DependencyManifestSnapshot',
+    'DependencyJson','DependencyFileWriter','FileDependencyJson','SourceDependencyJson','QualifiedSourceJson','SourceSnapshotJson','SourceSnapshotWriter','SourceSnapshotInput','DependencyInputJson','DependencyManifestSnapshot','ManagedOutputStream',
     'PagedSnapshotAnnotationStorage','PagedSnapshotCapabilityStorage','PagedSnapshotContextStorage',
     'PagedSnapshotDependencyStorage','PagedSnapshotDistinctStorage','PagedSnapshotTypeStorage',
     'PagedSnapshotValidationStorage','PagedSnapshotVisibleStorage','SnapshotDependencyFileWriter','SnapshotDependencyJson')}

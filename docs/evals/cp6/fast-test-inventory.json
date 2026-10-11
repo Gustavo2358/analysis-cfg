@@ -506,6 +506,15 @@
       "distinctExecutionViewsShareExactCommonOutputChargeWithoutDoubleCharging",
       "commonOutputDenialLeavesBothCountersUnchangedAndPreservesTypedPhase"
     ],
+    "io.github.gustavo2358.analysis.adapters.NativeManagedCodecOutputBudgetTest": [
+      "directGeneralCodecHonorsCommonZeroOutputBeforeAnyBytesAndLeavesBorrowedOwnersAlive",
+      "directSourceCodecHonorsCommonZeroOutputBeforeAnyBytesAndLeavesBorrowedOwnersAlive",
+      "directAndAtomicGeneralCodecChargeExactlyOneCommonLogicalByteCount",
+      "directAndAtomicSourceCodecChargeExactlyOneCommonLogicalByteCount",
+      "compressedAtomicGeneralAndSourceChargeLogicalNotCompressedBytes",
+      "directManagedWritePreservesPrimaryIOExceptionAndNeverClosesBorrowedStream",
+      "sharedMeterUsesExactResourceIdentityAndRejectsInvalidRangesBeforeCharging"
+    ],
     "io.github.gustavo2358.analysis.adapters.ManagedExecutableDependencyIdentityTest": [
       "collidingUnitAndEntryNamesUnicodeAndReversedInventoryKeepEveryFullSiteAndProducer"
     ],

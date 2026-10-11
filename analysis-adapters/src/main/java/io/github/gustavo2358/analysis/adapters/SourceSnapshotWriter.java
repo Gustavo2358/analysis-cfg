@@ -40,7 +40,7 @@ final class SourceSnapshotWriter implements AutoCloseable {
         try {
             writer=new SourceSnapshotWriter(admission,source,capacity);var registration=capacity;capacity=null;
             registration.onOwnerClose(writer::close);
-            writer.initialize(new JsonOutput(new MeteredOutput(output,resources)),pages,resources);
+            writer.initialize(new JsonOutput(ManagedOutputStream.metered(output,resources)),pages,resources);
             var owned=writer;try(owned) {owned.writeValue(owned.view().root(),SourceShape.ROOT,0);owned.out().finish();owned.verify();}
         }catch(IOException|RuntimeException|Error failure) {
             if(writer!=null)try{writer.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}
@@ -231,12 +231,6 @@ final class SourceSnapshotWriter implements AutoCloseable {
         }
     }
     private static void suppress(Throwable primary,Throwable cleanup){if(primary!=cleanup)primary.addSuppressed(cleanup);}
-    private static final class MeteredOutput extends FilterOutputStream {
-        private final AnalysisResources resources;
-        private MeteredOutput(OutputStream stream,AnalysisResources resources){super(stream);this.resources=resources;}
-        @Override public void write(int value)throws IOException{resources.output(1,PHASE);out.write(value);}
-        @Override public void write(byte[] values,int at,int count)throws IOException{resources.output(count,PHASE);out.write(values,at,count);}
-    }
     @Override public void close() {
         PagedLongArray work;AnalysisResources.Reservation capacity,programCapacity;SourceAdmissionSnapshot.ConsumerLease link;
         synchronized(this){if(closed)return;closed=true;work=frames;frames=null;capacity=control;control=null;programCapacity=programControl;programControl=null;link=lifetime;lifetime=null;admission=null;source=null;characters=null;output=null;qualified=null;nominal=null;programs=null;pages=null;resources=null;depth=-1;}

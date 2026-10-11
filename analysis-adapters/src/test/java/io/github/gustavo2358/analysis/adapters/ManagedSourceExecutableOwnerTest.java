@@ -44,7 +44,8 @@ final class ManagedSourceExecutableOwnerTest {
         var fixture=new SourceCorrelationSnapshotTest();fixture.directory=directory;
         for(int n:new int[]{1,2,4,8,16}) {
             var publication=literalCalls(n);var evidence=literalEvidence(fixture.source(publication));
-            try(var input=fixture.new NativeCase(publication,evidence)) {
+            // This cost law publishes bytes; read-only and negative fixtures keep OUTPUT0.
+            try(var input=fixture.new NativeCase(publication,evidence,false,1_000_000)) {
                 var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).buildChecked(input.program,input.checked,BuildOptions.defaults());
                 assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());
                 try(var result=new DependencyAnalysis().prepareLeased(input.program,cfg,input.source,SourceCorrelationSnapshotTest.links(publication,evidence),input.pages,input.execution)) {
@@ -52,6 +53,7 @@ final class ManagedSourceExecutableOwnerTest {
                     assertEquals(1,result.programs().candidateCount(0));assertEquals(n,result.programs().supportCount(0,0));
                     assertEquals(n,call.fullFactProjections(),"only one full DTO per resolved source site; headers/support ordering must not decode full bodies n="+n);
                     var wire=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(result,input.program,input.pages,input.execution,wire);
+                    assertEquals(wire.size(),input.execution.outputUsed());assertEquals(wire.size(),input.resources.outputUsed());
                     assertEquals(4L*n,call.fullFactProjections(),"sites+edges+SOURCE executableSites each visit once; supports use scoped typed leaves n="+n);
                     var json=new com.fasterxml.jackson.databind.ObjectMapper().readTree(wire.toByteArray());
                     assertEquals(n,json.path("sites").size());assertEquals(n,json.path("edges").size());

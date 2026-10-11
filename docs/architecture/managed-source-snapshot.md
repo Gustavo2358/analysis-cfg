@@ -533,3 +533,40 @@ observations, plain qualification, common WORK accounting, global families and
 new gaps, original dimensions/isolated curves, integrated E2E, legacy retirement,
 human review and externally authorized integration remain pending. The earlier
 large products are historical, not fresh qualification of this general owner.
+
+## Shared managed codec OUTPUT qualification (2026-10-11)
+
+The direct managed general and SOURCE codecs now charge logical UTF8 bytes before
+writing, through the same final package-private stream meter used by standalone
+SOURCE and atomic file writers. Exact resource-owner identity reuses the meter;
+a foreign wrapper is rejected rather than silently switching accounting owners.
+Zstandard charges logical bytes, not compressed file size. Borrowed streams and
+result owners remain open; primary IO failures and pre-write output denial are
+preserved. The explicitly caller-managed direct compatibility DependencyResult
+port is unchanged. No productive quota, semantic/wire admission or pin changed.
+
+Four direct-codec bypass RED laws are preserved. Seven new laws and the 30-method
+neighboring family, 18 original CLI contracts, seven compiled guards and five
+actual complete-product CLI oracles passed freshly for this wave. All five products
+are byte-exact to their previous products; the SOURCE32000 observation took
+71.534475s and emitted 22824055 bytes. This is not a median or large-scale curve.
+The earlier GZIP test setup failure is retained; the test was corrected to the
+actual Zstandard transport without changing production for that setup error.
+
+The original complete FAST passed all 1411 mandatory methods, including every
+unchanged prior 1404 method, zero failures/errors/skips, in 1491.931s. Exact audit
+confirmed all 1452 productive classfiles across nine consumer and both AIR paths,
+586 Java sources, 579 fixtures and 15 runtime components, without helper shadow.
+Producer `a0aeb827ef53765815aa501c4687f197be77ac73` remains clean and unchanged.
+Only the explicit new adapter source and active outer compiled inventory were
+registered; existing public owner APIs and architectural denials are unchanged.
+
+This closes the managed direct OUTPUT bypass, not the campaign. A support leaf
+still materializes all premises and complete IDs. The next five prospective laws
+target constant funded support/identity cursors, full block identity and ordinal
+preservation, primary read failure, pressure and native expiry. They have not yet
+executed at this qualification point. Complete facts/programs/provider assembly,
+FILE results, observations, plain qualification, common WORK accounting, all-store
+and global families/new gaps, original dimensions/isolated curves, integrated E2E,
+legacy retirement, human review and external integration remain pending. Earlier
+large products remain historical, not fresh qualification of this OUTPUT wave.

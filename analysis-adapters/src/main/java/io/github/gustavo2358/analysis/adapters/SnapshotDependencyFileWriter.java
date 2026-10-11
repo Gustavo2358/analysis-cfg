@@ -37,15 +37,10 @@ public final class SnapshotDependencyFileWriter {
     private void write(Path destination,AnalysisResources resources,Encoder encoder,Runnable verify)throws IOException {
         Objects.requireNonNull(resources);Path target=destination.toAbsolutePath();Path temporary=Files.createTempFile(target.getParent(),".dependencies-",".tmp");
         try {
-            try(var raw=JsonFiles.output(Files.newOutputStream(temporary),destination);var stream=new MeteredOutput(raw,resources)){encoder.write(stream);}
+            try(var raw=JsonFiles.output(Files.newOutputStream(temporary),destination);var stream=ManagedOutputStream.metered(raw,resources)){encoder.write(stream);}
             verify.run();
             Files.move(temporary,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
         }finally{Files.deleteIfExists(temporary);}
     }
     @FunctionalInterface private interface Encoder{void write(OutputStream stream)throws IOException;}
-    private static final class MeteredOutput extends FilterOutputStream {
-        private final AnalysisResources resources;private MeteredOutput(OutputStream output,AnalysisResources resources){super(output);this.resources=resources;}
-        @Override public void write(int value)throws IOException{resources.output(1,AnalysisResources.Phase.ENCODE);out.write(value);}
-        @Override public void write(byte[] value,int offset,int length)throws IOException{resources.output(length,AnalysisResources.Phase.ENCODE);out.write(value,offset,length);}
-    }
 }
