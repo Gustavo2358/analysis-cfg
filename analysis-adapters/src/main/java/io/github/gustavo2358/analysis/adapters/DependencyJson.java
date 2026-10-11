@@ -94,7 +94,7 @@ public final class DependencyJson {
             "occurrences",source.occurrences().stream().map(o->object("occurrence",QualifiedSourceJson.value(o.occurrence()),"status",o.status().name(),"valueRemainder",o.valueRemainder(),"interpretationRemainder",o.interpretationRemainder(),
                 "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())))))));
         if(managed!=null)document.put("sourceQualifiedDependencies",writer.qualified(managed.qualified()));
-        var dependencies=object("programs",managed!=null?writer.programs(managed.programs()):executable!=null?managedPrograms(executable):result.programDependencies().stream().map(DependencyJson::program));
+        var dependencies=object("programs",managed!=null?writer.programs(managed.programs()):executable!=null?managedPrograms(executable,factWriter):result.programDependencies().stream().map(DependencyJson::program));
         if(managed!=null&&managed.nativeFileCount()>0)dependencies.put("files",writer.nativeFiles(managed.qualified()));
         result.sourceQualifiedDependencies().filter(s->!s.nativeFiles().isEmpty()).ifPresent(s->dependencies.put("files",s.nativeFiles().stream().map(f->object(
             "analysisBoundary","NON_EXECUTABLE_SOURCE","source",QualifiedSourceJson.value(f.source()),"status",f.status().name(),"remainder",f.remainder(),
@@ -109,9 +109,9 @@ public final class DependencyJson {
         out.symbol('[');boolean first=true;
         for(int site=0,n=owner.result().sites().size();site<n;site++)try(var fact=owner.openFact(site)){if(fact.reachability()!=Reachability.UNREACHABLE_IN_MODEL)first=writer.edges(fact,first);}out.symbol(']');
     };}
-    private static JsonOutput.EncodedValue managedPrograms(ManagedExecutableDependencyResult owner){return out->{
+    private static JsonOutput.EncodedValue managedPrograms(ManagedExecutableDependencyResult owner,FactWriter writer){return out->{
         out.symbol('[');for(int i=0,n=owner.result().programDependencies().size();i<n;i++){
-            if(i!=0)out.symbol(',');try(var projection=owner.projectProgram(i)){out.value(program(projection.resolution()));}
+            if(i!=0)out.symbol(',');try(var cursor=owner.openProgram(i)){writer.program(cursor);}
         }out.symbol(']');
     };}
     /** Fixed root-funded buffers/carrier. Collections sort into caller-owned
@@ -199,6 +199,37 @@ public final class DependencyJson {
         }
         void executableSite(SourceTargetPlan.FactCursor f)throws IOException {
             out.value(new JsonOutput.Fields("entry",identity(f::entry),"operation",identity(f::operation),"reachability",f.reachability().name(),"valuePoint",(JsonOutput.EncodedValue)ignored->{try(var point=f.valuePoint()){point(point);}},"premises",(JsonOutput.EncodedValue)ignored->ids(f.premiseCount(),f::premise),"provenance",(JsonOutput.EncodedValue)ignored->ids(f.provenanceCount(),f::provenance)));
+        }
+        private void executableSite(ManagedExecutableDependencyResult.ProgramCursor.SiteScope f)throws IOException {
+            out.value(new JsonOutput.Fields("entry",identity(f::entry),"operation",identity(f::operation),"reachability",f.reachability().name(),"valuePoint",(JsonOutput.EncodedValue)ignored->{try(var point=f.valuePoint()){point(point);}},"premises",(JsonOutput.EncodedValue)ignored->ids(f.premiseCount(),f::premise),"provenance",(JsonOutput.EncodedValue)ignored->ids(f.provenanceCount(),f::provenance)));
+        }
+        void program(ManagedExecutableDependencyResult.ProgramCursor p)throws IOException {
+            var o=p.occurrence();var fields=new JsonOutput.Fields("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),"technology",o.technology(),"nameProfile",o.nameProfile(),"targetKind",o.targetKind(),
+                "authorities",(JsonOutput.EncodedValue)ignored->{out.symbol('[');for(int i=0,n=p.authorityCount();i<n;i++){if(i!=0)out.symbol(',');out.value(p.authority(i));}out.symbol(']');},"qualifications",o.qualifications(),"executableOperations",DependencyJson.ids(o.executableOperations()),
+                "executableSites",(JsonOutput.EncodedValue)ignored->{out.symbol('[');for(long i=0,n=p.siteCount();i<n;i++){if(i!=0)out.symbol(',');try(var site=p.openSite(i)){executableSite(site);}}out.symbol(']');},
+                "candidates",(JsonOutput.EncodedValue)ignored->{out.symbol('[');for(long i=0,n=p.candidateCount();i<n;i++){if(i!=0)out.symbol(',');programCandidate(p,i);}out.symbol(']');},
+                "valueRemainder",p.valueRemainder(),"interpretationRemainder",p.interpretationRemainder(),"analysisReasons",(JsonOutput.EncodedValue)ignored->{out.symbol('[');for(long i=0,n=p.reasonCount();i<n;i++){if(i!=0)out.symbol(',');out.generalProgramReason(p,i,left);}out.symbol(']');});
+            if(o.sourceControlRemainder())fields.put("controlRemainder",true);out.value(fields);
+        }
+        private void programCandidate(ManagedExecutableDependencyResult.ProgramCursor p,long ordinal)throws IOException {
+            out.value(new JsonOutput.Fields("referenceName",(JsonOutput.EncodedValue)ignored->out.generalProgramText(p,ordinal,false,left),"rawValue",(JsonOutput.EncodedValue)ignored->out.generalProgramText(p,ordinal,true,left),"supports",(JsonOutput.EncodedValue)ignored->programSupports(p,ordinal),"qualifications",p.occurrence().qualifications()));
+        }
+        private int compareProgramSupports(ManagedExecutableDependencyResult.ProgramCursor p,long candidate,long a,long b){
+            try(var x=p.openSupport(candidate,a);var y=p.openSupport(candidate,b)){
+                int c;try(var first=x.producer();var second=y.producer()){c=compareIdentity(first,second);}
+                if(c==0)try(var first=x.origin();var second=y.origin()){c=compareIdentity(first,second);}return c==0?Long.compare(a,b):c;
+            }
+        }
+        private void programSupports(ManagedExecutableDependencyResult.ProgramCursor p,long candidate)throws IOException {
+            out.symbol('[');long count=p.supportCount(candidate);
+            if(count==1)programSupport(p,candidate,0);
+            else if(count>1)try(var order=new PagedLongIndex(pages,resources,PHASE,(a,b)->compareProgramSupports(p,candidate,a,b))){
+                for(long i=0;i<count;i++){resources.work(1,PHASE);order.intern(i,i+1);}
+                boolean first=true;try(var rows=order.cursor()){while(rows.advance()){if(!first)out.symbol(',');first=false;programSupport(p,candidate,rows.value()-1);}}
+            }out.symbol(']');
+        }
+        private void programSupport(ManagedExecutableDependencyResult.ProgramCursor p,long candidate,long ordinal)throws IOException {
+            try(var support=p.openSupport(candidate,ordinal)){out.value(new JsonOutput.Fields("kind",support.kind().name(),"producer",identity(support::producer),"origin",identity(support::origin),"premises",(JsonOutput.EncodedValue)ignored->ids(support.premiseCount(),support::premise)));}
         }
     }
     static Object program(TargetResolver.Resolution resolved) {

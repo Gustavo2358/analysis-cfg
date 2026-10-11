@@ -29,6 +29,13 @@ TESTS['analysis-launcher']['PhysicalChoiceTargetTest']={'physicalAlternativesSur
 # Select and verify its independent literal writer oracle; keep strict no-test failure.
 TESTS['cfg-adapters']={'TransportTest':{'writerMatchesIndependentGoldenBytesAndIsDeterministic'}}
 TESTS['analysis-launcher']['PipelineCliTest']={
+ 'defaultRoutePublishesCfgAndDependenciesFromTheValidatedSnapshot',
+ 'exhaustedCommonBudgetStopsBeforeSourceParsingAndPreservesProducts',
+ 'exhaustedCommonBudgetStopsSourceValidationAndPreservesProducts',
+ 'experimentalPhysicalPipelineUsesNativeValuesWithoutDroppingChoiceSupports',
+ 'explicitSourceEvidenceUsesOneCheckedSnapshotAndPreservesEverySection',
+ 'largerUnitKeepsOrphanReturnHaltAndDependencyThroughTheRealPipeline',
+ 'sharedLabelEntriesReachEverySiteThroughTheRealSnapshotPipeline',
  'oneReadAndCompleteProductsEqualIndependentSeparateRoutes',
  'invalidIncompleteDigestAndAliasesRejectBeforeAnyDestination',
  'fullCorrelatedSourceAndDigestMismatchPreserveProducts',

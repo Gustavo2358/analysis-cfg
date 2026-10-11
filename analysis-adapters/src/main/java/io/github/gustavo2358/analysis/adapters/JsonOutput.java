@@ -88,6 +88,14 @@ final class JsonOutput {
     void programReason(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long item,long ordinal,char[] block)throws IOException {
         blockText(source.reasonLength(item,ordinal),block,(offset,destination,count)->source.readReason(item,ordinal,offset,destination,0,count));
     }
+    void generalProgramText(io.github.gustavo2358.analysis.dependencies.ManagedExecutableDependencyResult.ProgramCursor source,long candidate,boolean raw,char[] block)throws IOException {
+        if(block.length==0)throw new IllegalArgumentException("general program text buffer");
+        blockText(raw?source.rawLength(candidate):source.referenceLength(candidate),block,(offset,destination,count)->{if(raw)source.readRaw(candidate,offset,destination,0,count);else source.readReference(candidate,offset,destination,0,count);},true);
+    }
+    void generalProgramReason(io.github.gustavo2358.analysis.dependencies.ManagedExecutableDependencyResult.ProgramCursor source,long ordinal,char[] block)throws IOException {
+        if(block.length==0)throw new IllegalArgumentException("general program reason buffer");
+        blockText(source.reasonLength(ordinal),block,(offset,destination,count)->source.readReason(ordinal,offset,destination,0,count),true);
+    }
     void globalProgramReason(io.github.gustavo2358.analysis.dependencies.SourceProgramSnapshot source,long ordinal,char[] block)throws IOException {
         blockText(source.globalReasonLength(ordinal),block,(offset,destination,count)->source.readGlobalReason(ordinal,offset,destination,0,count));
     }

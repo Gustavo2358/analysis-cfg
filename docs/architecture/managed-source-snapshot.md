@@ -671,3 +671,72 @@ gaps/original dimensions/isolated repeated curves/integrated E2E/legacy/human/
 external authority remain pending. Older large products remain historical, not
 newly executed or qualified by a blanket runtime-equivalence claim. Continue
 with the genuine general program aggregation countercase, not a checkpoint stop.
+
+## Native general program assembly (2026-10-11)
+
+The general managed writer now consumes `openProgram(int)` rather than complete
+fact leases and resident resolution lists. A paged program cursor aggregates real
+CALL ordinals, full-identity distinct support unions and stable canonical wire
+ordering. General and SOURCE resolution share the same fixed assembly state and
+legacy length-prefixed candidate identity. General free text preserves strict
+Unicode scalar admission; SOURCE escaped code units remain a separate contract.
+Resident `projectProgram` compatibility is unchanged.
+
+The cursor reserves 4096 bytes before construction; its steady resident increment
+is 34176 bytes across the tested geometries. Site/support/identity scopes are
+funded before carriers and expire with their parents. Operational read, funding
+and output failures retire only owned derived state, preserve the primary error
+and keep borrowed AIR/backend alive. Caller null/range errors do not poison the
+owner. An actual output fault with a 100005-character producer occurs while the
+program and support scopes are live and restores every transient pool baseline.
+Its initial legacy full-projection SCRATCH failure is preserved separately; the
+native fault test uses literal semantic expectations, not a regenerated oracle.
+
+Twenty-one new laws cover cursor semantics/lifetimes, candidate pressure, failures
+and six shape families, including UTF16 widths, all sealed producer forms, stable
+support ties, duplicate premises and staged Entry-sites at 64 through 16384.
+Staged Entry-sites are not a substitute for real AIR admission. The real many-CALL
+witness completed 64/256/1024, but was retired during AIR admission at 4096 before
+opening the program cursor; its method is PARTIAL and 16384 was NOT_REACHED.
+One stack sample does not establish production latency causality.
+
+The 22 representative consumer methods, 18 original CLI contracts, seven original
+compiled guards and five fresh complete-product CLI oracles pass. Every previous
+whole product byte is exact. SOURCE32000 took 70.577206s for 22824055 bytes: one
+observation, not a median or repeated isolated curve. Mechanical review preserves
+all 14 previous public managed-owner methods with only the additive program port;
+five new core classes and no new outer classes. Only active compiled inventories
+were synchronized; guard policies, source registration, pins, quotas and cache
+geometry remain unchanged. Mechanical review is not human review.
+
+Original FAST1468 passed in 2965.043s with zero failures/errors/skips, including
+all 1447 prior methods unchanged. The audit proves all 1477 productive classfiles,
+597 Java sources, 579 fixtures and 15 components exact to the frozen actual CLI
+runtime, without helper shadow. Producer
+`a0aeb827ef53765815aa501c4687f197be77ac73` remains clean and unchanged. The original
+local full entrypoint ran in 3122.581567s and exited 1 at an obsolete W3 nominal
+method inventory, after the Java and architecture gates passed. Its original
+failure is preserved. W3 omitted one already-committed scalar-demand test; W5
+then omitted seven already-committed PipelineCli tests. Only those eight required
+method registrations were added: every previous method and all gate functions,
+architecture rules, source policies and rejection behavior remain unchanged.
+Each metadata review rejects missing-old/missing-new, duplicate, foreign-class,
+failure, error and skip mutations. W3 now passes all 28 nominal methods.
+
+The 1477 productive classfiles and all Java/POM/fixture inputs remain exact.
+The successful full prefix is explicitly reused by that proof. The exact original
+remaining semantic/performance/integration/W2D commands passed in 3735.211391s.
+The first remaining-command attempt exited 1 at W5 metadata and is also preserved.
+The corrected second attempt exited 0; original producer checkouts stayed unchanged.
+New checks include all W1--W5 semantic/performance gates, integration with 54
+nominal methods and 167 rejected report mutations, W5 S10, W2D, MOVE/data,
+PERFORM, multiple CALLs, partiality and all 22 FILE composite E2E cases.
+This is not a relabelled full entrypoint PASS, a new full-prefix execution or
+global completion. The original full exit 1 remains recorded as such.
+
+Providers still construct complete facts. Header paths still decode full typed
+identities, and occurrence qualification retains resident maps/lists. These,
+FILE, observations, common WORK accounting, real large AIR admission, all-store,
+global21/new gaps, original dimensions/isolated repeated curves, campaign-wide E2E,
+legacy retirement, human review and external integration remain pending. This
+closes one local materialization frontier, not AS-W00--W10 or the campaign.

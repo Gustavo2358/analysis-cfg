@@ -25,6 +25,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     private OperationId soughtOperation;
     private Cursor cursors;
     private ProgramProjection programProjections;
+    private ProgramCursor programCursors;
     private List<QualifiedDependencyOccurrence> occurrences;
     private DependencyResult result;
     private int sites,edges;
@@ -176,6 +177,196 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
             projection.resolution=TargetResolver.resolve(occurrence,projection.selected,List.of(),()->program.progress(io.github.gustavo2358.analysis.structure.ProgramStore.ExecutionPhase.DOMAIN));projection.open();return projection;
         }catch(RuntimeException|Error failure){abort(failure);if(capacity!=null)try{capacity.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
     }
+    /** General PROGRAM assembly over real fact ordinals. The original complete
+     * projection remains explicit compatibility; occurrence/header DTOs remain
+     * separate debt,not disguised as a bounded provider or SOURCE bridge. */
+    public ProgramCursor openProgram(int ordinal){
+        available();Objects.checkIndex(ordinal,occurrences.size());AnalysisResources.Reservation capacity=null;
+        try{
+            capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,4096,AnalysisResources.Phase.SORT);
+            var cursor=new ProgramCursor(occurrences.get(ordinal),capacity);capacity=null;cursor.capacity.onOwnerClose(cursor::close);cursor.initialize();cursor.open();return cursor;
+        }catch(RuntimeException|Error failure){abort(failure);if(capacity!=null)try{capacity.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    public final class ProgramCursor implements AutoCloseable {
+        private static final int CANDIDATE=8,SUPPORT=4;
+        private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.SORT;
+        private QualifiedDependencyOccurrence occurrence;
+        private AnalysisResources.Reservation capacity;
+        private ProgramCursor previous,next;
+        private SourceTextDictionary text;
+        private PagedLongArray siteRows,candidates,candidateOrder,supports,supportOrder,reasons;
+        private TargetResolver.AssemblyState state;
+        private char[] left,right;
+        private TextProbe probe;
+        private SiteScope siteScopes;
+        private SupportScope supportScopes;
+        private long sitesCount,candidateRows,candidatesCount,supportRows,supportsCount,reasonsCount;
+        private boolean retired,complete;
+        private ProgramCursor(QualifiedDependencyOccurrence occurrence,AnalysisResources.Reservation capacity){
+            this.occurrence=occurrence;this.capacity=capacity;next=programCursors;if(programCursors!=null)programCursors.previous=this;programCursors=this;
+        }
+        private void live(){if(retired)throw new IllegalStateException("general program cursor expired");available();}
+        private void open(){live();if(!complete)throw new IllegalStateException("general program cursor incomplete");}
+        private PagedLongArray array(){return new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);}
+        private PagedDependencyFactStorage.FactCursor fact(int ordinal){int flags=(int)(annotations.get(ordinal)&7);return facts.openFact(ordinal).annotations(flags);}
+        private int compareText(long a,long b){return TargetResolver.compareText(text,a,b,left,right,resources,PHASE);}
+        private int compareCandidate(long a,long b){if(a==b)return 0;return TargetResolver.compareCandidateKey(text,candidates.get(a*CANDIDATE),candidates.get(a*CANDIDATE+1),candidates.get(b*CANDIDATE),candidates.get(b*CANDIDATE+1),left,right,resources,PHASE);}
+        private long addCandidate(PagedLongIndex order,long reference,long raw){
+            long row=candidateRows=Math.incrementExact(candidateRows),at=Math.multiplyExact(row,CANDIDATE);candidates.set(at,reference);candidates.set(at+1,raw);long found=order.intern(row,row);long count=found*CANDIDATE+4;candidates.set(count,Math.incrementExact(candidates.get(count)));return found;
+        }
+        private void addSupport(long candidate,int fact,int value,int support){
+            long row=supportRows=Math.incrementExact(supportRows),at=Math.multiplyExact(row,SUPPORT);supports.set(at,fact);supports.set(at+1,value);supports.set(at+2,support);long base=candidate*CANDIDATE,last=candidates.get(base+3);
+            if(last==0)candidates.set(base+2,row);else supports.set(last*SUPPORT+3,row);candidates.set(base+3,row);
+        }
+        private long intern(PagedDependencyFactStorage.TextView value){try{probe.text(value);return text.intern(probe);}finally{probe.clear();}}
+        private void initialize(){
+            live();left=new char[128];right=new char[128];probe=new TextProbe();state=new TargetResolver.AssemblyState(!occurrence.qualifications().isEmpty(),occurrence.sourceControlRemainder());
+            text=new SourceTextDictionary(pages,resources,PHASE);siteRows=array();candidates=array();candidateOrder=array();supports=array();supportOrder=array();reasons=array();
+            try(var order=new PagedLongIndex(pages,resources,PHASE,this::compareCandidate);var reasonOrder=new PagedLongIndex(pages,resources,PHASE,this::compareText)){
+                if(occurrence.sourceControlRemainder()){long id=text.intern("SOURCE_CONTROL_UNAVAILABLE");reasonOrder.intern(id,id);}
+                for(var operation:occurrence.executableOperations()){
+                    soughtOperation=operation;
+                    try(var rows=operations.cursor(0)){
+                        soughtOperation=null;
+                        while(rows.advance()){
+                            int ordinal=Math.toIntExact(rows.value()-1);if(!facts.withHeader(ordinal,h->h.operation().equals(operation)))break;
+                            siteRows.set(sitesCount,ordinal);sitesCount=Math.incrementExact(sitesCount);accept(ordinal,order,reasonOrder);
+                        }
+                    }finally{soughtOperation=null;}
+                }
+                literalCandidates(order);
+                String reason=state.finish(occurrence.targetKind(),occurrence.sourceValueRemainder(),sitesCount);if(reason!=null){long id=text.intern(reason);reasonOrder.intern(id,id);}
+                try(var rows=order.cursor()){while(rows.advance()){long row=rows.value();candidateOrder.set(candidatesCount++,row);orderSupports(row);}}
+                try(var rows=reasonOrder.cursor()){while(rows.advance())reasons.set(reasonsCount++,rows.value());}
+            }probe.clear();live();complete=true;
+        }
+        private void accept(int ordinal,PagedLongIndex order,PagedLongIndex reasonOrder){
+            try(var site=fact(ordinal)){
+                for(int i=0,n=site.reasonCount();i<n;i++)try(var reason=site.reason(i)){long id=intern(reason);reasonOrder.intern(id,id);}
+                if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)return;
+                state.site(site.reachability(),site.modelValueRemainder(),site.sourceValueRemainder(),site.interpretationUnknownRemainder());
+                for(int c=0,n=site.candidateCount();c<n;c++)try(var value=site.openCandidate(c)){
+                    long row;try{probe.candidate(value,false);long reference=text.intern(probe);probe.candidate(value,true);row=addCandidate(order,reference,text.intern(probe));}finally{probe.clear();}
+                    for(int s=0,count=value.supportCount();s<count;s++)addSupport(row,ordinal,c,s);
+                }
+            }
+        }
+        private void literalCandidates(PagedLongIndex order){
+            if(occurrence.qualifications().isEmpty()||!occurrence.targetKind().equals("LITERAL"))return;
+            boolean cics=occurrence.technology().equals("CICS"),supported=occurrence.nameProfile().equals(cics?CicsNameInterpreter.PROFILE:CallNameInterpreter.PROFILE);
+            for(var raw:occurrence.literals()){
+                resources.work(1,PHASE);if(!supported){state.interpretationOpen=true;continue;}
+                var value=TargetResolver.interpret(cics,raw,false,cics?new io.github.gustavo2358.air.model.Interactions.ExtensionName("cics-ts.program","1"):io.github.gustavo2358.air.model.Interactions.ExactName.INSTANCE);
+                state.interpretationOpen|=value.unknownRemainder()||!cics;if(value.referenceName()!=null)addCandidate(order,text.intern(value.referenceName()),text.intern(raw));
+            }
+        }
+        private PagedDependencyFactStorage.SupportCursor support(long row){long at=row*SUPPORT;return facts.openSupport(Math.toIntExact(supports.get(at)),Math.toIntExact(supports.get(at+1)),Math.toIntExact(supports.get(at+2)));}
+        private int compareSupport(long a,long b,boolean identity){
+            if(a==b)return 0;try(var x=support(a);var y=support(b)){
+                int c=identity?x.kind().compareTo(y.kind()):0;
+                if(c==0)try(var first=x.producer();var second=y.producer()){c=PagedDependencyFactStorage.compareIdentity(first,second,left,right);}
+                if(c==0)try(var first=x.origin();var second=y.origin()){c=PagedDependencyFactStorage.compareIdentity(first,second,left,right);}
+                if(!identity)return c==0?Long.compare(a,b):c;
+                for(int i=0,n=Math.min(x.premiseCount(),y.premiseCount());c==0&&i<n;i++)try(var first=x.premise(i);var second=y.premise(i)){c=PagedDependencyFactStorage.compareIdentity(first,second,left,right);}
+                return c==0?Integer.compare(x.premiseCount(),y.premiseCount()):c;
+            }
+        }
+        private void orderSupports(long row){long at=row*CANDIDATE;candidates.set(at+5,supportsCount);
+            TargetResolver.orderSupportUnion(candidates.get(at+4)>1,candidates.get(at+2),value->supports.get(value*SUPPORT+3),(a,b)->compareSupport(a,b,true),(a,b)->compareSupport(a,b,false),value->supportOrder.set(supportsCount++,value),pages,resources,PHASE);
+            candidates.set(at+6,supportsCount-candidates.get(at+5));
+        }
+        private final class TextProbe implements CharSequence {
+            private PagedDependencyFactStorage.CandidateCursor candidate;
+            private PagedDependencyFactStorage.TextView value;
+            private boolean raw;
+            private int length,start=-1,count;
+            private final char[] block=new char[128];
+            void candidate(PagedDependencyFactStorage.CandidateCursor candidate,boolean raw){clear();this.candidate=candidate;this.raw=raw;length=Math.toIntExact(raw?candidate.rawLength():candidate.referenceLength());}
+            void text(PagedDependencyFactStorage.TextView value){clear();this.value=value;length=Math.toIntExact(value.characterCount());}
+            void clear(){candidate=null;value=null;length=0;start=-1;count=0;raw=false;}
+            @Override public int length(){return length;}
+            @Override public char charAt(int index){Objects.checkIndex(index,length);if(start<0||index<start||index>=start+count){start=index;count=Math.min(block.length,length-start);if(value!=null)value.readCharacters(start,block,0,count);else if(raw)candidate.readRaw(start,block,0,count);else candidate.readReference(start,block,0,count);}return block[index-start];}
+            @Override public CharSequence subSequence(int start,int end){throw new UnsupportedOperationException("no complete general program text projection");}
+        }
+        private <T> T read(java.util.function.Supplier<T> action){open();try{return action.get();}catch(IndexOutOfBoundsException invalid){throw invalid;}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+        private void destination(char[] destination){if(destination==null){open();throw new NullPointerException("general program text destination");}}
+        private long candidate(long ordinal){open();if(ordinal<0||ordinal>=candidatesCount)throw new IndexOutOfBoundsException("general candidate ordinal");return candidateOrder.get(ordinal)*CANDIDATE;}
+        private long reason(long ordinal){open();if(ordinal<0||ordinal>=reasonsCount)throw new IndexOutOfBoundsException("general program reason ordinal");return reasons.get(ordinal);}
+        public QualifiedDependencyOccurrence occurrence(){open();return occurrence;}
+        public long siteCount(){open();return sitesCount;}
+        public long candidateCount(){open();return candidatesCount;}
+        public long referenceLength(long ordinal){return read(()->text.characterCount(candidates.get(candidate(ordinal))));}
+        public long rawLength(long ordinal){return read(()->text.characterCount(candidates.get(candidate(ordinal)+1)));}
+        public void readReference(long ordinal,long offset,char[] destination,int at,int count){destination(destination);read(()->{text.readCharacters(candidates.get(candidate(ordinal)),offset,destination,at,count);return 0;});}
+        public void readRaw(long ordinal,long offset,char[] destination,int at,int count){destination(destination);read(()->{text.readCharacters(candidates.get(candidate(ordinal)+1),offset,destination,at,count);return 0;});}
+        public long supportCount(long ordinal){return read(()->candidates.get(candidate(ordinal)+6));}
+        public long reasonCount(){open();return reasonsCount;}
+        public long reasonLength(long ordinal){return read(()->text.characterCount(reason(ordinal)));}
+        public void readReason(long ordinal,long offset,char[] destination,int at,int count){destination(destination);read(()->{text.readCharacters(reason(ordinal),offset,destination,at,count);return 0;});}
+        public int authorityCount(){open();return state.authorityCount();}
+        public String authority(int ordinal){open();return state.authority(ordinal);}
+        public boolean valueRemainder(){open();return state.valueOpen;}
+        public boolean interpretationRemainder(){open();return state.interpretationOpen;}
+        public SiteScope openSite(long ordinal){
+            open();if(ordinal<0||ordinal>=sitesCount)throw new IndexOutOfBoundsException("general program site ordinal");AnalysisResources.Reservation funding=null;PagedDependencyFactStorage.FactCursor raw=null;
+            try{funding=resources.reserve(AnalysisResources.Pool.SCRATCH,256,AnalysisResources.Phase.REPLAY);raw=fact(Math.toIntExact(siteRows.get(ordinal)));var scope=new SiteScope(raw,funding);raw=null;funding=null;scope.raw.onClose(scope::close);scope.funding.onOwnerClose(scope::close);scope.live();return scope;}
+            catch(RuntimeException|Error failure){abort(failure);cleanup(raw,failure);cleanup(funding,failure);throw failure;}
+        }
+        public SupportScope openSupport(long candidate,long ordinal){
+            open();AnalysisResources.Reservation funding=null;PagedDependencyFactStorage.SupportCursor raw=null;
+            try{long at=candidate(candidate);if(ordinal<0||ordinal>=candidates.get(at+6))throw new IndexOutOfBoundsException("general program support ordinal");long row=supportOrder.get(candidates.get(at+5)+ordinal);
+                funding=resources.reserve(AnalysisResources.Pool.SCRATCH,256,AnalysisResources.Phase.REPLAY);raw=support(row);var scope=new SupportScope(raw,funding);raw=null;funding=null;scope.raw.onClose(scope::close);scope.funding.onOwnerClose(scope::close);scope.live();return scope;}
+            catch(IndexOutOfBoundsException invalid){cleanup(raw,invalid);cleanup(funding,invalid);throw invalid;}
+            catch(RuntimeException|Error failure){abort(failure);cleanup(raw,failure);cleanup(funding,failure);throw failure;}
+        }
+        private void cleanup(AutoCloseable owned,Throwable primary){if(owned!=null)try{owned.close();}catch(Exception|Error failure){if(failure!=primary)primary.addSuppressed(failure);}}
+        private void retire(AutoCloseable cursor,AnalysisResources.Reservation funding){
+            Throwable failure=null;try{cursor.close();}catch(Exception|Error error){failure=error;}
+            try{funding.close();}catch(RuntimeException|Error error){if(failure==null)failure=error;else if(error!=failure)failure.addSuppressed(error);}
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("general scope cleanup failed",failure);
+        }
+        public final class SiteScope implements AutoCloseable {
+            private PagedDependencyFactStorage.FactCursor raw;
+            private AnalysisResources.Reservation funding;
+            private SiteScope previous,next;private boolean retired;
+            private SiteScope(PagedDependencyFactStorage.FactCursor raw,AnalysisResources.Reservation funding){this.raw=raw;this.funding=funding;next=siteScopes;if(siteScopes!=null)siteScopes.previous=this;siteScopes=this;}
+            private void live(){if(retired)throw new IllegalStateException("general program site scope expired");open();}
+            public int candidateCount(){live();return raw.candidateCount();}
+            public PagedDependencyFactStorage.CandidateCursor openCandidate(int ordinal){live();return raw.openCandidate(ordinal);}
+            public PagedDependencyFactStorage.IdentityView entry(){live();return raw.entry();}
+            public PagedDependencyFactStorage.IdentityView operation(){live();return raw.operation();}
+            public DependencySiteFact.Reachability reachability(){live();return raw.reachability();}
+            public PagedDependencyFactStorage.PointView valuePoint(){live();return raw.valuePoint();}
+            public int premiseCount(){live();return raw.premiseCount();}
+            public PagedDependencyFactStorage.IdentityView premise(int ordinal){live();return raw.premise(ordinal);}
+            public int provenanceCount(){live();return raw.provenanceCount();}
+            public PagedDependencyFactStorage.IdentityView provenance(int ordinal){live();return raw.provenance(ordinal);}
+            @Override public void close(){if(retired)return;retired=true;if(previous==null)siteScopes=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;var cursor=raw;raw=null;var reservation=funding;funding=null;retire(cursor,reservation);}
+        }
+        public final class SupportScope implements AutoCloseable {
+            private PagedDependencyFactStorage.SupportCursor raw;
+            private AnalysisResources.Reservation funding;
+            private SupportScope previous,next;private boolean retired;
+            private SupportScope(PagedDependencyFactStorage.SupportCursor raw,AnalysisResources.Reservation funding){this.raw=raw;this.funding=funding;next=supportScopes;if(supportScopes!=null)supportScopes.previous=this;supportScopes=this;}
+            private void live(){if(retired)throw new IllegalStateException("general program support scope expired");open();}
+            public DependencySiteFact.SupportKind kind(){live();return raw.kind();}
+            public PagedDependencyFactStorage.IdentityView producer(){live();return raw.producer();}
+            public PagedDependencyFactStorage.IdentityView origin(){live();return raw.origin();}
+            public int premiseCount(){live();return raw.premiseCount();}
+            public PagedDependencyFactStorage.IdentityView premise(int ordinal){live();return raw.premise(ordinal);}
+            @Override public void close(){if(retired)return;retired=true;if(previous==null)supportScopes=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;var cursor=raw;raw=null;var reservation=funding;funding=null;retire(cursor,reservation);}
+        }
+        @Override public void close(){
+            if(retired)return;retired=true;complete=false;if(previous==null)programCursors=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;
+            Throwable failure=null;
+            while(siteScopes!=null)try{siteScopes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            while(supportScopes!=null)try{supportScopes.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            if(probe!=null)probe.clear();
+            for(var owned:new AutoCloseable[]{reasons,supportOrder,supports,candidateOrder,candidates,siteRows,text,capacity})if(owned!=null)try{owned.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            reasons=null;supportOrder=null;supports=null;candidateOrder=null;candidates=null;siteRows=null;text=null;capacity=null;probe=null;left=null;right=null;state=null;occurrence=null;
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
+        }
+    }
     /** SOURCE supplies its own paged program inventory and metric enrichment. */
     DependencyResult bindBase(DependencyResult base){live();occurrences=List.of();result=Objects.requireNonNull(base);ready=true;return result;}
     DependencyResult bind(DependencyResult base,DependencyInput.Qualification qualification){
@@ -277,6 +468,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=primary)primary.addSuppressed(cleanup);}}
     @Override public void close(){
         if(closed)return;closed=true;ready=false;Throwable failure=null;
+        while(programCursors!=null)try{programCursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         while(programProjections!=null)try{programProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         while(cursors!=null)try{cursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var owned:new AutoCloseable[]{order,annotations,operations,index,facts,control})if(owned!=null)try{owned.close();}

@@ -84,20 +84,18 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         if(conditional){text.readCharacters(id,0,left,0,prefix.length());for(int i=0;i<prefix.length();i++)if(left[i]!=prefix.charAt(i)){conditional=false;break;}}
         if(conditional||text.matches(id,"SOURCE_CONTROL_UNAVAILABLE"))global.intern(id,id);
     }
-    /** Authority is encoded in insertion order, not sorted or inferred from names. */
-    private void addAuthority(long item,int value){long at=item*ITEM+2,packed=items.get(at);for(long rest=packed;rest!=0;rest>>>=3)if((rest&7)==value+1)return;int shift=0;for(long rest=packed;rest!=0;rest>>>=3)shift+=3;items.set(at,packed|((long)value+1)<<shift);}
     private void resolve(long item,PagedLongIndex global) {
-        long base=item*ITEM;items.set(base,candidateCount);items.set(base+4,reasonCount);boolean qualified=plan.qualified(item),computed=plan.targetKind(item).equals("COMPUTED"),observed=false,valueOpen=false,interpretationOpen=false,execCandidates=false;
+        long base=item*ITEM;items.set(base,candidateCount);items.set(base+4,reasonCount);boolean qualified=plan.qualified(item),computed=plan.targetKind(item).equals("COMPUTED"),execCandidates=false;
+        var state=new TargetResolver.AssemblyState(qualified,plan.sourceControlRemainder(item));
         if(computed&&(qualified||plan.operationCount(item)>0))qualifiedComputed=Math.incrementExact(qualifiedComputed);
         try(var order=new PagedLongIndex(pages,resources,PHASE,this::compareCandidate);var reasonOrder=new PagedLongIndex(pages,resources,PHASE,this::compareText)) {
-            if(qualified)addAuthority(item,plan.sourceControlRemainder(item)?1:0);
             if(plan.sourceControlRemainder(item))reason(reasonOrder,global,"SOURCE_CONTROL_UNAVAILABLE");
             for(long s=0,n=plan.siteCount(item);s<n;s++) {
                 if(plan.hasManagedFactCursors())try(var site=plan.openFact(item,s)) {
                     resources.work(1,PHASE);
                     for(int r=0,length=site.reasonCount();r<length;r++)try(var value=site.reason(r)){try{probe.factText(value);reason(reasonOrder,global,text.intern(probe));}finally{probe.clear();}}
                     if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)continue;
-                    observed=true;addAuthority(item,site.reachability()==DependencySiteFact.Reachability.REACHABLE?2:3);valueOpen|=!Boolean.FALSE.equals(site.modelValueRemainder())||site.sourceValueRemainder();interpretationOpen|=site.interpretationUnknownRemainder();
+                    state.site(site.reachability(),site.modelValueRemainder(),site.sourceValueRemainder(),site.interpretationUnknownRemainder());
                     for(int c=0,size=site.candidateCount();c<size;c++)try(var candidate=site.openCandidate(c)) {
                         resources.work(1,PHASE);execCandidates|=candidate.supportCount()!=0;long row;
                         try{probe.factCandidate(candidate,false);long reference=text.intern(probe);probe.factCandidate(candidate,true);row=add(order,reference,text.intern(probe));}finally{probe.clear();}
@@ -106,7 +104,7 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
                 }else try(var projection=plan.projectSite(item,s)) {
                 resources.work(1,PHASE);var site=projection.fact();for(var r:site.analysisReasons())reason(reasonOrder,global,r);
                 if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)continue;
-                observed=true;addAuthority(item,site.reachability()==DependencySiteFact.Reachability.REACHABLE?2:3);valueOpen|=!Boolean.FALSE.equals(site.modelValueRemainder())||site.sourceValueRemainder();interpretationOpen|=site.interpretationUnknownRemainder();
+                state.site(site.reachability(),site.modelValueRemainder(),site.sourceValueRemainder(),site.interpretationUnknownRemainder());
                 for(int c=0,size=site.candidates().size();c<size;c++) {
                     resources.work(1,PHASE);var candidate=site.candidates().get(c);execCandidates|=!candidate.supports().isEmpty();long row=add(order,text.intern(candidate.referenceName()),text.intern(candidate.rawValue()));
                     for(int p=0,length=candidate.supports().size();p<length;p++)addSupport(row,item,s,c,p);
@@ -119,22 +117,20 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
                 long literals=field(occurrence,SourceShape.OCCURRENCE,7);
                 for(long i=0,n=source.size(literals,SourceShape.VALUE);i<n;i++) {
                     resources.work(1,PHASE);long raw=field(source.element(literals,SourceShape.VALUE,i),SourceShape.VALUE,1);probe.source(raw);
-                    int length=supported?interpret(cics,false):-1;interpretationOpen|=length<0||!cics;
+                    int length=supported?interpret(cics,false):-1;state.interpretationOpen|=length<0||!cics;
                     if(length>=0)addInterpreted(order,length);
                 }
             }
             long query=plan.queryOrdinal(item);
             if(plan.requiresNominal(item)&&nominal!=null&&query>=0&&nominal.candidateCount(query)>0) {
-                valueOpen=true;addAuthority(item,4);reason(reasonOrder,global,"CONDITIONAL_NOMINAL_VALUE_EVIDENCE");
+                state.conditional();reason(reasonOrder,global,"CONDITIONAL_NOMINAL_VALUE_EVIDENCE");
                 for(long c=0,n=nominal.candidateCount(query);c<n;c++) {
-                    resources.work(1,PHASE);probe.nominal(query,c);int length=supported?interpret(cics,true):-1;interpretationOpen|=length<0||!cics;
+                    resources.work(1,PHASE);probe.nominal(query,c);int length=supported?interpret(cics,true):-1;state.interpretationOpen|=length<0||!cics;
                     if(length>=0){long row=addInterpreted(order,length);candidates.set(row*CANDIDATE+5,copyConditional(query,c)+1);}
                 }
             }
-            if(qualified&&!observed&&computed){valueOpen=true;reason(reasonOrder,global,plan.siteCount(item)==0?"SOURCE_TARGET_WITHOUT_EXECUTABLE_QUERY":"SOURCE_TARGET_WITHOUT_REACHABLE_VALUE");}
-            if(plan.targetKind(item).equals("UNAVAILABLE")){valueOpen=true;reason(reasonOrder,global,"SOURCE_TARGET_UNAVAILABLE");}
-            if(qualified&&!observed)valueOpen|=source.bool(field(occurrence,SourceShape.OCCURRENCE,8));
-            items.set(base+3,(valueOpen?1:0)|(interpretationOpen?2:0));
+            String missing=state.finish(plan.targetKind(item),qualified&&!state.observed&&source.bool(field(occurrence,SourceShape.OCCURRENCE,8)),plan.siteCount(item));if(missing!=null)reason(reasonOrder,global,missing);
+            items.set(base+2,state.packedAuthorities());items.set(base+3,(state.valueOpen?1:0)|(state.interpretationOpen?2:0));
             try(var cursor=order.cursor()){while(cursor.advance()){long row=cursor.value();candidateOrder.set(candidateCount++,row);orderSupports(row);}}
             items.set(base+1,candidateCount-items.get(base));
             try(var cursor=reasonOrder.cursor()){while(cursor.advance())reasons.set(reasonCount++,cursor.value());}items.set(base+5,reasonCount-items.get(base+4));
@@ -152,11 +148,8 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
     private SourceTargetPlan.SupportCursor openSupportRow(long row){long at=row*SUPPORT;return plan.openSupport(supports.get(at),supports.get(at+1),Math.toIntExact(supports.get(at+2)),Math.toIntExact(supports.get(at+3)));}
     private void orderSupports(long candidate) {
         long at=candidate*CANDIDATE;candidates.set(at+6,supportCount);
-        try(var distinct=new PagedLongIndex(pages,resources,PHASE,this::compareSupportIdentity);var order=new PagedLongIndex(pages,resources,PHASE,this::compareSupportWire)) {
-            boolean merged=candidates.get(at+4)>1;
-            for(long row=candidates.get(at+2);row!=0;row=supports.get(row*SUPPORT+4)){resources.work(1,PHASE);if(!merged||distinct.intern(row,row)==row)order.intern(row,row);}
-            try(var cursor=order.cursor()){while(cursor.advance())supportOrder.set(supportCount++,cursor.value());}
-        }candidates.set(at+7,supportCount-candidates.get(at+6));
+        TargetResolver.orderSupportUnion(candidates.get(at+4)>1,candidates.get(at+2),row->supports.get(row*SUPPORT+4),this::compareSupportIdentity,this::compareSupportWire,row->supportOrder.set(supportCount++,row),pages,resources,PHASE);
+        candidates.set(at+7,supportCount-candidates.get(at+6));
     }
     private long copyConditional(long query,long candidate) {
         long row=conditionalCount++,at=row*CONDITIONAL,mask=0;
@@ -171,10 +164,9 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         for(int i=0;i<end;i++){char c=probe.charAt(i);boolean letter=c>='A'&&c<='Z',digit=c>='0'&&c<='9';if(cics?!(letter||digit||c=='$'||c=='@'||c=='#'):!(letter||c=='_'||c=='$'||i>0&&(digit||c=='@'||c=='#')))return -1;}return end;
     }
     private int compareText(long a,long b) {
-        if(a==b)return 0;int na=text.characterCount(a),nb=text.characterCount(b),n=Math.min(na,nb);
-        for(int at=0;at<n;){resources.work(1,PHASE);int count=Math.min(left.length,n-at);text.readCharacters(a,at,left,0,count);text.readCharacters(b,at,right,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;}return Integer.compare(na,nb);
+        return TargetResolver.compareText(text,a,b,left,right,resources,PHASE);
     }
-    private int compareCandidate(long a,long b){if(a==b)return 0;long x=candidates.get(a*CANDIDATE),y=candidates.get(b*CANDIDATE);int c=(Integer.toString(text.characterCount(x))+":").compareTo(Integer.toString(text.characterCount(y))+":");if(c==0)c=compareText(x,y);return c==0?compareText(candidates.get(a*CANDIDATE+1),candidates.get(b*CANDIDATE+1)):c;}
+    private int compareCandidate(long a,long b){if(a==b)return 0;return TargetResolver.compareCandidateKey(text,candidates.get(a*CANDIDATE),candidates.get(a*CANDIDATE+1),candidates.get(b*CANDIDATE),candidates.get(b*CANDIDATE+1),left,right,resources,PHASE);}
     private int compareSupportIdentity(long a,long b){
         if(a==b)return 0;
         if(plan.hasManagedSupportCursors())try(var first=openSupportRow(a);var second=openSupportRow(b)){

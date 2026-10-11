@@ -573,6 +573,35 @@
       "eachFundedNativeAnnotationCombinationPreservesDetachedFactStatusReasonsAndWholeSiteBytes",
       "actualPhysicalDisabledSourceProductRetainsKnownCandidateAndPerSiteReason"
     ],
+    "io.github.gustavo2358.analysis.adapters.NativeGeneralProgramCursorTest": [
+      "actualGeneralWriterAcrossFiveGeometriesDoesNotProjectCompleteFactsForProgramAggregation",
+      "scopedGeneralProgramFieldsBoundsAndParentExpiryPreserveBorrowedOwners",
+      "oneProgramWithReversedDuplicateOperationsPreservesFullLegacyResolutionAndWire"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeGeneralProgramPressureTest": [
+      "oneCallerStagedProgramEveryCandidateReverseReadAndFullLegacyWireHaveFixedResidentControls"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeGeneralProgramFailureTest": [
+      "everyInvalidProgramFieldAndBlockRangeLeavesOwnerAndSiblingScopesUsable",
+      "nullDestinationIsCallerErrorAndDoesNotRetireTheGeneralProgramGraph",
+      "deniedResidentControlAndEarlyCarriersRetireOnlyTheDerivedOwner",
+      "deniedSiteAndSupportWrappersExpireAllDerivedScopesWithoutScratchLeaks",
+      "allocationReadAndWriteFaultsDuringGeneralAssemblyPreservePrimaryAndBorrowedBackend",
+      "lateTextReadFaultImmediatelyExpiresEveryProgramSiteSupportAndIdentityScope",
+      "workExhaustionRetiresTheWholeGeneralGraphUsingCleanupBudgetOnly",
+      "nativeProgramExpiryImmediatelyRetiresAllProgramDescendantsButNotBorrowedPageBackend",
+      "wholeGeneralWriterOutputFailurePreservesPrimaryAndClosesTransientProgramsOnly",
+      "firstPreparationGrowthIsBorrowedProgramMetadataAndWarmOwnersRetireExactly",
+      "outputFailureWhileRealWideProducerAndProgramAreStillOpenReleasesEveryTransientScopeOnly"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeGeneralProgramShapeTest": [
+      "fiveUtf16WidthsKeepLegacyLengthPrefixedKeysFullRawAndWideProofIdentityCold",
+      "fiveSupportCountsPreserveSingleContributionDuplicatesButMergedFullIdentityUnionAndStableWireTies",
+      "fivePremiseCountsRetainEveryCollidingDuplicateOrdinalWithoutGrowingLiveScopes",
+      "allSeventeenSealedProducerKindsRemainReadableAndWireAdmissionStillRejectsTheOriginalUnsupportedKinds",
+      "everyGeneralReferenceRawAndReasonRejectsUnpairedUnicodeExactlyLikeLegacyWithoutExpiringItsOwner",
+      "fiveCallerStagedEntrySiteCountsKeepWholeProgramUnionAndEverySiteOrdinalWithFixedResidentControls"
+    ],
     "io.github.gustavo2358.analysis.adapters.ManagedSourceExecutableOwnerTest": [
       "planningAndColdSupportSortingNeverDecodeWholeUnrelatedFactBodies",
       "admittedSourceOwnsGeneralCallCursorAndExpiresItWithoutClosingBorrowedAir",
