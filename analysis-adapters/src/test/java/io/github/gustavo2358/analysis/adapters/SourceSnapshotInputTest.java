@@ -21,10 +21,13 @@ final class SourceSnapshotInputTest {
     private SourceCorrelationSnapshotTest fixtures(){var value=new SourceCorrelationSnapshotTest();value.directory=directory;return value;}
     @Test void typedInputBindsWireDocumentAirAndPublicationWithoutResidentSourceProjection()throws Exception {
         var publication=SourceCorrelationSnapshotTest.program(1);var source=SourceProgramSnapshotTest.source(publication,"source-possibility/unknown-copy-kill.source.json");byte[] wire=CODEC.encode(source);Path path=directory.resolve("source.json");Files.write(path,wire);var fixture=fixtures();
-        try(var input=fixture.new NativeCase(publication,source)) {
+        // This case publishes bytes, unlike the read-only/denial cases below.
+        // Declare output capacity explicitly; the native view must charge its root.
+        try(var input=fixture.new NativeCase(publication,source,false,1_000_000)) {
             long baseline=input.pages.statistics().livePages();
             try(var admitted=SourceSnapshotInput.read(path,input.program,input.pages,input.execution,"0".repeat(64),Optional.of(digest(wire)),Optional.of(source.source().sha256()))) {
                 assertEquals(source.units().size(),admitted.unitCount());var bytes=new ByteArrayOutputStream();CODEC.writeSnapshot(admitted,bytes,input.pages,input.execution);assertEquals(JSON.readTree(wire),JSON.readTree(bytes.toByteArray()));assertEquals(publication.id(),input.program.publicationId());
+                assertEquals(bytes.size(),input.execution.outputUsed());assertEquals(bytes.size(),input.resources.outputUsed());
             }assertEquals(baseline,input.pages.statistics().livePages());assertTrue(input.source.unitCount()>0);
         }
     }

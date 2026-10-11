@@ -18,6 +18,9 @@ public interface ProgramStore {
     enum CapacityPool { RESIDENT, SCRATCH, DIRECT, TEMPORARY, OPEN_FILES }
     interface ExecutionBudget {
         CapacityLease reserve(CapacityPool pool,long amount,ExecutionPhase phase);
+        /** Cumulative output belongs to the common admitted owner. An older
+         * capacity-only implementation cannot silently advertise output quotas. */
+        default void output(long bytes,ExecutionPhase phase){throw new UnsupportedOperationException("native output budget is not implemented");}
     }
     /** Capacity changes are atomic. Absorb transfers already charged capacity,
      * never charges again; foreign owner/pool, self and closed transfers fail.

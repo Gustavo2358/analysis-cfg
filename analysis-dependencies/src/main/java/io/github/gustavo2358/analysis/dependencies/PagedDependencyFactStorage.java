@@ -16,12 +16,16 @@ import static io.github.gustavo2358.analysis.dependencies.DependencySiteFact.*;
  * payloads are not interned in this initial codec. Radix-directory costs belong
  * to PagedLongArray. Fixed control is 1024 + two3072-byte tape controls; the
  * shared backend separately funds its cache and external payload/directories.
- * Get explicitly projects one detached fact under a preflight scratch envelope
- * (1024 +64 per encoded cell), released on return. Callers that retain decoded
- * facts are resident compatibility consumers, not managed cursor qualification.
+ * Project funds one complete fact under a preflight scratch envelope
+ * (1024 +64 per encoded cell), held until its scoped projection closes. Get is
+ * explicit detached compatibility and releases that envelope on return. Callers
+ * retaining detached facts are not managed cursor qualification. A complete fact
+ * can also project a complete typed support leaf through paged inline directories.
+ * One huge support/premise list or text still needs finer-grained cursors.
  * Owner expiry/read/write/denial abort retires only these tapes and controls. */
 public final class PagedDependencyFactStorage implements FactStorage<DependencySiteFact> {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DEMAND;
+    private static final int STRIDE=8;
     private final AnalysisResources resources;
     private AnalysisResources.Reservation control;
     private PagedLongArray offsets,payload;
@@ -29,6 +33,8 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private int count;
     private boolean closed;
     private Transaction active;
+    private Projection projections;
+    private SupportProjection supportProjections;
     public PagedDependencyFactStorage(PageStore pages,AnalysisResources resources) {
         Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);
         control=resources.reserve(AnalysisResources.Pool.RESIDENT,1024,PHASE);
@@ -51,17 +57,19 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         Objects.requireNonNull(fact);open();
         try {
             int next=Math.incrementExact(count);long begin=cells;
-            id(fact.caller());id(fact.entry());id(fact.sequence());id(fact.operation());word(fact.offset());
+            id(fact.caller());id(fact.entry());id(fact.sequence());id(fact.operation());long keyEnd=cells;word(fact.offset());
             id(fact.siteOrigin());id(fact.targetOrigin());text(fact.technology());text(fact.command());text(fact.namespace());text(fact.nameProfile());
-            word(fact.targetKind().ordinal());id(fact.subject());point(fact.valuePoint());
-            word(fact.reachability().ordinal());word(fact.targetStatus().ordinal());
+            long kind=cells;word(fact.targetKind().ordinal());id(fact.subject());point(fact.valuePoint());
+            long reach=cells;word(fact.reachability().ordinal());word(fact.targetStatus().ordinal());
             word(fact.rawCandidates().size());for(var raw:fact.rawCandidates()){text(raw.rawValue());supports(raw.supports());}
-            word(fact.candidates().size());for(var candidate:fact.candidates()){text(candidate.referenceName());text(candidate.rawValue());supports(candidate.supports());}
-            word(fact.modelValueRemainder()==null?0:fact.modelValueRemainder()?2:1);
+            long candidates=cells;indexed(fact.candidates().size(),i->{var candidate=fact.candidates().get(i);text(candidate.referenceName());text(candidate.rawValue());supports(candidate.supports());});
+            long model=cells;word(fact.modelValueRemainder()==null?0:fact.modelValueRemainder()?2:1);
             bool(fact.sourceValueRemainder());bool(fact.interpretationUnknownRemainder());bool(fact.effectiveUnknownRemainder());bool(fact.openControlRemainder());
             ids(fact.evidence());ids(fact.provenance());ids(fact.premises());ids(fact.uncertaintyRefs());
-            word(fact.analysisStatus().ordinal());word(fact.analysisReasons().size());for(var reason:fact.analysisReasons())text(reason);
-            offsets.set(count*2L,begin);offsets.set(count*2L+1,cells);count=next;
+            long analysis=cells;word(fact.analysisStatus().ordinal());word(fact.analysisReasons().size());for(var reason:fact.analysisReasons())text(reason);
+            long row=count*(long)STRIDE;
+            offsets.set(row,begin);offsets.set(row+1,cells);offsets.set(row+2,keyEnd);
+            offsets.set(row+3,kind);offsets.set(row+4,reach);offsets.set(row+5,candidates);offsets.set(row+6,analysis);offsets.set(row+7,model);count=next;
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     /** Sequential consumer ranges share these same two tapes. No fixed tape
@@ -76,6 +84,33 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         try{control.grow(256,PHASE);var next=new Transaction(count);active=next;return next;}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
+    /** Transfer the committed ranges to this explicit result owner before the
+     * PlanningExecution closes its transaction views. No failed tail is revived. */
+    synchronized void seal(){open();active=null;}
+    record Header(UnitId caller,EntryId entry,OperationId operation,TargetKind targetKind,
+                  Reachability reachability,int candidates,AnalysisStatus analysisStatus,Boolean modelValueRemainder) { }
+    /** Only identity prefix and fixed typed columns, never candidates/proofs/body.
+     * Callback lifetime keeps both the projected complete key and carrier funded.
+     * The eight directory cells per fact are paged, not a resident side inventory. */
+    synchronized <T> T withHeader(int ordinal,java.util.function.Function<Header,T> use) {
+        open();Objects.checkIndex(ordinal,count);Objects.requireNonNull(use);
+        try {
+            long row=ordinal*(long)STRIDE,first=offsets.get(row),keyEnd=offsets.get(row+2);
+            try(var scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,Math.addExact(1024,Math.multiplyExact(Math.subtractExact(keyEnd,first),64)),AnalysisResources.Phase.SORT)) {
+                if(scratch.amount()==0)throw new IllegalStateException("unfunded fact key projection");
+                var reader=new Reader(first,keyEnd);var caller=reader.id(UnitId.class);var entry=reader.id(EntryId.class);
+                reader.id(LabelId.class);var operation=reader.id(OperationId.class);
+                if(reader.at!=keyEnd)throw new IllegalStateException("fact key extent mismatch");
+                var header=new Header(caller,entry,operation,reader.tag(TargetKind.values(),Math.toIntExact(payload.get(offsets.get(row+3)))),
+                    reader.tag(Reachability.values(),Math.toIntExact(payload.get(offsets.get(row+4)))),Math.toIntExact(payload.get(offsets.get(row+5))),
+                    reader.tag(AnalysisStatus.values(),Math.toIntExact(payload.get(offsets.get(row+6)))),
+                    remainder(payload.get(offsets.get(row+7))));
+                if(header.candidates()<0)throw new IllegalStateException("negative candidate count");
+                return use.apply(header);
+            }
+        }catch(RuntimeException|Error failure){abort(failure);throw failure;}
+    }
+    private static Boolean remainder(long value){return switch(Math.toIntExact(value)){case 0->null;case 1->Boolean.FALSE;case 2->Boolean.TRUE;default->throw new IllegalStateException("invalid nullable remainder");};}
     private final class Transaction implements FactStorage<DependencySiteFact> {
         private final int first;
         private int size;
@@ -89,8 +124,8 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     }
     private void truncate(int first) {
         try {
-            long tail=first==count?cells:offsets.get(first*2L);
-            for(int i=count-1;i>=first;i--){offsets.set(i*2L+1,0);offsets.set(i*2L,0);}
+            long tail=first==count?cells:offsets.get(first*(long)STRIDE);
+            for(int i=count-1;i>=first;i--)for(int column=STRIDE-1;column>=0;column--)offsets.set(i*(long)STRIDE+column,0);
             for(long i=cells;i>tail;)payload.set(--i,0);
             count=first;cells=tail;
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
@@ -99,7 +134,16 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private void bool(boolean value){word(value?1:0);}
     private void text(String value){word(value.length());for(int i=0;i<value.length();i++)word(value.charAt(i));}
     private void ids(List<? extends Id> values){word(values.size());for(var value:values)id(value);}
-    private void supports(List<Support> values){word(values.size());for(var value:values){word(value.kind().ordinal());id(value.producer());id(value.origin());ids(value.premises());}}
+    /** Count/end plus two extent cells per element, all in the existing paged
+     * payload tape. Direct leaf access does not scan preceding candidate/proofs.
+     * No additional fixed tape control or resident per-element directory. */
+    private void indexed(int size,java.util.function.IntConsumer append){
+        word(size);long endCell=cells;word(0);long directory=cells;
+        for(long i=0,n=2L*size;i<n;i++)word(0);
+        for(int i=0;i<size;i++){long first=cells;append.accept(i);payload.set(directory+2L*i,first);payload.set(directory+2L*i+1,cells);}
+        payload.set(endCell,cells);
+    }
+    private void supports(List<Support> values){indexed(values.size(),i->{var value=values.get(i);word(value.kind().ordinal());id(value.producer());id(value.origin());ids(value.premises());});}
     /** Explicit tags describe all sealed AIR identities, including both Operand owners. */
     private void id(Id value) {
         if(value==null){word(0);return;}
@@ -134,16 +178,85 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         }
     }
     @Override public synchronized DependencySiteFact get(int ordinal) {
-        open();Objects.checkIndex(ordinal,count);
-        try {
-            long first=offsets.get(ordinal*2L),end=offsets.get(ordinal*2L+1),length=Math.subtractExact(end,first);
-            if(first<0||end>cells||length<=0)throw new IllegalStateException("invalid fact payload range");
-            try(var scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,Math.addExact(1024,Math.multiplyExact(length,64)),AnalysisResources.Phase.REPLAY)) {
-                if(scratch.amount()==0)throw new IllegalStateException("unfunded fact projection");
-                var reader=new Reader(first,end);var fact=reader.fact();if(reader.at!=end)throw new IllegalStateException("fact payload trailing fields");return fact;
-            }
-        }catch(RuntimeException|Error failure){abort(failure);throw failure;}
+        try(var projection=project(ordinal)){return projection.fact();}
     }
+    /** Fund before decoding; the caller must close this borrowed projection.
+     * Invalid ordinals do not poison storage. Operational failure expires all
+     * live projections and retires only this storage's derived pages. */
+    public synchronized Projection project(int ordinal) {
+        open();Objects.checkIndex(ordinal,count);
+        AnalysisResources.Reservation scratch=null;
+        try {
+            long first=offsets.get(ordinal*(long)STRIDE),end=offsets.get(ordinal*(long)STRIDE+1),length=Math.subtractExact(end,first);
+            if(first<0||end>cells||length<=0)throw new IllegalStateException("invalid fact payload range");
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,Math.addExact(1024,Math.multiplyExact(length,64)),AnalysisResources.Phase.REPLAY);
+            if(scratch.amount()==0)throw new IllegalStateException("unfunded fact projection");
+            var reader=new Reader(first,end);var fact=reader.fact();
+            if(reader.at!=end)throw new IllegalStateException("fact payload trailing fields");
+            var projection=new Projection(fact,scratch);
+            projection.next=projections;if(projections!=null)projections.previous=projection;projections=projection;
+            scratch=null;projection.reservation.onOwnerClose(projection::close);
+            // Native expiry may run cleanup during callback registration.
+            projection.available();return projection;
+        }catch(RuntimeException|Error failure){
+            abort(failure);
+            if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }
+    }
+    /** Intrusive live-lease chain avoids an unbudgeted cardinality-sized directory.
+     * The preflight envelope also funds this carrier and its links. Closing drops
+     * this owner's DTO reference; an explicitly copied Java record cannot expire. */
+    public final class Projection implements AutoCloseable {
+        private DependencySiteFact fact;
+        private AnalysisResources.Reservation reservation;
+        private Projection previous,next;
+        private boolean retired;
+        private Projection(DependencySiteFact fact,AnalysisResources.Reservation reservation){this.fact=fact;this.reservation=reservation;}
+        private void available(){if(retired)throw new IllegalStateException("dependency fact projection expired");open();}
+        public DependencySiteFact fact(){synchronized(PagedDependencyFactStorage.this){available();return fact;}}
+        long funding(){synchronized(PagedDependencyFactStorage.this){available();return reservation.amount();}}
+        @Override public void close(){synchronized(PagedDependencyFactStorage.this){
+            if(retired)return;retired=true;
+            if(previous==null)projections=next;else previous.next=next;
+            if(next!=null)next.previous=previous;
+            previous=null;next=null;fact=null;var owned=reservation;reservation=null;
+            if(owned!=null)owned.close();
+        }}
+    }
+    /** O(1) directory probes plus bytes of the selected complete typed support.
+     * Fund only that leaf before decoding, and keep it funded until close.
+     * Fixed root control covers the bounded metadata probes before reservation. */
+    public synchronized SupportProjection projectSupport(int ordinal,int candidate,int support){
+        open();Objects.checkIndex(ordinal,count);AnalysisResources.Reservation scratch=null;
+        try {
+            long row=ordinal*(long)STRIDE;var reader=new Reader(offsets.get(row+5),offsets.get(row+1));
+            var candidateRange=reader.select(candidate);reader=new Reader(candidateRange.first(),candidateRange.end());reader.skipText();reader.skipText();
+            var range=reader.select(support);
+            scratch=resources.reserve(AnalysisResources.Pool.SCRATCH,Math.addExact(1024,Math.multiplyExact(Math.subtractExact(range.end(),range.first()),64)),AnalysisResources.Phase.REPLAY);
+            if(scratch.amount()==0)throw new IllegalStateException("unfunded support projection");
+            reader=new Reader(range.first(),range.end());var value=reader.support();if(reader.at!=range.end())throw new IllegalStateException("support trailing fields");
+            var projection=new SupportProjection(value,scratch);projection.next=supportProjections;if(supportProjections!=null)supportProjections.previous=projection;supportProjections=projection;
+            scratch=null;projection.reservation.onOwnerClose(projection::close);projection.available();return projection;
+        }catch(InvalidOrdinal invalid){throw new IndexOutOfBoundsException(invalid.getMessage());}
+        catch(RuntimeException|Error failure){abort(failure);if(scratch!=null)try{scratch.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+    }
+    private static final class InvalidOrdinal extends RuntimeException {
+        private static final long serialVersionUID=1L;
+        InvalidOrdinal(){super("dependency nested ordinal");}
+    }
+    public final class SupportProjection implements AutoCloseable {
+        private Support support;private AnalysisResources.Reservation reservation;private SupportProjection previous,next;private boolean retired;
+        private SupportProjection(Support support,AnalysisResources.Reservation reservation){this.support=support;this.reservation=reservation;}
+        private void available(){if(retired)throw new IllegalStateException("dependency support projection expired");open();}
+        public Support support(){synchronized(PagedDependencyFactStorage.this){available();return support;}}
+        @Override public void close(){synchronized(PagedDependencyFactStorage.this){
+            if(retired)return;retired=true;if(previous==null)supportProjections=next;else previous.next=next;if(next!=null)next.previous=previous;
+            previous=null;next=null;support=null;var owned=reservation;reservation=null;if(owned!=null)owned.close();
+        }}
+    }
+    private record Range(long first,long end) { }
+    private record Directory(int size,long at,long body,long end) { }
     private final class Reader {
         private long at;private final long end;
         Reader(long first,long end){at=first;this.end=end;}
@@ -154,6 +267,15 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         <T> T tag(T[] values){return tag(values,integer());}
         <T> T tag(T[] values,int tag){if(tag<0||tag>=values.length)throw new IllegalStateException("invalid fact tag");return values[tag];}
         String text(){int size=length();char[] value=new char[size];for(int i=0;i<size;i++){long character=word();if(character<0||character>Character.MAX_VALUE)throw new IllegalStateException("invalid UTF16 cell");value[i]=(char)character;}return new String(value);}
+        void skipText(){int size=length();at=Math.addExact(at,size);}
+        Directory directory(){int size=length();long finish=word(),body=Math.addExact(at,2L*size);if(body>finish||finish>end||size==0&&body!=finish)throw new IllegalStateException("invalid nested fact directory");return new Directory(size,at,body,finish);}
+        Range range(Directory directory,int ordinal){long first=payload.get(directory.at()+2L*ordinal),last=payload.get(directory.at()+2L*ordinal+1);if(first<directory.body()||last<=first||last>directory.end())throw new IllegalStateException("invalid nested fact extent");return new Range(first,last);}
+        Range select(int ordinal){var directory=directory();if(ordinal<0||ordinal>=directory.size())throw new InvalidOrdinal();return range(directory,ordinal);}
+        <T> List<T> indexed(java.util.function.Function<Reader,T> decode){
+            var directory=directory();var values=new ArrayList<T>(directory.size());long expected=directory.body();
+            for(int i=0;i<directory.size();i++){var range=range(directory,i);if(range.first()!=expected)throw new IllegalStateException("noncontiguous nested payload");var reader=new Reader(range.first(),range.end());values.add(decode.apply(reader));if(reader.at!=range.end())throw new IllegalStateException("nested trailing fields");expected=range.end();}
+            if(expected!=directory.end())throw new IllegalStateException("nested extent mismatch");at=directory.end();return values;
+        }
         Id id() {
             return switch(integer()) {
                 case 0->null;
@@ -169,7 +291,8 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
         }
         <T extends Id> T id(Class<T> type){return type.cast(Objects.requireNonNull(id()));}
         <T extends Id> List<T> ids(Class<T> type){int size=length();var values=new ArrayList<T>(size);for(int i=0;i<size;i++)values.add(id(type));return values;}
-        List<Support> supports(){int size=length();var values=new ArrayList<Support>(size);for(int i=0;i<size;i++)values.add(new Support(tag(SupportKind.values()),id(Id.class),id(OriginId.class),ids(PremiseId.class)));return values;}
+        Support support(){return new Support(tag(SupportKind.values()),id(Id.class),id(OriginId.class),ids(PremiseId.class));}
+        List<Support> supports(){return indexed(Reader::support);}
         ProgramPoint point() {
             int kind=integer();if(kind==0)return null;
             var entry=id(EntryId.class);var operation=(OperationId)id();
@@ -181,7 +304,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             var siteOrigin=id(OriginId.class);var targetOrigin=id(OriginId.class);var technology=text();var command=text();var namespace=text();var profile=text();
             var kind=tag(TargetKind.values());var subject=(ObjectId)id();var point=point();var reach=tag(Reachability.values());var status=tag(TargetStatus.values());
             int rawCount=length();var raw=new ArrayList<RawCandidate>(rawCount);for(int i=0;i<rawCount;i++)raw.add(new RawCandidate(text(),supports()));
-            int candidateCount=length();var candidates=new ArrayList<Candidate>(candidateCount);for(int i=0;i<candidateCount;i++)candidates.add(new Candidate(text(),text(),supports()));
+            var candidates=indexed(reader->new Candidate(reader.text(),reader.text(),reader.supports()));
             Boolean model=switch(integer()){case 0->null;case 1->Boolean.FALSE;case 2->Boolean.TRUE;default->throw new IllegalStateException("invalid nullable remainder");};
             boolean source=bool(),interpretation=bool(),effective=bool(),controlOpen=bool();
             var evidence=ids(Id.class);var origins=ids(OriginId.class);var premises=ids(PremiseId.class);var uncertainties=ids(UncertaintyId.class);var analysis=tag(AnalysisStatus.values());
@@ -193,6 +316,10 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=primary)primary.addSuppressed(cleanup);}}
     @Override public synchronized void close() {
         if(closed)return;closed=true;Throwable failure=null;
+        while(supportProjections!=null)try{supportProjections.close();}
+            catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+        while(projections!=null)try{projections.close();}
+            catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         for(var owned:new AutoCloseable[]{payload,offsets,control})if(owned!=null)try{owned.close();}
             catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
         payload=null;offsets=null;control=null;active=null;count=0;cells=0;

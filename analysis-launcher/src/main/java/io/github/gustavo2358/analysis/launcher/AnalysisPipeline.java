@@ -113,14 +113,13 @@ public final class AnalysisPipeline {
                     // Complete analysis preparation before replacing either existing product.
                     var analysis=new DependencyAnalysis(physical?StorageAnalysisMode.EXPERIMENTAL_PHYSICAL:StorageAnalysisMode.LOGICAL_ONLY);
                     var result=evidence==null?null:analysis.prepareLeased(program,built,evidence,List.of(),read.borrowedPages(),execution);
-                    try(result) {
-                        var executable=evidence==null?analysis.prepareLeased(program,built,read.borrowedPages(),execution):null;
+                    try(result;var executable=evidence==null?analysis.prepareManaged(program,built,read.borrowedPages(),execution):null) {
                         try {new CfgJsonWriter(resources.limits().outputBytes()).write(built,cfg,
                                 bytes->resources.output(bytes,AnalysisResources.Phase.ENCODE));}
                         catch(CfgJsonException failure){err.println("CFG_OUTPUT_SERIALIZATION");return 5;}
                         catch(IOException failure){err.println("CFG_OUTPUT_IO");return 6;}
                         program.releaseCfgProjection(built.options().projectionPolicy());
-                        try {if(result!=null)new SnapshotDependencyFileWriter().write(result,dependencies,read.borrowedPages(),execution);else new SnapshotDependencyFileWriter().write(executable,program,dependencies,resources);}
+                        try {if(result!=null)new SnapshotDependencyFileWriter().write(result,dependencies,read.borrowedPages(),execution);else new SnapshotDependencyFileWriter().write(executable,program,dependencies,execution);}
                         catch(IOException|IllegalArgumentException failure){err.println("DEPENDENCY_OUTPUT_FAILURE");return 6;}
                     }
                 }

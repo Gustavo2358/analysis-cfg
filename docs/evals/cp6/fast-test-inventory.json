@@ -491,6 +491,40 @@
       "nativeProgramExpiryDetachesEveryFactPageWithoutClosingBorrowedAdmittedInput",
       "allCompletionReachabilityTargetKindsAndOptionalPointShapesRetainExactClosedFields"
     ],
+    "io.github.gustavo2358.analysis.adapters.ManagedExecutableDependencyResultTest": [
+      "completeGeneralFactsHaveCanonicalPagedResultAndFundedScopedCursorUntilOwnerClose",
+      "resultOwnerRetiresOnlyDerivedPagesAndProgramExpiryInvalidatesTheLiveCursor"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ManagedExecutableDependencyProgramsTest": [
+      "plainProgramRequestsProjectOnlyMatchingCompleteFactsNotRequestsTimesAllSites"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ManagedExecutableDependencyWriterTest": [
+      "wholeWireMatchesGeneralCompatibilityAndProjectsOneSitePerSectionWithoutWholeSort",
+      "atomicOutputQuotaFailurePreservesDestinationAndBorrowedProgram"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeExecutionOutputBudgetTest": [
+      "distinctExecutionViewsShareExactCommonOutputChargeWithoutDoubleCharging",
+      "commonOutputDenialLeavesBothCountersUnchangedAndPreservesTypedPhase"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ManagedExecutableDependencyIdentityTest": [
+      "collidingUnitAndEntryNamesUnicodeAndReversedInventoryKeepEveryFullSiteAndProducer"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedDependencyFactProjectionTest": [
+      "completeFactsRemainFundedUntilEachLeaseClosesAndRootCloseRetiresLiveLeases",
+      "deniedLaterProjectionAbortsOwnedStorageAndExistingLeasesWithoutClosingBorrowedPages",
+      "workDenialOnScopedFactKeepsPrimaryAndImmediatelyRetiresEveryLiveProjection"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ManagedSourceExecutableOwnerTest": [
+      "planningAndColdSupportSortingNeverDecodeWholeUnrelatedFactBodies",
+      "admittedSourceOwnsGeneralCallCursorAndExpiresItWithoutClosingBorrowedAir",
+      "closingSourcePlanRetiresOnlyItsLiveSiteAndSupportScopesNotBorrowedCallOwner",
+      "ownedStatusCannotShortCircuitExpiryThroughAlreadyKnownPartialReasons"
+    ],
+    "io.github.gustavo2358.analysis.adapters.PagedDependencySupportProjectionTest": [
+      "everyTypedProducerAndRepeatedPremiseStaysFundedUntilLeafClosesAndRootExpiresAllLeaves",
+      "deniedLeafProjectionKeepsPrimaryExpiresEarlierLeavesAndRetiresOnlyOwnedTapes",
+      "coldDirectoryReadFailurePreservesPrimaryAndExpiresEveryLiveTypedLeafWithoutClosingBackend"
+    ],
     "io.github.gustavo2358.analysis.adapters.PagedJsonWordMemoTest": [
       "exactPhysicalWordsRemainCoherentAndWorkChecked"
     ],

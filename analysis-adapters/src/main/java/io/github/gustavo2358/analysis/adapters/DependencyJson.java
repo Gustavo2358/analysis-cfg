@@ -27,6 +27,16 @@ public final class DependencyJson {
             }
         }else write(result,stream,source); // Explicit caller-managed resident compatibility.
     }
+    /** General native CALL sections consume scoped facts in canonical order.
+     * Whole FILE and one-program/nested DTOs remain explicit migration debt. */
+    public void writeSnapshot(ManagedExecutableDependencyResult result,SnapshotProgram source,
+            io.github.gustavo2358.analysis.solver.AnalysisResources resources,OutputStream stream)throws IOException {
+        Objects.requireNonNull(result);Objects.requireNonNull(stream);result.requireContext(source,resources);
+        try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
+            if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed executable root buffer");
+            write(result.result(),source,new JsonOutput(stream),null,null,result);result.result();
+        }
+    }
     /** One funded root buffer; every SOURCE section borrows its complete prepared owner. */
     public void writeSnapshot(ManagedDependencyResult result,SnapshotProgram source,io.github.gustavo2358.analysis.solver.PageStore pages,
             io.github.gustavo2358.analysis.solver.AnalysisResources resources,OutputStream stream)throws IOException {
@@ -34,13 +44,16 @@ public final class DependencyJson {
         if(result.program()!=source)throw new IllegalArgumentException("foreign native managed result owner");
         try(var buffer=resources.reserve(io.github.gustavo2358.analysis.solver.AnalysisResources.Pool.RESIDENT,65536+4096,io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.ENCODE)) {
             if(buffer.amount()!=65536+4096)throw new IllegalStateException("unfunded managed root buffer");var output=new JsonOutput(stream);
-            try(var writer=SourceSnapshotWriter.open(result.admission(),output,pages,resources)){write(result.executable(),source,output,result,writer);writer.verify();result.programs().count();}
+            try(var writer=SourceSnapshotWriter.open(result.admission(),output,pages,resources)){write(result.executable(),source,output,result,writer,result.executableOwner());writer.verify();result.executable();result.programs().count();}
         }
     }
     private void write(DependencyResult result,OutputStream stream,ProgramStore.Structural programSource) throws IOException {
         write(result,programSource,new JsonOutput(stream),null,null);
     }
     private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer)throws IOException {
+        write(result,programSource,out,managed,writer,null);
+    }
+    private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer,ManagedExecutableDependencyResult executable)throws IOException {
         boolean snapshot=programSource!=null;
         // Native v3 borrows scalar headers from the existing paged catalogue.
         // Only the explicit non-native compatibility API builds a resident map.
@@ -59,10 +72,10 @@ public final class DependencyJson {
         var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->Set.of("1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(s.evidence().version())?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
-            "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->{
+            "sites",executable!=null?managedSites(executable,siteCoverage):result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->{
                 var value=site(s,true);if(snapshot)value.put("coverage",Objects.requireNonNull(siteCoverage.apply(s.operation()),"missing original site coverage").name());return value;
             }),
-            "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
+            "edges",executable!=null?managedEdges(executable):result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
             "metrics",result.metrics(),"origins",orderedMetadata(result.origins(),Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),
             "artifacts",orderedMetadata(result.artifacts(),Comparator.comparing(a->a.id().localId())).map(a->object("id",id(a.id()),"logicalName",a.logicalName(),"contentDigest",a.contentDigest().orElse(null))),
             "sourceUncertaintyRefs",ids(result.sourceUncertaintyRefs()));
@@ -71,7 +84,7 @@ public final class DependencyJson {
             document.put("version","3.0.0");document.put("modelScope","VALIDATED_SNAPSHOT_DEPENDENCY");
             document.put("analysisStatus",partial||result.publicationInventory()!=Evidence.InventoryStatus.COMPLETE?"PARTIAL":"COMPLETE");
             document.put("generalAnalysisMetrics",managed==null?result.metrics():writer.metrics(managed.programs()));
-            document.put("metrics",object("sites",(long)result.sites().size(),"candidates",result.sites().stream().mapToLong(s->s.candidates().size()).sum()));
+            document.put("metrics",object("sites",(long)result.sites().size(),"candidates",executable!=null?executable.candidateCount():result.sites().stream().mapToLong(s->s.candidates().size()).sum()));
         }
         document.put("analysisBoundary","COBOL_SOURCE_ONLY");document.put("fileDependencies",FileDependencyJson.value(result.fileDependencies()));
         document.put("sourceDependencies",SourceDependencyJson.value(result.sourceDependencies()));
@@ -80,7 +93,7 @@ public final class DependencyJson {
             "occurrences",source.occurrences().stream().map(o->object("occurrence",QualifiedSourceJson.value(o.occurrence()),"status",o.status().name(),"valueRemainder",o.valueRemainder(),"interpretationRemainder",o.interpretationRemainder(),
                 "candidates",o.candidates().stream().map(c->object("referenceName",c.referenceName(),"rawValue",c.rawValue(),"occurrence",QualifiedSourceJson.value(c.occurrence()),"qualifications",c.qualifications())))))));
         if(managed!=null)document.put("sourceQualifiedDependencies",writer.qualified(managed.qualified()));
-        var dependencies=object("programs",managed==null?result.programDependencies().stream().map(DependencyJson::program):writer.programs(managed.programs()));
+        var dependencies=object("programs",managed!=null?writer.programs(managed.programs()):executable!=null?managedPrograms(executable):result.programDependencies().stream().map(DependencyJson::program));
         if(managed!=null&&managed.nativeFileCount()>0)dependencies.put("files",writer.nativeFiles(managed.qualified()));
         result.sourceQualifiedDependencies().filter(s->!s.nativeFiles().isEmpty()).ifPresent(s->dependencies.put("files",s.nativeFiles().stream().map(f->object(
             "analysisBoundary","NON_EXECUTABLE_SOURCE","source",QualifiedSourceJson.value(f.source()),"status",f.status().name(),"remainder",f.remainder(),
@@ -88,6 +101,30 @@ public final class DependencyJson {
         document.put("dependencies",dependencies);
         out.value(document);out.finish();
     }
+    private static JsonOutput.EncodedValue managedSites(ManagedExecutableDependencyResult owner,java.util.function.Function<OperationId,Evidence.CoverageStatus> coverage){return out->{
+        out.symbol('[');boolean first=true;
+        try(var cursor=owner.cursor()){while(cursor.advance()){
+            if(!first)out.symbol(',');first=false;var fact=cursor.fact();var value=site(fact,true);
+            value.put("coverage",Objects.requireNonNull(coverage.apply(fact.operation()),"missing original site coverage").name());out.value(value);
+        }}out.symbol(']');
+    };}
+    private static JsonOutput.EncodedValue managedEdges(ManagedExecutableDependencyResult owner){return out->{
+        out.symbol('[');boolean first=true;
+        try(var cursor=owner.cursor()){while(cursor.advance()){
+            var fact=cursor.fact();if(fact.reachability()==Reachability.UNREACHABLE_IN_MODEL)continue;
+            try(var candidates=fact.candidates().stream().sorted(Comparator.comparing(Candidate::referenceName).thenComparing(Candidate::rawValue))){
+                var items=candidates.iterator();while(items.hasNext()){
+                    if(!first)out.symbol(',');first=false;
+                    out.value(object("caller",id(fact.caller()),"entry",id(fact.entry()),"site",id(fact.operation()),"candidate",candidate(items.next()),"openSite",fact.effectiveUnknownRemainder()));
+                }
+            }
+        }}out.symbol(']');
+    };}
+    private static JsonOutput.EncodedValue managedPrograms(ManagedExecutableDependencyResult owner){return out->{
+        out.symbol('[');for(int i=0,n=owner.result().programDependencies().size();i<n;i++){
+            if(i!=0)out.symbol(',');try(var projection=owner.projectProgram(i)){out.value(program(projection.resolution()));}
+        }out.symbol(']');
+    };}
     static Object program(TargetResolver.Resolution resolved) {
         var o=resolved.occurrence();
         var result=object("sourceOccurrence",o.source().map(QualifiedSourceJson::value).orElse(null),"caller",o.caller(),

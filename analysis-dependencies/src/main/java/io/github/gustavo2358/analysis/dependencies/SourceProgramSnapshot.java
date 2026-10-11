@@ -12,7 +12,9 @@ import java.util.Objects;
  * existing immutable site ordinal. Only one selected unit's nominal solve lives
  * at a time. No resident SOURCE, candidate or support tree is reconstructed.
  * Interpretation and union laws match TargetResolver; open evidence never
- * replaces known candidates. This does not make the borrowed base result spill.
+ * replaces known candidates. Native support sorting/writing projects funded
+ * typed leaves through paged directories, not entire cold site bodies. This is
+ * not a bounded cursor for an individually huge fact or support/premise list.
  */
 public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Dependent {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.SORT;
@@ -84,8 +86,8 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         try(var order=new PagedLongIndex(pages,resources,PHASE,this::compareCandidate);var reasonOrder=new PagedLongIndex(pages,resources,PHASE,this::compareText)) {
             if(qualified)addAuthority(item,plan.sourceControlRemainder(item)?1:0);
             if(plan.sourceControlRemainder(item))reason(reasonOrder,global,"SOURCE_CONTROL_UNAVAILABLE");
-            for(long s=0,n=plan.siteCount(item);s<n;s++) {
-                resources.work(1,PHASE);var site=plan.site(item,s);for(var r:site.analysisReasons())reason(reasonOrder,global,r);
+            for(long s=0,n=plan.siteCount(item);s<n;s++)try(var projection=plan.projectSite(item,s)) {
+                resources.work(1,PHASE);var site=projection.fact();for(var r:site.analysisReasons())reason(reasonOrder,global,r);
                 if(site.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)continue;
                 observed=true;addAuthority(item,site.reachability()==DependencySiteFact.Reachability.REACHABLE?2:3);valueOpen|=!Boolean.FALSE.equals(site.modelValueRemainder())||site.sourceValueRemainder();interpretationOpen|=site.interpretationUnknownRemainder();
                 for(int c=0,size=site.candidates().size();c<size;c++) {
@@ -128,7 +130,7 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         long row=++supportRows,at=row*SUPPORT;supports.set(at,item);supports.set(at+1,site);supports.set(at+2,value);supports.set(at+3,support);long base=candidate*CANDIDATE,last=candidates.get(base+3);
         if(last==0)candidates.set(base+2,row);else supports.set(last*SUPPORT+4,row);candidates.set(base+3,row);
     }
-    private DependencySiteFact.Support supportRow(long row){long at=row*SUPPORT;return plan.site(supports.get(at),supports.get(at+1)).candidates().get(Math.toIntExact(supports.get(at+2))).supports().get(Math.toIntExact(supports.get(at+3)));}
+    private SourceTargetPlan.SupportProjection projectSupportRow(long row){long at=row*SUPPORT;return plan.projectSupport(supports.get(at),supports.get(at+1),Math.toIntExact(supports.get(at+2)),Math.toIntExact(supports.get(at+3)));}
     private void orderSupports(long candidate) {
         long at=candidate*CANDIDATE;candidates.set(at+6,supportCount);
         try(var distinct=new PagedLongIndex(pages,resources,PHASE,this::compareSupportIdentity);var order=new PagedLongIndex(pages,resources,PHASE,this::compareSupportWire)) {
@@ -154,8 +156,8 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
         for(int at=0;at<n;){resources.work(1,PHASE);int count=Math.min(left.length,n-at);text.readCharacters(a,at,left,0,count);text.readCharacters(b,at,right,0,count);for(int i=0;i<count;i++){int c=Character.compare(left[i],right[i]);if(c!=0)return c;}at+=count;}return Integer.compare(na,nb);
     }
     private int compareCandidate(long a,long b){if(a==b)return 0;long x=candidates.get(a*CANDIDATE),y=candidates.get(b*CANDIDATE);int c=(Integer.toString(text.characterCount(x))+":").compareTo(Integer.toString(text.characterCount(y))+":");if(c==0)c=compareText(x,y);return c==0?compareText(candidates.get(a*CANDIDATE+1),candidates.get(b*CANDIDATE+1)):c;}
-    private int compareSupportIdentity(long a,long b){if(a==b)return 0;var x=supportRow(a);var y=supportRow(b);int c=x.kind().compareTo(y.kind());if(c==0)c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());for(int i=0,n=Math.min(x.premises().size(),y.premises().size());c==0&&i<n;i++)c=compareId(x.premises().get(i),y.premises().get(i));return c==0?Integer.compare(x.premises().size(),y.premises().size()):c;}
-    private int compareSupportWire(long a,long b){if(a==b)return 0;var x=supportRow(a);var y=supportRow(b);int c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());return c==0?Long.compare(a,b):c;}
+    private int compareSupportIdentity(long a,long b){if(a==b)return 0;try(var first=projectSupportRow(a);var second=projectSupportRow(b)){var x=first.support();var y=second.support();int c=x.kind().compareTo(y.kind());if(c==0)c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());for(int i=0,n=Math.min(x.premises().size(),y.premises().size());c==0&&i<n;i++)c=compareId(x.premises().get(i),y.premises().get(i));return c==0?Integer.compare(x.premises().size(),y.premises().size()):c;}}
+    private int compareSupportWire(long a,long b){if(a==b)return 0;try(var first=projectSupportRow(a);var second=projectSupportRow(b)){var x=first.support();var y=second.support();int c=compareId(x.producer(),y.producer());if(c==0)c=compareId(x.origin(),y.origin());return c==0?Long.compare(a,b):c;}}
     /** Full typed identity in the established wire order; no hash-only equality. */
     private static int compareId(Id a,Id b){int c=a.publication().localId().compareTo(b.publication().localId());if(c==0)c=domain(a).compareTo(domain(b));if(c==0)c=unit(a).compareTo(unit(b));if(c==0&&a instanceof OperandId x&&b instanceof OperandId y){c=Integer.compare(x.owner() instanceof EntryOwner?0:1,y.owner() instanceof EntryOwner?0:1);if(c==0)c=owner(x).compareTo(owner(y));}return c==0?a.localId().compareTo(b.localId()):c;}
     private static String owner(OperandId id){return switch(id.owner()){case OperationOwner v->v.operation().localId();case EntryOwner v->v.entry().localId();};}
@@ -185,7 +187,9 @@ public final class SourceProgramSnapshot extends SourceAdmissionSnapshot.Depende
     public void readRaw(long item,long candidate,long offset,char[] destination,int at,int count){read(()->{text.readCharacters(textId(item,candidate,true),offset,destination,at,count);return 0;});}
     public void readReference(long item,long candidate,long offset,char[] destination,int at,int count){read(()->{text.readCharacters(textId(item,candidate,false),offset,destination,at,count);return 0;});}
     public long supportCount(long item,long candidate){return read(()->candidates.get(candidate(item,candidate)+7));}
-    public DependencySiteFact.Support support(long item,long candidate,long ordinal){open();try{long row=candidate(item,candidate);if(ordinal<0||ordinal>=candidates.get(row+7))throw new IndexOutOfBoundsException("SOURCE program support ordinal");return supportRow(supportOrder.get(candidates.get(row+6)+ordinal));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+    public SourceTargetPlan.SupportProjection projectSupport(long item,long candidate,long ordinal){open();try{long row=candidate(item,candidate);if(ordinal<0||ordinal>=candidates.get(row+7))throw new IndexOutOfBoundsException("SOURCE program support ordinal");return projectSupportRow(supportOrder.get(candidates.get(row+6)+ordinal));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+    /** Explicit detached compatibility; productive writer uses projectSupport. */
+    public DependencySiteFact.Support support(long item,long candidate,long ordinal){try(var projection=projectSupport(item,candidate,ordinal)){return projection.support();}}
     public boolean hasConditionalSupport(long item,long candidate){return read(()->candidates.get(candidate(item,candidate)+5))!=0;}
     public int conditionalAssumptionCount(long item,long candidate){return Math.toIntExact(read(()->Long.bitCount(conditionals.get(conditional(item,candidate)))));}
     public String conditionalAssumption(long item,long candidate,int ordinal){long mask=read(()->conditionals.get(conditional(item,candidate)));if(ordinal<0||ordinal>=Long.bitCount(mask)){var failure=new IndexOutOfBoundsException("conditional assumption ordinal");abort(failure);throw failure;}for(int i=0;i<ASSUMPTIONS.length;i++)if((mask&(1L<<i))!=0&&ordinal--==0)return ASSUMPTIONS[i];throw new AssertionError();}

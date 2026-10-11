@@ -13,9 +13,14 @@ import java.util.Objects;
 
 /** Atomic bounded publication of one complete snapshot-native dependency result. */
 public final class SnapshotDependencyFileWriter {
+    public void write(io.github.gustavo2358.analysis.dependencies.ManagedExecutableDependencyResult result,
+            io.github.gustavo2358.analysis.dependencies.SnapshotProgram source,Path destination,AnalysisResources resources)throws IOException {
+        Objects.requireNonNull(result);result.requireContext(source,resources);
+        write(destination,resources,stream->new DependencyJson().writeSnapshot(result,source,resources,stream),()->result.requireContext(source,resources));
+    }
     public void write(ManagedDependencyResult result,Path destination,PageStore pages,AnalysisResources resources)throws IOException {
         Objects.requireNonNull(result);result.admission().snapshot(pages,resources);
-        write(destination,resources,stream->new DependencyJson().writeSnapshot(result,result.program(),pages,resources,stream),()->result.programs().count());
+        write(destination,resources,stream->new DependencyJson().writeSnapshot(result,result.program(),pages,resources,stream),()->{result.executable();result.programs().count();});
     }
     public void write(DependencyResult result,ProgramStore.Structural source,Path destination,AnalysisResources resources)throws IOException {
         Objects.requireNonNull(result);Objects.requireNonNull(source);write(destination,resources,stream->new DependencyJson().writeSnapshot(result,source,stream));

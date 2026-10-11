@@ -195,6 +195,7 @@ public final class AnalysisResources {
         Objects.requireNonNull(phase); nonnegative(bytes);
         time(phase);
         require(Resource.OUTPUT, phase, limits.outputBytes(), outputUsed, bytes);
+        if(executionBudget!=null)executionBudget.output(bytes,executionPhase(phase));
         outputUsed += bytes;
     }
 

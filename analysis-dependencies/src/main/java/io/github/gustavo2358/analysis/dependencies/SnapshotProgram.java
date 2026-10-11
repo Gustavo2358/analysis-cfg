@@ -138,6 +138,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     /** Intrusive live-lease registry: no historical collection or per-pool catalogue. */
     private final class NativeBudget implements ProgramStore.ExecutionBudget {
         private NativeCapacity first;
+        @Override public void output(long bytes,ProgramStore.ExecutionPhase phase){borrowedOpen();runtime.output(bytes,AnalysisResources.Phase.valueOf(Objects.requireNonNull(phase).name()));}
         @Override public ProgramStore.CapacityLease reserve(ProgramStore.CapacityPool pool,long amount,ProgramStore.ExecutionPhase phase) {
             borrowedOpen();Objects.requireNonNull(pool);Objects.requireNonNull(phase);
             var owned=runtime.reserve(AnalysisResources.Pool.valueOf(pool.name()),amount,AnalysisResources.Phase.valueOf(phase.name()));

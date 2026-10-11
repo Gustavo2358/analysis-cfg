@@ -22,7 +22,9 @@ final class ManagedSourceResultTest {
         var publication=SourceCorrelationSnapshotTest.program(2);var fixture=fixtures();
         for(String path:List.of("source-possibility/unknown-branch-kill.source.json","source-possibility/unknown-copy-kill.source.json","source-possibility/unknown-branch-query.source.json","perform-reentry/reentry-values.source.json","qualified-source-r9/ordinary.source.json","source-possibility/unknown-native.source.json")) {
             var evidence=SourceProgramSnapshotTest.source(publication,path);var links=path.contains("ordinary")||path.contains("native")?List.<DependencyInput.StatementCorrelation>of():SourceCorrelationSnapshotTest.links(publication,evidence);
-            try(var input=fixture.new NativeCase(publication,evidence)) {
+            // Metered publication needs a nonzero common output budget. Keep
+            // every semantic oracle unchanged; read-only/denial fixtures stay zero.
+            try(var input=fixture.new NativeCase(publication,evidence,false,1_000_000)) {
                 var built=cfg(input);assertEquals(CfgBuildResult.Status.CFG_BUILT,built.status());var analysis=new DependencyAnalysis();var old=analysis.prepareLeased(input.program,built,evidence,links,input.pages,input.execution);var oracle=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(old,input.program,oracle);
                 long baseline=input.pages.statistics().livePages();try(var result=analysis.prepareLeased(input.program,built,input.source,links,input.pages,input.execution)) {
                     var wire=new ByteArrayOutputStream();new DependencyJson().writeSnapshot(result,input.program,input.pages,input.execution,wire);assertEquals(JSON.readTree(oracle.toByteArray()),JSON.readTree(wire.toByteArray()),path);

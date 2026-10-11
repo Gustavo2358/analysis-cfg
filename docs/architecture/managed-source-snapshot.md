@@ -497,3 +497,39 @@ not a closed explanation/fix for the isolated nominal timeout. A same-frozen03
 productive baseline versus single-class prototype isolated pair is running only
 after FAST and exact runtime audit. Reverse, all-store, global and review remain
 open; no new quota/cache/deadline or semantic cap was introduced.
+
+## General managed CALL and scoped SOURCE support ownership (2026-10-11)
+
+Both productive CLI routes now retain general CALL facts in a managed paged
+owner, including when SOURCE is absent. SOURCE preparation borrows this owner;
+header indices preserve full typed site/operation identity and last-fact-wins
+ordering without retaining a second complete fact list. Candidate/support extent
+directories permit funded leaf projections instead of decoding unrelated fact
+bodies for each support. Closing a SOURCE plan retires its projections without
+closing borrowed CALL storage. Operational failure and owner expiry remain errors,
+not semantic remainder. Detached List/DTO access remains explicit compatibility.
+
+The common execution root now receives OUTPUT charges from the dependency
+resource view. The original mandatory FAST first failed at one publishing-success
+test whose root allowed zero output: its requested 12081 bytes were correctly
+denied. That failed run and reports are preserved. Only that success fixture now
+provides explicit output capacity and asserts both counters equal actual bytes;
+the four original methods and other zero-output negative/read-only fixtures remain.
+Its 19-method neighboring family passed. Exact equality of all 1453 productive
+classfiles proves reuse of the earlier 40-method family, 18 original CLI contracts,
+seven compiled guards and five actual complete-product oracle runs; those were
+not newly executed after the fixture correction. The second original FAST passed
+all 1404 mandatory methods, zero failures/errors/skips, in 1516.515s. The audit
+confirmed all nine consumer and both AIR runtime paths, 15 components, 584 Java
+sources and 579 fixtures, with no helper shadow. Producer
+`a0aeb827ef53765815aa501c4687f197be77ac73` remains unchanged.
+
+This is not all-output or all-store qualification. Direct managed DependencyJson
+stream ports still bypass the meter that the file adapter correctly owns; the
+next focused laws must expose that bypass and prevent double charging when the
+same codec is called through the file adapter. Individual support/premise/ID/fact
+and program projections still materialize complete nested DTOs. FILE results,
+observations, plain qualification, common WORK accounting, global families and
+new gaps, original dimensions/isolated curves, integrated E2E, legacy retirement,
+human review and externally authorized integration remain pending. The earlier
+large products are historical, not fresh qualification of this general owner.

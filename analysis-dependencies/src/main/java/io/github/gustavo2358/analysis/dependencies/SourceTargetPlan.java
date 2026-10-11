@@ -10,11 +10,13 @@ import static io.github.gustavo2358.air.model.AirShape.*;
 
 /**
  * Complete source/executable target inventory and conditional-query selection.
- * It borrows the existing immutable executable application result, never copies
- * its SiteFacts, and indexes it by the native program's exact operation directory.
+ * It borrows the general native executable owner (or explicit resident compatibility),
+ * never copies its SiteFacts, and indexes it by the program's exact operation directory.
  * All new inventories, incidence and query demand are paged. SOURCE order and
  * unmapped AIR order are preserved. This is planning, not resolved candidates,
- * product serialization or a claim that the borrowed executable result spills.
+ * product serialization or an all-store qualification. Native identity/flags use
+ * funded headers; derived site/support scopes expire with this plan. The CALL
+ * root and shared backend remain borrowed. One huge fact/support still has a DTO.
  */
 public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DEMAND;
@@ -23,6 +25,9 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private SnapshotProgram program;
     private SourceSnapshot source;
     private DependencyResult executable;
+    private ManagedExecutableDependencyResult managed;
+    private SiteProjection siteProjections;
+    private SupportProjection supportProjections;
     private ProgramStore.OperationDirectory directory;
     private PagedLongArray rows,operations,sites,queryRanges,requested;
     private AnalysisResources.Reservation control;
@@ -33,17 +38,25 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private SourceTargetPlan(SourceAdmissionSnapshot admission,SnapshotProgram program,DependencyResult executable,AnalysisResources.Reservation capacity){this.admission=admission;this.program=program;this.executable=executable;control=capacity;}
     public static SourceTargetPlan prepare(SourceCorrelationSnapshot correlations,SourceQualifiedSnapshot qualified,
             DependencyResult executable,PageStore pages,AnalysisResources resources) {
+        return prepare(correlations,qualified,executable,null,pages,resources);
+    }
+    public static SourceTargetPlan prepare(SourceCorrelationSnapshot correlations,SourceQualifiedSnapshot qualified,
+            ManagedExecutableDependencyResult executable,PageStore pages,AnalysisResources resources) {
+        executable.requireContext(correlations.program(),resources);return prepare(correlations,qualified,executable.result(),executable,pages,resources);
+    }
+    private static SourceTargetPlan prepare(SourceCorrelationSnapshot correlations,SourceQualifiedSnapshot qualified,
+            DependencyResult executable,ManagedExecutableDependencyResult managed,PageStore pages,AnalysisResources resources) {
         Objects.requireNonNull(correlations);Objects.requireNonNull(qualified);Objects.requireNonNull(executable);Objects.requireNonNull(pages);Objects.requireNonNull(resources);
         var admission=correlations.admission();var program=correlations.program();admission.requireContext(pages,resources);
         if(qualified.admission()!=admission||!executable.publication().equals(program.publicationId()))throw new IllegalArgumentException("foreign target-plan source or executable result");
         var capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,2048,PHASE);SourceTargetPlan result=null;
         try {
-            result=new SourceTargetPlan(admission,program,executable,capacity);var registration=capacity;capacity=null;registration.onOwnerClose(result::close);
+            result=new SourceTargetPlan(admission,program,executable,capacity);result.managed=managed;var registration=capacity;capacity=null;registration.onOwnerClose(result::close);
             result.initialize(correlations,qualified,pages,resources);admission.attach(result,pages,resources);result.open();return result;
         }catch(RuntimeException|Error failure){if(result!=null)result.abort(failure);else if(capacity!=null)try{capacity.close();}catch(RuntimeException|Error cleanup){suppress(failure,cleanup);}throw failure;}
     }
     private SourceAdmissionSnapshot parent(){var value=admission;if(value==null)throw new IllegalStateException("SOURCE target plan expired");return value;}
-    private void open(){if(closed||!ready)throw new IllegalStateException("SOURCE target plan expired or incomplete");parent().snapshot();program.admission();}
+    private void open(){if(closed||!ready)throw new IllegalStateException("SOURCE target plan expired or incomplete");parent().snapshot();program.admission();if(managed!=null)managed.result();}
     private PagedLongArray array(PageStore pages,AnalysisResources resources){return new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);}
     private long sf(long row,SourceShape shape,int column){return source.field(row,shape,column);}
     private void initialize(SourceCorrelationSnapshot correlations,SourceQualifiedSnapshot qualified,PageStore pages,AnalysisResources resources) {
@@ -52,7 +65,7 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
         rows=array(pages,resources);operations=array(pages,resources);sites=array(pages,resources);queryRanges=array(pages,resources);requested=array(pages,resources);
         try(var heads=array(pages,resources);var next=array(pages,resources);var queries=new SourceAdmissionDirectory(pages,resources)) {
             for(int s=0,n=executable.sites().size();s<n;s++) {
-                resources.work(1,PHASE);int op=directory.ordinal(executable.sites().get(s).operation());if(op<0)throw new IllegalArgumentException("foreign executable site operation");
+                resources.work(1,PHASE);int op=managed==null?directory.ordinal(executable.sites().get(s).operation()):managed.operationOrdinal(s,directory);if(op<0)throw new IllegalArgumentException("foreign executable site operation");
                 long at=op*2L,last=heads.get(at+1),id=s+1L;if(last==0)heads.set(at,id);else next.set(last,id);heads.set(at+1,id);
             }
             indexQueries(queries,resources);
@@ -97,7 +110,9 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private boolean openExecutable(long at,AnalysisResources resources) {
         for(long i=0,n=rows.get(at+6);i<n;i++) {
             resources.work(1,PHASE);
-            var site=executable.sites().get(Math.toIntExact(sites.get(rows.get(at+5)+i)));
+            int ordinal=Math.toIntExact(sites.get(rows.get(at+5)+i));
+            if(managed!=null){if(managed.requiresNominal(ordinal))return true;continue;}
+            var site=executable.sites().get(ordinal);
             if(site.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL&&!Boolean.FALSE.equals(site.modelValueRemainder()))return true;
         }return false;
     }
@@ -142,6 +157,30 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     public long operationCount(long item){return word(item,4);}
     public OperationId operation(long item,long ordinal){open();try{long row=row(item);if(ordinal<0||ordinal>=rows.get(row+4))throw new IndexOutOfBoundsException("target-plan operation ordinal");return directory.identity(Math.toIntExact(operations.get(rows.get(row+3)+ordinal)));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public long siteCount(long item){return word(item,6);}
+    public SiteProjection projectSite(long item,long ordinal){open();try{
+        long row=row(item);if(ordinal<0||ordinal>=rows.get(row+6))throw new IndexOutOfBoundsException("target-plan site ordinal");
+        int site=Math.toIntExact(sites.get(rows.get(row+5)+ordinal));
+        return managed==null?new SiteProjection(null,executable.sites().get(site)):new SiteProjection(managed.projectSite(site),null);
+    }catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+    /** Native carriers borrow a funded cursor. The old resident port remains
+     * explicitly caller-managed; both are invalid once this plan expires. */
+    public final class SiteProjection implements AutoCloseable {
+        private ManagedExecutableDependencyResult.Cursor cursor;private DependencySiteFact resident;private SiteProjection previous,next;private boolean retired;
+        private SiteProjection(ManagedExecutableDependencyResult.Cursor cursor,DependencySiteFact resident){this.cursor=cursor;this.resident=resident;next=siteProjections;if(siteProjections!=null)siteProjections.previous=this;siteProjections=this;}
+        public DependencySiteFact fact(){if(retired)throw new IllegalStateException("SOURCE site projection expired");open();return cursor==null?resident:cursor.fact();}
+        @Override public void close(){if(retired)return;retired=true;if(previous==null)siteProjections=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;resident=null;var owned=cursor;cursor=null;if(owned!=null)owned.close();}
+    }
+    public SupportProjection projectSupport(long item,long ordinal,int candidate,int support){open();try{
+        long row=row(item);if(ordinal<0||ordinal>=rows.get(row+6))throw new IndexOutOfBoundsException("target-plan site ordinal");
+        int site=Math.toIntExact(sites.get(rows.get(row+5)+ordinal));
+        return managed==null?new SupportProjection(null,executable.sites().get(site).candidates().get(candidate).supports().get(support)):new SupportProjection(managed.projectSupport(site,candidate,support),null);
+    }catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+    public final class SupportProjection implements AutoCloseable {
+        private PagedDependencyFactStorage.SupportProjection projection;private DependencySiteFact.Support resident;private SupportProjection previous,next;private boolean retired;
+        private SupportProjection(PagedDependencyFactStorage.SupportProjection projection,DependencySiteFact.Support resident){this.projection=projection;this.resident=resident;next=supportProjections;if(supportProjections!=null)supportProjections.previous=this;supportProjections=this;}
+        public DependencySiteFact.Support support(){if(retired)throw new IllegalStateException("SOURCE support projection expired");open();return projection==null?resident:projection.support();}
+        @Override public void close(){if(retired)return;retired=true;if(previous==null)supportProjections=next;else previous.next=next;if(next!=null)next.previous=previous;previous=null;next=null;resident=null;var owned=projection;projection=null;if(owned!=null)owned.close();}
+    }
     public DependencySiteFact site(long item,long ordinal){open();try{long row=row(item);if(ordinal<0||ordinal>=rows.get(row+6))throw new IndexOutOfBoundsException("target-plan site ordinal");return executable.sites().get(Math.toIntExact(sites.get(rows.get(row+5)+ordinal)));}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public long queryCount(long unit){open();try{if(unit<0||unit>=parent().unitCount())throw new IndexOutOfBoundsException("target-plan source unit ordinal");return queryRanges.get(unit*2+1);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     public boolean requestsQuery(long unit,long query){open();try{if(query<0||query>=queryCount(unit))throw new IndexOutOfBoundsException("target-plan nominal query ordinal");return requested.get(queryRanges.get(unit*2)+query)!=0;}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
@@ -152,8 +191,10 @@ public final class SourceTargetPlan extends SourceAdmissionSnapshot.Dependent {
     private void abort(Throwable primary){try{close();}catch(RuntimeException|Error cleanup){suppress(primary,cleanup);}}
     @Override public void close() {
         AutoCloseable[] owned;
-        synchronized(this){if(closed)return;closed=true;ready=false;owned=new AutoCloseable[]{requested,queryRanges,sites,operations,rows,airLifetime,control};requested=queryRanges=sites=operations=rows=null;airLifetime=null;control=null;source=null;admission=null;program=null;directory=null;executable=null;}
+        synchronized(this){if(closed)return;closed=true;ready=false;owned=new AutoCloseable[]{requested,queryRanges,sites,operations,rows,airLifetime,control};requested=queryRanges=sites=operations=rows=null;airLifetime=null;control=null;source=null;admission=null;program=null;directory=null;executable=null;managed=null;}
         var parent=owner;if(parent!=null)parent.release(this);Throwable failure=null;
+        while(siteProjections!=null)try{siteProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
+        while(supportProjections!=null)try{supportProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         for(var value:owned)if(value!=null)try{value.close();}catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else suppress(failure,cleanup);}
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("target-plan cleanup",failure);
     }

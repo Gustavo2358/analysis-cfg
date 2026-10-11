@@ -36,7 +36,10 @@ final class SourceCorrelationSnapshotTest {
             this(publication,evidence,false);
         }
         NativeCase(Publication publication,QualifiedSourceDependencies evidence,boolean faults)throws Exception {
-            resources=new AnalysisResources(new AnalysisResources.Limits(64L*1024*1024,16L*1024*1024,0,512L*1024*1024,8,Long.MAX_VALUE,0));
+            this(publication,evidence,faults,0);
+        }
+        NativeCase(Publication publication,QualifiedSourceDependencies evidence,boolean faults,long outputBytes)throws Exception {
+            resources=new AnalysisResources(new AnalysisResources.Limits(64L*1024*1024,16L*1024*1024,0,512L*1024*1024,8,Long.MAX_VALUE,outputBytes));
             // The resident fixture intentionally includes Origins.Unavailable,
             // outside the JSON binding profile. Copy its exact official typed
             // shapes into the managed AIR store, not a changed origin fixture.
