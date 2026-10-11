@@ -465,6 +465,15 @@
       "unfinishedReuseAndDoubleFinishNeverBecomeSuccessfulEmptyEvidence",
       "deniedConstructionReturnsEveryTransferredLease"
     ],
+    "io.github.gustavo2358.analysis.adapters.NativeCoverageSnapshotTest": [
+      "scalarCoverageNeverReprojectsAnAdmittedColdInvokeBody",
+      "fullCollidingIdentitiesKeepAllFourOriginalHeaderStatusesAndExpiredOwnersReject",
+      "coverageReadFailurePreservesPrimaryRetiresEveryDirectoryTapeAndBorrowsInput"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeDependencyOutputFundingTest": [
+      "plainNativeRootBufferDenialOccursBeforeOutputAndDoesNotExpireBorrowedInput",
+      "failedPlainNativeOutputKeepsPrimaryAndReleasesTheObservedRootLease"
+    ],
     "io.github.gustavo2358.analysis.adapters.PagedJsonWordMemoTest": [
       "exactPhysicalWordsRemainCoherentAndWorkChecked"
     ],

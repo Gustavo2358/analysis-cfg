@@ -15,9 +15,17 @@ public final class DependencyJson {
     }
     /** Native input uses the complete existing fact projection, never the direct-profile lossy projection. */
     public void writeSnapshot(DependencyResult result,ProgramStore.Structural source,OutputStream stream) throws IOException {
-        Objects.requireNonNull(source);
+        Objects.requireNonNull(source);Objects.requireNonNull(stream);
         if(!source.publicationId().equals(result.publication()))throw new IllegalArgumentException("foreign snapshot result source");
-        write(result,stream,source);
+        var budget=source.executionBudget();
+        if(budget.isPresent()) {
+            // Reserve the bounded UTF8 buffer and fixed root-field scratch before
+            // JsonOutput allocation. The managed SOURCE overload owns its own
+            // single reservation and does not pass through this compatibility port.
+            try(var buffer=budget.orElseThrow().reserve(ProgramStore.CapacityPool.RESIDENT,65536+4096,ProgramStore.ExecutionPhase.ENCODE)) {
+                Objects.requireNonNull(buffer);write(result,stream,source);
+            }
+        }else write(result,stream,source); // Explicit caller-managed resident compatibility.
     }
     /** One funded root buffer; every SOURCE section borrows its complete prepared owner. */
     public void writeSnapshot(ManagedDependencyResult result,SnapshotProgram source,io.github.gustavo2358.analysis.solver.PageStore pages,
@@ -34,18 +42,25 @@ public final class DependencyJson {
     }
     private void write(DependencyResult result,ProgramStore.Structural programSource,JsonOutput out,ManagedDependencyResult managed,SourceSnapshotWriter writer)throws IOException {
         boolean snapshot=programSource!=null;
-        // Coverage is required by the existing native v3 contract. One header scan, not
-        // a per-site program rescan; no Unit/Sequence/operation aggregate is retained.
-        var coverage=new HashMap<OperationId,Evidence.CoverageStatus>();
-        if(snapshot)for(var unit:programSource.units())for(var sequence:unit.sequences()) {
-            var terminator=sequence.terminator();
-            if(terminator instanceof Operations.Invoke)coverage.put(terminator.header().id(),terminator.header().coverage());
+        // Native v3 borrows scalar headers from the existing paged catalogue.
+        // Only the explicit non-native compatibility API builds a resident map.
+        java.util.function.Function<OperationId,Evidence.CoverageStatus> coverage=identity->null;
+        if(programSource instanceof SnapshotProgram nativeProgram) {
+            coverage=identity->nativeProgram.invokeCoverage(identity).orElse(null);
+        }else if(snapshot) {
+            var legacyCoverage=new HashMap<OperationId,Evidence.CoverageStatus>();
+            for(var unit:programSource.units())for(var sequence:unit.sequences()) {
+                var terminator=sequence.terminator();
+                if(terminator instanceof Operations.Invoke)legacyCoverage.put(terminator.header().id(),terminator.header().coverage());
+            }
+            coverage=legacyCoverage::get;
         }
+        var siteCoverage=coverage;
         var document=object("schema","analysis-dependency-result","version",result.sourceQualifiedDependencies().map(s->Set.of("1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0").contains(s.evidence().version())?"2.7.0":"2.6.0").orElse("2.5.0"),"airVersion",version(result.airVersion()),
             "publication",id(result.publication()),"interpretationProfile","per-site","valuesProfile","scalar-text-effects@1",
             "modelScope",result.structuralScope()?"STRUCTURAL_AIR_OCCURRENCES":"KNOWN_GRAPH_ENTRY","publicationInventory",inventory(result.publicationInventory()),
             "sites",result.sites().stream().sorted(Comparator.comparing(DependencySiteFact::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(f->f.operation().localId())).map(s->{
-                var value=site(s,true);if(snapshot)value.put("coverage",Objects.requireNonNull(coverage.get(s.operation()),"missing original site coverage").name());return value;
+                var value=site(s,true);if(snapshot)value.put("coverage",Objects.requireNonNull(siteCoverage.apply(s.operation()),"missing original site coverage").name());return value;
             }),
             "edges",result.edges().stream().sorted(Comparator.comparing(DependencyResult.Edge::entry,io.github.gustavo2358.analysis.plan.AnalysisKey.ENTRY_ORDER).thenComparing(e->e.site().localId()).thenComparing(e->e.candidate().referenceName()).thenComparing(e->e.candidate().rawValue())).map(e->object("caller",id(e.caller()),"entry",id(e.entry()),"site",id(e.site()),"candidate",candidate(e.candidate()),"openSite",e.openSite())),
             "metrics",result.metrics(),"origins",orderedMetadata(result.origins(),Comparator.comparing(o->o.id().localId())).map(DependencyJson::origin),

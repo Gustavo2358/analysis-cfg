@@ -428,6 +428,12 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     @Override public Optional<ProgramStore.OperationDirectory> operationDirectory(){
         borrowedOpen();if(operationDirectory==null)operationDirectory=new NativeOperations();return Optional.of(operationDirectory);
     }
+    /** Exact admitted Invoke header, without projecting its target/contract/body.
+     * Missing or non-Invoke identities have no site coverage. Borrowed lifetime
+     * and the existing paged operation catalogue govern this scalar view. */
+    public Optional<Evidence.CoverageStatus> invokeCoverage(OperationId identity){
+        Objects.requireNonNull(identity);operationDirectory();return operationDirectory.coverage(identity);
+    }
     /** All code, in original Unit/Sequence/occurrence order. Only primitive
      * source handles, exact keys and sorted ordinals live in the paged owner. */
     private final class NativeOperations implements ProgramStore.OperationDirectory,AutoCloseable {
@@ -462,11 +468,23 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         }
         private void add(long operation,SnapshotOrderStorage.Index index){
             long identity=field(field(operation,0),0);
-            sourceOrder.append(identity);sourceKeys.append(keys.key(identity));index.add(sourceOrder.size());
+            sourceOrder.append(operation);sourceKeys.append(keys.key(identity));index.add(sourceOrder.size());
         }
         private void available(){borrowedOpen();if(ended)throw new IllegalStateException("native operation directory is closed");}
         @Override public int size(){available();return Math.toIntExact(sourceOrder.size());}
-        @Override public OperationId identity(int ordinal){available();Objects.checkIndex(ordinal,size());return occurrence(sourceOrder.handle(ordinal),OperationId.class);}
+        @Override public OperationId identity(int ordinal){available();Objects.checkIndex(ordinal,size());return occurrence(field(field(sourceOrder.handle(ordinal),0),0),OperationId.class);}
+        private Optional<Evidence.CoverageStatus> coverage(OperationId identity){
+            try {
+                available();int ordinal=ordinal(identity);if(ordinal<0)return Optional.empty();
+                long operation=sourceOrder.handle(ordinal);if(snapshot.shape(operation)!=OPERATIONS_INVOKE)return Optional.empty();
+                long header=field(operation,0),value=snapshot.scalar(snapshot.field(header,OPERATIONS_HEADER,2));
+                return Optional.of(switch(Math.toIntExact(value)){
+                    case 0->Evidence.CoverageStatus.MODELED;case 1->Evidence.CoverageStatus.ABSTRACTED;
+                    case 2->Evidence.CoverageStatus.UNSUPPORTED;case 3->Evidence.CoverageStatus.INPUT_MISSING;
+                    default->throw new IllegalStateException("changed admitted Invoke coverage");
+                });
+            }catch(RuntimeException|Error failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
         @Override public boolean identityAt(int ordinal,OperationId identity){
             available();Objects.requireNonNull(identity);return ordinal>=0&&ordinal<sourceOrder.size()&&keys.key(identity)==sourceKeys.handle(ordinal);
         }

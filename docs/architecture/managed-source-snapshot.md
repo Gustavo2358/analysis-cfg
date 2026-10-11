@@ -56,8 +56,56 @@ helper shadow. Producer a0aeb827ef53765815aa501c4687f197be77ac73 stays clean and
 unchanged. Audit01's summary accidentally overwrote its method count with a CLI
 count; that immutable record is retained and audit02 independently confirms1368.
 
-These finite witnesses do not prove global complexity, all-store funding,
-reverse-order qualification,21-family coverage or completion of AS-W00--AS-W10.
+The subsequent original eighteen SOURCE state/forward/reverse cases complete
+with their unchanged independent whole-product oracles at consumer8fbe3dd. They
+are finite isolated single observations, not three-repeat clock medians or a
+general order/permutation proof. Global complexity, all-store funding,21-family
+coverage and completion of AS-W00--AS-W10 remain pending.
+
+## Native writer header and fixed root funding (2026-10-11; local qualification)
+
+Native v3 site coverage reads the exact admitted Invoke scalar header through
+SnapshotProgram.invokeCoverage(OperationId). The existing three-tape paged
+operation catalogue stores the operation handle instead of only its ID handle;
+identity views still read the complete typed ID and use the original canonical
+full-key lookup. No fourth tape, resident coverage map, body projection or
+cardinality cutoff is introduced. Missing/non-Invoke identities return empty;
+all four admitted coverage statuses remain distinct. A failed read preserves
+the primary exception, retires all three catalogue tapes and leaves borrowed
+input/backend/program owners usable. Only the explicitly non-native Structural
+compatibility route retains the historical resident coverage map.
+
+A complete checked AIR witness with a65536-character contract shows the old
+writer attempted a cold body read merely to emit header coverage. The guard
+protects16384 packed words but fails on the first attempted read; it does not
+measure16384 reads. The identical formal law is RED on the old writer and GREEN
+on current productive classes. Colliding full identities, four statuses,
+non-Invoke/missing IDs, expiry and primary read-fault ownership are covered.
+
+Plain native Structural output now reserves65536+4096 RESIDENT bytes in ENCODE
+before JsonOutput allocation: the existing fixed UTF8 buffer and root scratch.
+Insufficient capacity emits no bytes, releases reservations and does not expire
+borrowed input; output failure preserves its primary IOException and returns
+the observed lease. Managed SOURCE output already owns one root reservation
+and bypasses this overload, so it is not double-charged. Caller-managed resident
+compatibility without an execution budget remains explicit. This fixed funding
+does not qualify variable site/result maps, sorting or all-store coverage.
+
+Five new laws plus ten unchanged neighbors pass on actual classes with zero
+skips; eighteen original real CLI contracts also pass. Exact active inventory
+review preserves all1368 old methods and adds five, requiring FAST1373. Seven
+original compiled guards pass: only one additive scalar public method and the
+existing Evidence/budget port references changed. Five fresh actual CLI products
+pass their complete original oracles: SOURCE forward32000, manifest1/4, and
+SOURCE-file16 through dependencies and pipeline. Each preserves the corresponding
+previous whole-product bytes. Original FAST1373 passes in1439.137s with zero
+failures/errors/skips. Exact post-FAST audit matches all1436 production classfiles
+across nine consumer and two AIR modules,570 Java sources and579 fixtures to the
+frozen runtime used by those products. The producer pin remains unchanged.
+Prior large products remain historical, not fresh writer qualification or blanket
+successful-bytecode equivalence. General native result/staging/sorting maps,
+all-store coverage, architecture human review and global qualification remain
+pending; this local wave does not complete AS-W00--AS-W10.
 
 SourceShape lists the41 existing record shapes and4 primitive/container shapes
 from QualifiedSourceDependencies,NominalValueEvidence and NominalValues. Typed
