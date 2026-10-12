@@ -1,5 +1,65 @@
 # Managed ordered typed graph grammar
 
+## Qualified local frontier —2026-10-12
+
+OriginalFAST1506 passes2706.261s, zero failures/errors/skips. Complete class
+audit confirms1482 productive classes/15 runtime components equal the frozen
+runtime of six actual CLI products with complete oracles/byte equality. Public
+Main16384 passes571.306772948s observed with128MiB/1200s+1245s and original
+other quotas/cache; not a repeated curve, root-ledger observation or gain claim.
+The published CI-only5c1d8363 ancestor has both remote jobs SUCCESS/original1485.
+
+JointRun is additive public API in this local wave; the two additional private
+families and unchanged-existing-descriptor comparison below refer specifically
+to the later1496→1506 delta. Human semantic/API review and final full remain
+pending. Mixed admission has an unchanged40-control RED with32 cost violations.
+The60-decision manual oracle and isolated native40-graph/lifecycle prototype
+are preparation evidence, not a productive AIR compiler or general admission
+correction. CALL+FILE/commonWORK/allstore/nativeglobal21/curves/E2E/legacy and
+global qualification remain pending. Historical captures below are preserved.
+
+## Exact joint eligibility and scalar admission — working 2026-10-12
+
+Joint grouping requires multiple batches under the full AnalysisKey, not
+multiple unrelated opted-in runs. Planning-epoch counts use owned ordinal
+storage plus binary search over existing ordered keys; fixed160B controls are
+funded before allocation and expire with the epoch/owner. Batch order, queries,
+facts and operational failure semantics remain unchanged.
+
+Homogeneous scalar admission uses one accepted union solely to certify the
+same per-subject provider decisions. A refused union preserves original
+individual admission order and decisions; failures remain operational. New
+insertion-order controls fund128+32D scratch before distinct insertion, with
+explicit lifecycle; no all-store claim for retained typed maps and observations.
+Metrics are logical admissions, not physical preparation counts. Ten new
+methods (including40 geometric/backend cost controls) and seven original
+compiled guards pass; only two private compiled families were added, existing
+public descriptors/Maven unchanged. FAST1506 retains1496+10; current CLI/FAST/
+full and human review pending. Mixed refusal still scans per subject and general
+AS-W07/common preparation/FILE/commonWORK/global qualification remain open.
+
+## Joint observation working frontier — 2026-10-12
+
+Only the explicitly participating PossibleValues stable run shares observation
+replay. Batch IDs are not execution roots: exact AnalysisKey/context selection,
+immutable stable roots and current epoch delimit reuse. The existing replay
+still advances each root to each original point before joining. Facts retain
+full point/subject/producer/origin/remainder identity; per-consumer planned
+query permissions and independent logical batch outcomes remain unchanged.
+No coalescing of arbitrary Run providers or sharing across epochs/sessions.
+Controlled failure falls back atomically per original batch; operational errors
+abort. Scratch controls are reserved before allocation and retired on all exits;
+resident detached query/fact storage is not advertised as native paging.
+Focused4..1024 prefix law,36 planning regressions and two real file/cache1
+budget laws pass again after the empty-native-plan capacity RED/GREEN correction.
+Empty/nonparticipating plans and a single participating batch allocate no joint
+controls; only participating batches fund grouping and actual multi-batch groups
+fund query references. Four deadline laws pass again. FAST1496=1485 preserved+11
+new methods; fresh FAST/full and corrected-runtime product qualification remain
+pending. The preceding candidate's actual public CLI1200s16384 case passed its
+whole oracle and byte-exact output, not the corrected runtime's qualification.
+No global/all-provider/commonWORK claim.
+
 ## Native CALL target-choice working frontier — 2026-10-12
 
 Exact site-plan own-child diagnostic closed TIME482.001462s: admission at360/420,

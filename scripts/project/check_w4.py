@@ -145,8 +145,8 @@ def verify_metrics(output:str)->list[dict]:
             q=n//2 if p=='S6-half' else n
             eq('planning_candidateSites',1);eq('planning_structuralVisits',1);eq('planning_siteMatches',k);eq('consumer_consumerInvocations',k)
             eq('observation_uniqueQueries',q);eq('observation_queriesAnswered',q);eq('observation_closedInModelResults',q);eq('retained_ValueFact',q)
-            eq('observation_operationsReplayed',n*(n+1)//2 if p=='S16-batches' else q)
-            eq('observation_sequencesReplayed',n if p=='S16-batches' else 1)
+            eq('observation_operationsReplayed',q)
+            eq('observation_sequencesReplayed',1)
             eq('observation_queryRequests',q*k if p.startswith('S6') else n);eq('consumer_factsCommitted',q*k if p.startswith('S6') else n)
         eq('planning_observationBatchesPlanned',n if p=='S16-batches' else 1);eq('observation_observationBatchesExecuted',n if p=='S16-batches' else 1)
     if len({r['index_structuralVisits'] for r in rows if r['probe']=='S5'})!=1:raise Failure('W4 global index multiplied by K')

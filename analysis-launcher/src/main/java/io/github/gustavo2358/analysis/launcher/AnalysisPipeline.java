@@ -13,7 +13,6 @@ import io.github.gustavo2358.analysis.solver.AnalysisResources;
 import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
 import java.io.*;
 import java.nio.file.*;
-import java.time.Duration;
 import java.util.*;
 
 /** Outer file composition: one strict AIR admission, distinct complete products. */
@@ -75,15 +74,15 @@ public final class AnalysisPipeline {
         DataflowAirReader.SnapshotRead read(Path input,AnalysisResources resources)throws IOException;
     }
     static int runSnapshot(String[] args,PrintStream err,SnapshotAirRead reader) {
-        return runSnapshot(args,err,reader,AnalysisResources.withDeadline(new AnalysisResources.Limits(
-                64L*1024*1024,16L*1024*1024,0,16L*1024*1024*1024,8,Long.MAX_VALUE,4L*1024*1024*1024),Duration.ofMinutes(8)));
+        try{return runSnapshot(args,err,reader,AnalysisDeadline.resources(AnalysisDeadline.parse(args,3,true)));}
+        catch(IllegalArgumentException failure){return usage(err);}
     }
     /** The production budget is injectable only within the outer composition package. */
     static int runSnapshot(String[] args,PrintStream err,DataflowAirReader reader,AnalysisResources resources) {
         return runSnapshot(args,err,reader::readSnapshot,resources);
     }
     static int runSnapshot(String[] args,PrintStream err,SnapshotAirRead reader,AnalysisResources resources) {
-        if(args.length<3)return usage(err);
+        try{AnalysisDeadline.parse(args,3,true);}catch(IllegalArgumentException failure){return usage(err);}
         Path input,cfg,dependencies,source=null;boolean physical=false;
         try {
             input=Path.of(args[0]);cfg=Path.of(args[1]);dependencies=Path.of(args[2]);
@@ -91,6 +90,7 @@ public final class AnalysisPipeline {
             for(int n=3;n<args.length;n++) {
                 if(args[n].equals("--source-evidence")&&source==null&&n+1<args.length)source=Path.of(args[++n]);
                 else if(args[n].equals("--experimental-physical")&&!physical)physical=true;
+                else if(args[n].equals("--deadline-seconds"))n++; // Validated before any path or input IO.
                 else return usage(err);
             }
             var paths=new ArrayList<>(List.of(input,cfg,dependencies));if(source!=null)paths.add(source);
@@ -146,6 +146,6 @@ public final class AnalysisPipeline {
         return parent!=null&&Files.exists(parent)?parent.toRealPath().resolve(absolute.getFileName()):absolute;
     }
     private static int usage(PrintStream err) {
-        err.println("usage: analysis-pipeline <input.air.json> <output.cfg.json> <output.dependencies.json> [--source-evidence <source.json>] [--experimental-physical]");return 2;
+        err.println("usage: analysis-pipeline <input.air.json> <output.cfg.json> <output.dependencies.json> [--source-evidence <source.json>] [--experimental-physical] [--deadline-seconds <positive-integer>]");return 2;
     }
 }

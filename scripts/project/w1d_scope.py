@@ -28,7 +28,8 @@ NEW_W5 = {'analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapte
     'PagedSnapshotDependencyStorage','PagedSnapshotDistinctStorage','PagedSnapshotTypeStorage',
     'PagedSnapshotValidationStorage','PagedSnapshotVisibleStorage','SnapshotDependencyFileWriter','SnapshotDependencyJson')}
 NEW_W5.add('analysis-adapters/src/main/java/io/github/gustavo2358/analysis/adapters/PagedSnapshotOrderStorage.java')
-NEW_W5 |= {'analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/AnalysisDependencies.java'}
+NEW_W5 |= {'analysis-launcher/src/main/java/io/github/gustavo2358/analysis/launcher/'+name+'.java'
+           for name in ('AnalysisDependencies','AnalysisDeadline')}
 NEW_CFG_TEST = 'cfg-adapters/src/test/java/io/github/gustavo2358/analysis/cfg/adapters/W1dInvokeWireTest.java'
 NEW_ORDER_TEST = 'analysis-adapters/src/test/java/io/github/gustavo2358/analysis/adapters/PagedSnapshotOrderStorageTest.java'
 

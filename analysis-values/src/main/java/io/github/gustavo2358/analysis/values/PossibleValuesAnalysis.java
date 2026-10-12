@@ -111,6 +111,66 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
             if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
         }
         public record Observations(ObservationBatch<ObjectId,ValueFact> batch,Map<String,Long> stateMetrics,Map<String,Long> quality) { }
+        /** One replay union of immutable points in this exact selected run. Project
+         * after replay, never join different points or contexts. Controlled failure
+         * falls back to the original atomic per-batch path; operational failures
+         * still abort and are never converted into incomplete semantic answers. */
+        public List<Observations> observeBatches(List<List<PointQuery<ObjectId>>> requests) {
+            var active=profile;if(active==null)throw new IllegalStateException("closed scalar execution");
+            active.universe.available();
+            long bytes=Math.addExact(256L,Math.multiplyExact(128L,requests.size()));
+            for(var queries:requests)bytes=Math.addExact(bytes,Math.multiplyExact(192L,queries.size()));
+            // Union/index/list reference controls, not an admission claim about
+            // the existing resident detached ValueFact payloads.
+            var budget=active.session.index().store().executionBudget();
+            var lease=budget.isPresent()?budget.orElseThrow().reserve(ProgramStore.CapacityPool.SCRATCH,bytes,ProgramStore.ExecutionPhase.REPLAY):null;
+            try(lease) {
+                var union=new LinkedHashSet<PointQuery<ObjectId>>();
+                for(var queries:requests)for(var query:queries) {
+                    active.session.index().store().progress(ProgramStore.ExecutionPhase.REPLAY);union.add(Objects.requireNonNull(query));
+                }
+                var shared=observe(union);
+                var output=new ArrayList<Observations>();
+                if(shared.batch().status()!=ObservationBatch.Status.COMPLETE) {
+                    for(var queries:requests)output.add(observe(queries));
+                    if(!output.isEmpty()) {
+                        var first=output.getFirst();var local=first.batch();var m=local.metrics();var attempted=shared.batch().metrics();
+                        var work=new TreeMap<>(first.stateMetrics());
+                        shared.stateMetrics().forEach((name,value)->work.merge(name,value,Math::addExact));
+                        output.set(0,new Observations(new ObservationBatch<>(local.status(),local.reason(),local.observations(),
+                            new ObservationBatch.Metrics(m.queryRequests(),m.uniqueQueries(),Math.addExact(m.sequencesReplayed(),attempted.sequencesReplayed()),
+                                Math.addExact(m.operationsReplayed(),attempted.operationsReplayed()),m.maxRequestedOffsetObserved(),
+                                m.queriesAnswered(),m.unsupportedQueries(),m.queriesNotMaterialized(),m.observationFailures())),Map.copyOf(work),first.quality()));
+                    }
+                    return List.copyOf(output);
+                }
+                var answers=new HashMap<PointQuery<ObjectId>,ObservationBatch.Observation<ObjectId,ValueFact>>();
+                for(var observation:shared.batch().observations())answers.put(observation.query(),observation);
+                var order=Comparator.<PointQuery<ObjectId>,ProgramPoint>comparing(PointQuery::point,ProgramPoint.ORDER)
+                    .thenComparing(PointQuery::subject,Comparator.comparing((ObjectId id)->id.unit().publication().localId())
+                        .thenComparing(id->id.unit().localId()).thenComparing(ObjectId::localId));
+                for(int at=0;at<requests.size();at++) {
+                    var queries=requests.get(at);var selected=new ArrayList<>(new LinkedHashSet<>(queries));selected.sort(order);
+                    var observations=new ArrayList<ObservationBatch.Observation<ObjectId,ValueFact>>();
+                    long answered=0,unsupported=0,maxOffset=0;
+                    for(var query:selected) {
+                        active.session.index().store().progress(ProgramStore.ExecutionPhase.REPLAY);
+                        var observation=Objects.requireNonNull(answers.get(query));observations.add(observation);
+                        if(observation.status()==ObservationBatch.QueryStatus.VALUE) {
+                            answered=Math.incrementExact(answered);
+                            if(query.point().kind()!=ProgramPoint.Kind.ENTRY)
+                                maxOffset=Math.max(maxOffset,active.session.index().site(query.point().operation()).offset());
+                        } else unsupported=Math.incrementExact(unsupported);
+                    }
+                    var counters=shared.batch().metrics();
+                    var batch=new ObservationBatch<>(ObservationBatch.Status.COMPLETE,null,observations,
+                        new ObservationBatch.Metrics(queries.size(),selected.size(),at==0?counters.sequencesReplayed():0,
+                            at==0?counters.operationsReplayed():0,maxOffset,answered,unsupported,0,0));
+                    output.add(new Observations(batch,at==0?shared.stateMetrics():Map.of(),quality(batch)));
+                }
+                return List.copyOf(output);
+            }
+        }
         public Observations observe(Iterable<PointQuery<ObjectId>> queries) {
             var profile=this.profile;if(profile==null)throw new IllegalStateException("closed scalar execution");
             profile.universe.available();
@@ -134,6 +194,10 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
                             source,model,List.copyOf(premises),List.copyOf(evidence),List.copyOf(provenance),supports);
                     }
                 });
+            preparationMetrics=snapshotPreparation(profile);
+            return new Observations(batch,replayWork.snapshot(),quality(batch));
+        }
+        private static Map<String,Long> quality(ObservationBatch<ObjectId,ValueFact> batch) {
             var quality=new HashMap<String,Long>();
             for(String name:List.of("modelOpenResults","sourceOpenResults","effectiveOpenResults","closedInModelResults"))quality.put(name,0L);
             for(var observation:batch.observations())if(observation.value()!=null) {
@@ -143,8 +207,7 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
                 if(fact.effectiveUnknownRemainder())increment(quality,"effectiveOpenResults");
                 if(Boolean.FALSE.equals(fact.modelValueRemainder()))increment(quality,"closedInModelResults");
             }
-            preparationMetrics=snapshotPreparation(profile);
-            return new Observations(batch,replayWork.snapshot(),Map.copyOf(quality));
+            return Map.copyOf(quality);
         }
         private static void increment(Map<String,Long> metrics,String key){metrics.put(key,Math.incrementExact(metrics.get(key)));}
     }

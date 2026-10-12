@@ -1,5 +1,102 @@
 # Managed source storage boundary
 
+## Qualified local frontier —2026-10-12
+
+Original FAST1506 passes in2706.261s, with zero failures/errors/skips and a
+whole-runtime audit:1482 productive classes across all nine consumer/two AIR
+modules equal the frozen runtime used by six complete actual CLI oracles.
+The current public Main16384 product passes in571.306772948s observed at
+128MiB with explicit1200s deadline/1245s watchdog and unchanged other quotas;
+97958525 output bytes remain exact. This is one clock observation, not a gain
+or repeated curve. The default480s TIME remains preserved historical evidence.
+
+Published ancestor5c1d8363 changes only CI timeout15→60minutes; both remote
+jobs pass, including original1485 methods. It does not qualify this local wave.
+The local wave adds the explicit JointRun API and deadline option, as well as
+two private count/admission families; unchanged-public-descriptor statements
+below refer to the later delta against the1496-method candidate, not to the
+whole change from the published ancestor. Human semantic/API review remains
+required and no merge is authorized.
+
+Mixed admission still reproduces32 cost violations after40 exact manual
+provider/metric/cleanup controls. Individual60-decision refusal oracle and an
+isolated native40-graph/two-backend lifecycle prototype pass, but no new AIR
+constraint compiler is integrated. General preparation/CALL+FILE/commonWORK/
+allstore/nativeglobal21/repeated curves/E2E/legacy/final full remain pending.
+The earlier working-frontier captures below are historical; GLOBAL_PARTIAL.
+
+## Exact joint eligibility and homogeneous admission — working 2026-10-12
+
+An immutable planning-epoch count per complete AnalysisKey now distinguishes
+actual multi-batch groups from unrelated opted-in runs. The count payload uses
+the owner's ordinal storage and binary search over the existing sorted key list,
+with 160 fixed resident control bytes funded before allocation. The epoch owns
+and retires the column; empty/single-batch plans need no count index. Grouping
+capacity is reserved only for keys with multiple compatible batches, not merely
+because unrelated JointRuns exist. Exact-key native RED/GREEN preserves facts,
+logical requests, stable-run reuse, owner lifetime and zero grouping reservations.
+
+CALL scalar admission collects distinct subjects in original first-seen order.
+One ACCEPTED union under the exact snapshot/Entry/effects profile certifies the
+individual acceptance decisions; it does not share solver executions or widen
+the final demand. A refused union closes its probe and performs original per-
+subject admissions. Operational failures propagate, never become refusals or
+semantic fallback. The inserted order controls reserve128+32*D scratch bytes,
+before each distinct insertion, and retire on close/owner expiry. Existing
+typed keys, maps, queries and observations remain explicit resident debt.
+
+Admission metrics retain their logical per-subject meaning; they are not counts
+of physical preparations. Ten additive JUnit methods pass, including every
+nonempty subset of a three-subject model, mixed SCALAR/REGIONAL selection,
+global I-17 contradictory-initial rejection before demand, failure/expiry/real
+quota laws and40 cost controls across independent geometric dimensions and
+memory/file-cache1 backends. Homogeneous header bounds are Assign<=2D and
+Invoke<=5Q in these controls. Mixed refusal still adds a union probe and retains
+per-subject inventory scans: general common preparation/AS-W07 is NOT closed.
+Seven original compiled guards pass after an exact active inventory update for
+two internal classes; existing public descriptors and Maven edges are unchanged.
+FAST1506 preserves1496 prior methods plus10. Fresh runtime/products/FAST/full
+and human semantic/API review remain pending; no all-store/global claim.
+
+## Joint observation and configurable deadline — working 2026-10-12
+
+The qualified c2c5be0c runtime completed the original 16384-call input three
+times at unchanged128MiB: application median567.006190047s,range
+550.486863654..567.626038727s; whole oracles and bytes exact,all pools zero.
+The working CLI now accepts finite positive --deadline-seconds; default480s
+and every other quota remain unchanged. Four explicit configuration laws pass.
+
+JointRun is an additive explicit provider opt-in,not an assumption about any
+Run. Only PossibleValues participates: one existing BatchReplayer union per
+exact stable AnalysisKey/epoch,then immutable per-point facts projected to the
+original batches. Logical query/batch counts,permissions,unsupported points,
+local failures,producer support and context/root replay-before-join stay intact.
+Ordinary providers retain original invocation order. Controlled union failure
+uses independent batches and accounts attempted union work; operational errors
+propagate. Empty plans, ordinary providers and a single participating batch
+reserve no joint controls. With multiple participating batches, grouping reserves
+256+256*B scratch bytes before allocation; typed-query references grow that lease
+by96*R only for exact-key groups containing multiple batches. B counts participating
+batches; R counts their actual jointly observed input references. Union/index controls reserve
+256+128*B+192*R. R counts input query references,not decoded fact payload bytes.
+Existing detached observation payload storage remains explicit resident debt.
+
+Frozen original focused law RED4-prefix10,working GREENprefix4; five geometric
+sizes4..1024 preserve full candidate/support/origin/remainder/alias facts.
+36 selected planning laws, two file/cache1 native budget/cleanup laws and the
+empty-native-plan eligibility RED/GREEN law pass on the corrected working runtime.
+Four deadline laws pass again. The preceding candidate's real public CLI1200s
+completed the unchanged16384-call131454605B input in544.847597788s observed,
+with full oracle and97958525B output byte-exact to the qualified product. This
+public run predates the eligibility correction and exposes no root-ledger metrics.
+All seven compiled guards pass again after correction; original W4 capture
+proves every inventory facet unchanged. FAST1496 preserves1485+11. Corrected-runtime product qualification,
+fresh FAST and sensitive-kernel full are pending. Prior FAST/full remain
+historical for c2c5be0c,not current.
+The separate40-control preparation probe finds repeated per-subject body scans;
+joint replay does not resolve admission,FILE,commonWORK or all-store debt.
+API/architecture human review and global/integrated qualification remain pending.
+
 ## Native bounded page-address working set — 2026-10-12
 
 The previous one-address real Main16384 still exits7 TIME481.715473s,without

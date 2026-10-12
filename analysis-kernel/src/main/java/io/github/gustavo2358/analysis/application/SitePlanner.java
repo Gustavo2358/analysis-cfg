@@ -90,15 +90,20 @@ final class SitePlanner {
                 throw new IllegalArgumentException("missing or mismatched consumer batch dependency");
         }
         var frozen = new TreeMap<String,ExecutionPlan.BatchPlan>();
+        var keyOrder=List.copyOf(keys);
+        var batchCounts=batches.size()>1?ExecutionPlan.BatchCounts.create(keyOrder,store,lifetime):null;
+        if(batchCounts!=null)own.accept(batchCounts);
         for (var batch : batches.values()) {
+            if(batchCounts!=null)batchCounts.add(batch.id.analysisKey());
             var ordered = new ArrayList<PointQuery<?>>(batch.queries);
             ordered.sort(queryOrder(registry.require(batch.id.analysisKey())));
             frozen.put(batch.id.id(),new ExecutionPlan.BatchPlan(batch.id,ordered,batch.raw));
             counts.add("uniqueQueries",ordered.size()); counts.add("observationBatchesPlanned",1);
         }
+        if(batchCounts!=null)batchCounts.freeze();
         var selected = new TreeMap<String,List<SiteView>>(); sites.forEach((id,values) -> selected.put(id,List.copyOf(values)));
         for(var entry:nativeSites.entrySet()){entry.getValue().finish();counts.add("siteMatches",entry.getValue().size());selected.put(entry.getKey(),entry.getValue());}
-        return new ExecutionPlan<>(owner,epoch,List.copyOf(consumers.values()),selected,List.copyOf(keys),frozen,localRequests,counts.snapshot());
+        return new ExecutionPlan<>(owner,epoch,List.copyOf(consumers.values()),selected,keyOrder,frozen,localRequests,counts.snapshot(),batchCounts);
     }
     /** Frozen exact selection relation, not a decoded Operation catalogue.
      * Rows borrow registration Entry IDs and canonical admitted operation codes.

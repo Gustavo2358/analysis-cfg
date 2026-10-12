@@ -33,6 +33,14 @@ public interface AnalysisProvider<T,V> {
          * Stateless providers need no cleanup; state-owning providers override this idempotently. */
         @Override default void close() { }
     }
+    /** Explicit opt-in for immutable observations of this exact stable run. Results
+     * correspond to input batches in order and retain each batch's atomic failure
+     * scope, point identities and local query metrics. Physical replay work is
+     * counted once, not once per recipient. Ordinary Run implementations are never
+     * inferred to have this property. No sharing across runs or planning epochs. */
+    interface JointRun<T,V> extends Run<T,V> {
+        List<Materialized<T,V>> observeBatches(List<List<PointQuery<T>>> batches);
+    }
     record Materialized<T,V>(ObservationBatch<T,V> batch, Map<String,Long> metrics) {
         public Materialized { Objects.requireNonNull(batch); metrics = Map.copyOf(metrics); }
     }

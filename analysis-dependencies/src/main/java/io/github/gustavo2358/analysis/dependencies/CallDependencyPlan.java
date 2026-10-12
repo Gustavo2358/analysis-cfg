@@ -7,6 +7,7 @@ import io.github.gustavo2358.analysis.consumers.SiteView;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import io.github.gustavo2358.analysis.values.*;
 import java.util.*;
 import io.github.gustavo2358.analysis.storage.*;
@@ -78,7 +79,8 @@ public final class CallDependencyPlan {
             invokes.computeIfAbsent(site.owner().id(),ignored->new ArrayList<>()).add(site);
         for(var context:session.contexts()) {
             var entry=context.entryView().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
-            var admission=new HashMap<ObjectId,Boolean>();var demand=new HashSet<ObjectId>();
+            try(var admission=new ScalarAdmissions(session.index().store())) {
+            var demand=new HashSet<ObjectId>();
             var selected=new EnumMap<Provider,Set<OperationId>>(Provider.class);
             var queries=new HashSet<PointQuery<ObjectId>>();
             var scoped=session.selectEntries(List.of(entry));
@@ -98,17 +100,7 @@ public final class CallDependencyPlan {
                     metrics.merge("qualifiedComputedOccurrences",1L,Long::sum);
                     if(!readable(target))provider=Provider.UNRESOLVED;
                     else if(((Expressions.Read)((Interactions.ComputedTarget)target).name()).place() instanceof Places.ObjectPlace object) {
-                        boolean accepted=admission.computeIfAbsent(object.object(),subject->{
-                            metrics.merge("scalarAdmissionAttempts",1L,Long::sum);
-                            var probe=PossibleValuesAnalysis.prepare(scoped,PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(subject));
-                            try {
-                            if(probe.status()==PossibleValuesAnalysis.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,probe.reason());
-                            boolean ok=probe.status()==PossibleValuesAnalysis.Status.ACCEPTED;
-                            metrics.merge(ok?"scalarAdmissionAccepted":"scalarAdmissionRefused",1L,Long::sum);return ok;
-                            } finally{probe.analysis().ifPresent(PossibleValuesAnalysis::close);}
-                        });
-                        provider=accepted?Provider.SCALAR:Provider.REGIONAL;
-                        if(accepted)demand.add(object.object());
+                        admission.request(object.object());provider=Provider.SCALAR; // Pending exact admission, not a published decision.
                         queries.add(new PointQuery<>(ProgramPoint.before(entry,operation),object.object()));
                     } else provider=Provider.STORAGE;
                 }
@@ -117,6 +109,18 @@ public final class CallDependencyPlan {
                 if(provider==Provider.SCALAR)metrics.merge("scalarSelections",1L,Long::sum);
                 if(provider==Provider.REGIONAL||provider==Provider.STORAGE)metrics.merge("regionalSelections",1L,Long::sum);
             }
+            admission.prepare(scoped,metrics);
+            for(var query:queries) {
+                if(admission.accepted(query.subject()))demand.add(query.subject());
+                else {
+                    var operation=query.point().operation();
+                    providers.put(new SiteKey(entry,operation),Provider.REGIONAL);
+                    selected.get(Provider.SCALAR).remove(operation);
+                    selected.computeIfAbsent(Provider.REGIONAL,k->new HashSet<>()).add(operation);
+                    metrics.merge("scalarSelections",-1L,Long::sum);metrics.merge("regionalSelections",1L,Long::sum);
+                }
+            }
+            if(selected.containsKey(Provider.SCALAR)&&selected.get(Provider.SCALAR).isEmpty())selected.remove(Provider.SCALAR);
             // Both wider projections use the same regional engine. After scalar
             // admission, combine wider-only demands into its storage projection.
             // This never changes an accepted scalar selection.
@@ -152,8 +156,58 @@ public final class CallDependencyPlan {
                 var interest=new SiteInterest(Operations.Invoke.class,entry,s->operations.contains(s.operationId()),requests);
                 registrations.add(new ConsumerRegistration<>(new ConsumerPlan(namespace+":"+id+":"+provider,keys,batches),List.of(interest),List.of(),new CallDependencyConsumer(reach,values,storage)));
             }
+            }
         }
         return new Selection(registrations,providers,metrics);
+    }
+    /** Exact per-subject decisions. A supported union certifies acceptance only;
+     * a semantic refusal (including INVALID_INPUT) never substitutes for the
+     * original individual decision/order. Operational errors are not fallback.
+     * The execution demand and providers remain exactly the original choices.
+     * This reduces homogeneous admission probes, not mixed-case/global scans. */
+    private static final class ScalarAdmissions implements AutoCloseable {
+        private final ProgramStore store;
+        private final Map<ObjectId,Boolean> decisions=new LinkedHashMap<>();
+        private ProgramStore.CapacityLease orderCapacity;
+        ScalarAdmissions(ProgramStore store){this.store=store;}
+        void request(ObjectId subject) {
+            Objects.requireNonNull(subject);if(decisions.containsKey(subject))return;
+            // New insertion-order links only; existing typed keys/query/storage
+            // controls remain explicit resident debt. No paging/allstore claim.
+            if(orderCapacity==null) {
+                var budget=store.executionBudget();
+                if(budget.isPresent()) {
+                    orderCapacity=budget.orElseThrow().reserve(ProgramStore.CapacityPool.SCRATCH,160,ProgramStore.ExecutionPhase.DEMAND);
+                    orderCapacity.onOwnerClose(decisions::clear);
+                }
+            } else orderCapacity.grow(32,ProgramStore.ExecutionPhase.DEMAND);
+            decisions.put(subject,null);
+        }
+        void prepare(AnalysisSession session,Map<String,Long> metrics) {
+            if(decisions.size()>1) {
+                var joint=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE,decisions.keySet());
+                try {
+                    if(joint.status()==PossibleValuesAnalysis.Status.ACCEPTED) {
+                        for(var decision:decisions.entrySet()) {
+                            store.progress(ProgramStore.ExecutionPhase.DEMAND);decision.setValue(true);
+                            metrics.merge("scalarAdmissionAttempts",1L,Long::sum);metrics.merge("scalarAdmissionAccepted",1L,Long::sum);
+                        }
+                        return;
+                    }
+                } finally {joint.analysis().ifPresent(PossibleValuesAnalysis::close);}
+            }
+            for(var decision:decisions.entrySet()) {
+                store.progress(ProgramStore.ExecutionPhase.DEMAND);metrics.merge("scalarAdmissionAttempts",1L,Long::sum);
+                var probe=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(decision.getKey()));
+                try {
+                    if(probe.status()==PossibleValuesAnalysis.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,probe.reason());
+                    boolean accepted=probe.status()==PossibleValuesAnalysis.Status.ACCEPTED;decision.setValue(accepted);
+                    metrics.merge(accepted?"scalarAdmissionAccepted":"scalarAdmissionRefused",1L,Long::sum);
+                } finally {probe.analysis().ifPresent(PossibleValuesAnalysis::close);}
+            }
+        }
+        boolean accepted(ObjectId subject){return Objects.requireNonNull(decisions.get(subject),"subject not admitted");}
+        @Override public void close(){decisions.clear();if(orderCapacity!=null){orderCapacity.close();orderCapacity=null;}}
     }
     private static String part(String text){return text.length()+":"+text;}
 }

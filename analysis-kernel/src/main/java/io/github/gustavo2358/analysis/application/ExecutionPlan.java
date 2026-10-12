@@ -3,6 +3,7 @@ package io.github.gustavo2358.analysis.application;
 import io.github.gustavo2358.analysis.consumers.SiteView;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.PointQuery;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
 
 /** Immutable planning epoch; callbacks are retained only until the caller releases the plan. */
@@ -13,14 +14,16 @@ public final class ExecutionPlan<F> {
     final Map<String,List<SiteView>> sites;
     final List<AnalysisKey> keys;
     final Map<String,BatchPlan> batches;
+    final BatchCounts batchCounts;
     final Map<String,Map<String,Set<PointQuery<?>>>> requests;
     final Map<String,Long> metrics;
     ExecutionPlan(Object owner, long epoch, List<ConsumerRegistration<F>> registrations,
                   Map<String,List<SiteView>> sites, List<AnalysisKey> keys, Map<String,BatchPlan> batches,
-                  Map<String,Map<String,Set<PointQuery<?>>>> requests, Map<String,Long> metrics) {
+                  Map<String,Map<String,Set<PointQuery<?>>>> requests, Map<String,Long> metrics,BatchCounts batchCounts) {
         this.owner = owner; this.epoch = epoch; this.registrations = List.copyOf(registrations);
         var selected = new TreeMap<String,List<SiteView>>(); sites.forEach((k,v) -> selected.put(k,v instanceof SitePlanner.NativeSites?Collections.unmodifiableList(v):List.copyOf(v))); this.sites = Collections.unmodifiableMap(selected);
         this.keys = List.copyOf(keys); this.batches = Collections.unmodifiableMap(new TreeMap<>(batches));
+        this.batchCounts=batchCounts;
         var requested = new TreeMap<String,Map<String,Set<PointQuery<?>>>>();
         requests.forEach((consumer, byBatch) -> {
             var copy = new TreeMap<String,Set<PointQuery<?>>>(); byBatch.forEach((id,qs) -> copy.put(id,Set.copyOf(qs)));
@@ -38,6 +41,56 @@ public final class ExecutionPlan<F> {
     }
     public record ObservationPlan(ObservationBatchId<?,?> batchId, List<PointQuery<?>> queries, long queryRequests) {
         public ObservationPlan { queries = List.copyOf(queries); }
+    }
+    long batchCount(AnalysisKey key){return batchCounts==null?1:batchCounts.count(key);}
+    /** One immutable planning-epoch count per full key, not mutable cached-run
+     * state. Native payload uses the existing owned paged column; the fixed
+     * wrapper is funded before allocation. No input-wide count map or pair scan. */
+    static final class BatchCounts implements AutoCloseable {
+        private List<AnalysisKey> keys;
+        private ProgramStore store;
+        private Runnable lifetime;
+        private ProgramStore.OrdinalColumn values;
+        private ProgramStore.CapacityLease control;
+        private boolean closed,frozen;
+        private BatchCounts(List<AnalysisKey> keys,ProgramStore store,Runnable lifetime,
+                ProgramStore.OrdinalColumn values,ProgramStore.CapacityLease control) {
+            this.keys=keys;this.store=store;this.lifetime=lifetime;this.values=values;this.control=control;
+        }
+        static BatchCounts create(List<AnalysisKey> keys,ProgramStore.Structural store,Runnable lifetime) {
+            var budget=store.executionBudget();
+            var control=budget.isPresent()?budget.orElseThrow().reserve(ProgramStore.CapacityPool.RESIDENT,160,ProgramStore.ExecutionPhase.DEMAND):null;
+            ProgramStore.OrdinalColumn values=null;
+            try {
+                if(budget.isPresent()) {
+                    var storage=store.storageInventory().orElseThrow(()->new IllegalArgumentException("native batch counts require owned ordinal storage"));
+                    values=storage.column(keys.size());
+                } else values=ProgramStore.residentColumn(keys.size());
+                var result=new BatchCounts(keys,store,lifetime,values,control);
+                if(control!=null)control.onOwnerClose(result::close);
+                return result;
+            } catch(RuntimeException|Error failure) {
+                if(values!=null)try{values.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+                if(control!=null)try{control.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+                throw failure;
+            }
+        }
+        private int ordinal(AnalysisKey key) {
+            if(closed)throw new IllegalStateException("planning batch counts expired");
+            lifetime.run();store.progress(ProgramStore.ExecutionPhase.DEMAND);
+            int ordinal=Collections.binarySearch(keys,key,AnalysisKey.ORDER);
+            if(ordinal<0)throw new IllegalArgumentException("batch key outside planning epoch");return ordinal;
+        }
+        void add(AnalysisKey key){if(frozen)throw new IllegalStateException("frozen batch counts");int at=ordinal(key);values.set(at,Math.incrementExact(values.get(at)));}
+        void freeze(){if(closed)throw new IllegalStateException("planning batch counts expired");frozen=true;}
+        long count(AnalysisKey key){if(!frozen)throw new IllegalStateException("unfinished batch counts");return values.get(ordinal(key));}
+        @Override public void close() {
+            if(closed)return;closed=true;Throwable failure=null;
+            try{values.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
+            try{if(control!=null)control.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+            values=null;control=null;keys=null;store=null;lifetime=null;
+            if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;
+        }
     }
     static final class BatchPlan {
         final ObservationBatchId<?,?> id;

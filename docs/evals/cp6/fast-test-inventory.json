@@ -1,5 +1,30 @@
 {
   "analysis-adapters": {
+    "io.github.gustavo2358.analysis.adapters.NativeDisjointJointKeyEligibilityTest": [
+      "independentJointKeysNeverReserveGroupingCapacity"
+    ],
+    "io.github.gustavo2358.analysis.adapters.ScalarAdmissionSharingTest": [
+      "acceptedUnionPreservesEveryNonemptySubsetAndCompletePointFacts",
+      "contradictoryInitialFactsAreRejectedBeforeAnyDemandSharing",
+      "unsupportedUnionCannotRefuseTheIndividuallyAcceptedScalarCall"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeScalarAdmissionLifecycleTest": [
+      "repeatedSubjectsFundOneOrderControlBeforeGrowthAndRetireIt",
+      "literalOnlyPlanNeverReservesScalarOrderControls",
+      "reserveAndGrowthFailuresAreOperationalAtomicAndAllowAFreshAttempt",
+      "expiredOwnerCannotPublishChoicesAndStillRetiresOrderCapacity",
+      "actualScratchDenialBeforeOrderInsertionPreservesTheLiveOwner"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeComputedAdmissionCostTest": [
+      "acceptedSubjectsShareOnePreparationAcrossFiveIndependentGeometries"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeJointObservationEligibilityTest": [
+      "emptyNativePlansNeverReserveJointCapacity"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeJointObservationBudgetTest": [
+      "nativePlanningGroupDenialIsAtomicAndNextEpochPreservesCompleteFacts",
+      "nativeUnionDenialPrecedesReplayAndReturnsEveryLeaseOnSuccess"
+    ],
     "io.github.gustavo2358.analysis.adapters.DeliveryTest": [
       "resourceExhaustionIsNotACompletedOrSemanticDeliveryOutcome",
       "completeReceiptBindsExactFinalBytesAndReplacesExistingAtomically",
@@ -1490,6 +1515,12 @@
     ]
   },
   "analysis-launcher": {
+    "io.github.gustavo2358.analysis.launcher.ConfiguredDeadlineCliTest": [
+      "explicitLongerDeadlinePreservesCompleteDependencyProduct",
+      "pipelineDeadlineChangesOnlySharedTimeAndDefaultRemainsEightMinutes",
+      "malformedAndDuplicateDeadlinesNeverReadInputOrReplaceDestinations",
+      "deadlineOptionsRespectExistingPipelineValuesAndFiniteIntegerBoundary"
+    ],
     "io.github.gustavo2358.analysis.launcher.DataflowCliTest": [
       "defaultCodecAcceptsBeyondHistoricalCapWithoutLocalReadAdmission",
       "fileRouteMatchesInMemoryAndReceiptIsSeparate",
@@ -1541,6 +1572,12 @@
     ]
   },
   "analysis-values": {
+    "io.github.gustavo2358.analysis.values.JointObservationReplayTest": [
+      "compatibleIndependentBatchesReplayOnePrefixAndKeepExactLocalObservations",
+      "jointBatchesKeepUnsupportedPointsLocalOffsetsAndDistinctOverwriteFacts",
+      "jointControlledFailureFallsBackWithoutWideningAnotherBatch",
+      "jointOperationalFailurePropagatesAndNeverInvokesFallback"
+    ],
     "io.github.gustavo2358.analysis.values.DomainTest": [
       "missingStrongUpdateAndJoinHaveIndependentExpected",
       "finiteLatticeLawsAndAssignmentMonotonicity",
