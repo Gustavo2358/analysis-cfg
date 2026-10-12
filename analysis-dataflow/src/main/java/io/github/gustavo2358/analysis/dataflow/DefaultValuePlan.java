@@ -30,9 +30,9 @@ public final class DefaultValuePlan {
         }
         var registrations=new ArrayList<ConsumerRegistration<ObservedValueFact>>();
         var contexts=new ArrayList<>(session.contexts());
-        contexts.sort(Comparator.comparing(c->c.entry().id(),AnalysisKey.ENTRY_ORDER));
+        contexts.sort(Comparator.comparing(c->c.entryView().id(),AnalysisKey.ENTRY_ORDER));
         for(var context:contexts) {
-            var entry=context.entry().id(); var sequences=byUnit.get(entry.unit());
+            var entry=context.entryView().id(); var sequences=byUnit.get(entry.unit());
             if(sequences==null||sequences.isEmpty()) continue;
             var key=PossibleValuesProvider.key(entry);
             // Length-prefixed identity is injective even when IDs contain delimiters.

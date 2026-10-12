@@ -8,17 +8,23 @@ final class Candidates {
     private final int singleton;
     private final int[] many;
     private final boolean open;
+    private final long valuesFingerprint,fingerprint;
     final SupportSet supports;
     private Candidates(int singleton,int[] many,boolean open) { this(singleton,many,open,SupportSet.EMPTY); }
     private Candidates(int singleton,int[] many,boolean open,SupportSet supports) {
-        this.singleton=singleton;this.many=many;this.open=open;this.supports=supports;
+        this(singleton,many,open,supports,31L*singleton+Arrays.hashCode(many));
     }
+    private Candidates(int singleton,int[] many,boolean open,SupportSet supports,long valuesFingerprint) {
+        this.singleton=singleton;this.many=many;this.open=open;this.supports=supports;this.valuesFingerprint=valuesFingerprint;
+        fingerprint=valuesFingerprint+Long.rotateLeft(supports.fingerprint(),32)+(open?0x9e3779b97f4a7c15L:0);
+    }
+    long fingerprint(){return fingerprint;}
     Candidates supportedBy(int producer,ValuesWork work) {
         return withSupport(SupportSet.singleton(producer,work),work);
     }
     private Candidates withSupport(SupportSet next,ValuesWork work) {
         if(supports.equivalent(next))return this;
-        work.candidate(0);return new Candidates(singleton,many,open,next);
+        work.candidate(0);return new Candidates(singleton,many,open,next,valuesFingerprint);
     }
     static Candidates singleton(int value,ValuesWork w) {
         if(value<0)throw new IllegalArgumentException("negative value ordinal");
@@ -30,9 +36,11 @@ final class Candidates {
     int[] ordinals() { return many==null?(singleton<0?new int[0]:new int[]{singleton}):many.clone(); }
     Candidates withOpen(ValuesWork w) {
         if(open)return this;
-        w.candidate(0);return new Candidates(singleton,many,true,supports);
+        w.candidate(0);return new Candidates(singleton,many,true,supports,valuesFingerprint);
     }
     boolean equivalent(Candidates b) { return this==b||(open==b.open&&singleton==b.singleton&&Arrays.equals(many,b.many)&&supports.equivalent(b.supports)); }
+    @Override public int hashCode(){return Long.hashCode(fingerprint);}
+    @Override public boolean equals(Object other){return this==other||other instanceof Candidates candidates&&equivalent(candidates);}
     Candidates join(Candidates b,ValuesWork w) {
         if(this==b)return this;
         var support=supports.join(b.supports,w);

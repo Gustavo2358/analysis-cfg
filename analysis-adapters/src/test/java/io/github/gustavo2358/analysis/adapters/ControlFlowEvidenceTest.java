@@ -66,7 +66,7 @@ class ControlFlowEvidenceTest {
     static void topology(Publication p,boolean nested) {
         var built=W1dBoundaryTest.build(p);assertEquals(io.github.gustavo2358.analysis.cfg.application.CfgBuildResult.Status.CFG_BUILT,built.status());
         var graph=built.graph().orElseThrow();var names=new HashMap<CfgNodeId,String>();
-        for(var node:graph.nodes())names.put(node.id(),node instanceof CfgNode.SequenceNode s?s.source().label().localId():node instanceof CfgNode.EntryNode?"ENTRY":"EXIT");
+        for(var node:graph.nodes())names.put(node.id(),node instanceof CfgNode.SequenceNode s?s.label().localId():node instanceof CfgNode.EntryNode?"ENTRY":"EXIT");
         var expected=new TreeSet<>(List.of("ENTRY>start:ENTRY","start>left:BRANCH_TRUE","start>right:BRANCH_FALSE","join>end:INVOKE_NORMAL","end>EXIT:RETURN"));
         expected.add("right>join:JUMP");
         if(nested)expected.addAll(List.of("left>inner-a:BRANCH_TRUE","left>inner-b:BRANCH_FALSE","inner-a>middle:JUMP","inner-b>middle:JUMP","middle>join:JUMP"));

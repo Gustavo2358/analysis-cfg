@@ -12,9 +12,9 @@ PREFIX='io.github.gustavo2358.analysis.'
 TEST_PREFIX=PREFIX+'values.'
 INVENTORY='docs/evals/cp6/w1d-w4-inventory.json'
 PACKAGES={
-'application':'AnalysisProvider AnalysisRegistry ConsumerRegistration Counts ExecutionPlan PlanningExecution PreparedAnalysisResult SitePlanner'.split(),
+'application':'AnalysisProvider AnalysisRegistry ConsumerRegistration Counts ExecutionPlan PlanningExecution PreparedAnalysisResult SitePlanner StoredFacts'.split(),
 'plan':'AnalysisKey AnalysisOutcome ConsumerPlan ObservationBatchId ObservationRequest SiteInterest'.split(),
-'consumers':'FactConsumer FactSink PreparedFacts SiteView'.split()}
+'consumers':'FactConsumer FactSink FactStorage PreparedFacts SiteView'.split()}
 KERNEL_SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/{pkg}/{name}.java' for pkg,names in PACKAGES.items() for name in names}
 PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/PossibleValuesProvider.java'
 REGIONAL_PROVIDER='analysis-values/src/main/java/io/github/gustavo2358/analysis/values/RegionalValuesProvider.java'
@@ -97,7 +97,8 @@ def architecture(root:Path,update:bool=False)->None:
         if not paths:raise Failure('W4 classfiles missing')
         for path in paths:
             if struct.unpack('>IHH',(classes/path).read_bytes()[:8])!=(0xcafebabe,0,65):raise Failure('W4 requires Java 21 without preview')
-        descriptors={p[:-6].replace('/','.'):command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',p[:-6].replace('/','.')]) for p in paths}
+        from compiled_descriptors import public_descriptors
+        descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
         actual[module]={'sources':sorted(KERNEL_SOURCES if module=='analysis-kernel' else PROVIDERS),'classfiles':paths,
             'jdeps_edges':{k:v for k,v in edges.items() if (role(k)=='provider')==(module=='analysis-values')},'javap_descriptors':descriptors,
             'effective_maven':sorted(parse_tgf(root/module/'target/architecture-dependencies.tgf'))}
@@ -144,8 +145,8 @@ def verify_metrics(output:str)->list[dict]:
             q=n//2 if p=='S6-half' else n
             eq('planning_candidateSites',1);eq('planning_structuralVisits',1);eq('planning_siteMatches',k);eq('consumer_consumerInvocations',k)
             eq('observation_uniqueQueries',q);eq('observation_queriesAnswered',q);eq('observation_closedInModelResults',q);eq('retained_ValueFact',q)
-            eq('observation_operationsReplayed',n*(n+1)//2 if p=='S16-batches' else q)
-            eq('observation_sequencesReplayed',n if p=='S16-batches' else 1)
+            eq('observation_operationsReplayed',q)
+            eq('observation_sequencesReplayed',1)
             eq('observation_queryRequests',q*k if p.startswith('S6') else n);eq('consumer_factsCommitted',q*k if p.startswith('S6') else n)
         eq('planning_observationBatchesPlanned',n if p=='S16-batches' else 1);eq('observation_observationBatchesExecuted',n if p=='S16-batches' else 1)
     if len({r['index_structuralVisits'] for r in rows if r['probe']=='S5'})!=1:raise Failure('W4 global index multiplied by K')

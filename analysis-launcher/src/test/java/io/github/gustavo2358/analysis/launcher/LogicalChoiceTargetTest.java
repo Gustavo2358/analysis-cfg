@@ -65,11 +65,10 @@ class LogicalChoiceTargetTest {
             var dependencies=new DependencyAnalysis().prepare(p);var site=dependencies.sites().getFirst();
             assertEquals(expected,site.candidates().stream().map(DependencySiteFact.Candidate::referenceName).toList());assertEquals(point,site.valuePoint());assertTrue(site.effectiveUnknownRemainder());
             assertTrue(site.candidates().stream().allMatch(c->!c.supports().isEmpty()));
-            var input=dir.resolve(variant+".air.json");var output=dir.resolve(variant+".dependencies.json");Files.write(input,bytes);
+            var input=dir.resolve(variant+".air.json");var output=dir.resolve(variant+".dependencies.json");Files.write(input,bytes);Files.writeString(output,"sentinel");
             var errors=new ByteArrayOutputStream();assertEquals(0,AnalysisDependencies.run(new String[]{input.toString(),output.toString()},new PrintStream(errors)),errors.toString());
-            var memory=new ByteArrayOutputStream();new DependencyJson().write(dependencies,memory);assertArrayEquals(memory.toByteArray(),Files.readAllBytes(output));
+            PipelineCliTest.assertCompleteDependencySections(p,dependencies,output);
             var out=Path.of("target/ep-representation");Files.createDirectories(out);Files.write(out.resolve(variant+".air.json"),bytes);
-            Files.copy(output,out.resolve(variant+".dependencies.json"),StandardCopyOption.REPLACE_EXISTING);
             try(var stream=Files.newOutputStream(out.resolve(variant+".regional.json"))){new RegionalResultJson().write(regional,stream);}
         }
     }

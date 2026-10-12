@@ -109,6 +109,25 @@ class SolverScaleTest {
             assertEquals(4L*selected,result.metrics().analysisPoints());
             emit("S8",entries,result,elapsed,Map.of("selected",selected));
         }
+        ordinaryDirectoryDoesNotRetainEdgesOrClosedBuffers();
+    }
+    private static void ordinaryDirectoryDoesNotRetainEdgesOrClosedBuffers() throws Exception {
+        var p=new Program(new int[][]{{1,2},{2},{}},new int[]{0,1},2,
+                new Op[][]{new Op[0],new Op[0],new Op[0]},false);
+        try(var topology=new SolverTopology(p.session)) {
+            assertTrue(topology.points.length>0);
+            for(var field:SolverTopology.class.getDeclaredFields()) {
+                assertFalse(field.getType()==CfgTransition[].class,"ordinary solve must borrow edges by cursor");
+                assertFalse(field.getType()==int[].class,"no retained contextual edge adjacency arrays");
+            }
+        }
+        var result=DataflowSolver.solve(p.session,new Forward(p));var metrics=result.metrics();result.close();
+        assertSame(metrics,result.metrics());assertEquals(DataflowResult.Status.STABLE,result.status());
+        for(String name:List.of("in","out","lookup")) {
+            var field=DataflowResult.class.getDeclaredField(name);field.setAccessible(true);
+            assertNull(field.get(result),"closed public handle must release buffer capacity: "+name);
+        }
+        assertThrows(IllegalStateException.class,()->result.contains(p.contexts.getFirst(),p.contexts.getFirst().entryNode()));
     }
     static Map<String,Long> retained(DataflowResult<?> result) throws Exception {
         Set<Object> visited=Collections.newSetFromMap(new IdentityHashMap<>()); ArrayDeque<Object> todo=new ArrayDeque<>(); todo.add(result);

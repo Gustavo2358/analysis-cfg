@@ -32,13 +32,13 @@ final class W1dBoundaryTest {
         var graph=cfg.graph().orElseThrow();
         var source=p.units().getFirst().sequences().stream().filter(s->s.terminator() instanceof Operations.Invoke).findFirst().orElseThrow();
         var invoke=(Operations.Invoke)source.terminator();
-        var node=graph.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode s&&s.source()==source).findFirst().orElseThrow();
+        var node=graph.nodes().stream().filter(n->n instanceof CfgNode.SequenceNode s&&s.label().equals(source.label())).findFirst().orElseThrow();
         var edge=graph.transitions().stream().filter(t->t.from().equals(node.id())).toList();
         assertEquals(1,edge.size());assertEquals("INVOKE_NORMAL",edge.getFirst().kind().name());
         assertEquals(p.units().getFirst().entries().getFirst().id(),edge.getFirst().activationEntry());
         var normal=(Control.Normal)invoke.outcomes().known().getFirst();
         var destination=graph.nodes().stream().filter(n->n.id().equals(edge.getFirst().to())).findFirst().orElseThrow();
-        assertEquals(normal.label(),((CfgNode.SequenceNode)destination).source().label());
+        assertEquals(normal.label(),((CfgNode.SequenceNode)destination).label());
         assertEquals(4,graph.nodes().size());assertEquals(3,graph.transitions().size());
         assertInstanceOf(Scopes.WithinControl.class,invoke.outcomes().remainder());
         var index=session(p).index();var sites=index.sites(Operations.Invoke.class);

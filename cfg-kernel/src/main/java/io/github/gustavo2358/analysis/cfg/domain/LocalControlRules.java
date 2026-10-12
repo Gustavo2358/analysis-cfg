@@ -1,8 +1,6 @@
 package io.github.gustavo2358.analysis.cfg.domain;
 
 import io.github.gustavo2358.air.model.Control;
-import io.github.gustavo2358.air.model.Operations;
-import io.github.gustavo2358.air.model.Terminator;
 import io.github.gustavo2358.air.model.Ids.OperationId;
 import io.github.gustavo2358.air.model.Ids.LabelId;
 import io.github.gustavo2358.air.model.Ids.CompletionPortId;
@@ -44,37 +42,47 @@ public final class LocalControlRules {
     public record Unwind(CfgNodeId source,OperationId operation,BigInteger count,CfgNodeId destination,CfgNodeId invalidExit,boolean all) implements Rule {
         public Unwind(CfgNodeId source,OperationId operation,BigInteger count,CfgNodeId destination,CfgNodeId invalidExit){this(source,operation,count,destination,invalidExit,false);}
     }
-    public static boolean local(Terminator term) {
-        return term instanceof Operations.LocalInvoke || term instanceof Operations.LocalBoundary
-            || term instanceof Operations.LocalResume || term instanceof Operations.LocalUnwind;
+    public static boolean local(CfgControl control) {
+        return CfgControl.local(control);
     }
-    public static Control.Exceptional invalid(Terminator term) {
-        return term instanceof Operations.LocalResume || term instanceof Operations.LocalBoundary b&&b.resumeKey().isPresent() ? new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE)
-            : term instanceof Operations.LocalUnwind ? new Control.Exceptional("invalid_local_unwind",Control.Propagate.INSTANCE) : null;
+    public static boolean local(io.github.gustavo2358.air.model.Terminator term) {
+        return local(CfgControl.from(term));
+    }
+    public static Control.Exceptional invalid(CfgControl control) {
+        return control instanceof CfgControl.LocalResume || control instanceof CfgControl.LocalBoundary b&&b.resumeKey().isPresent() ? new Control.Exceptional("invalid_local_return",Control.Propagate.INSTANCE)
+            : control instanceof CfgControl.LocalUnwind ? new Control.Exceptional("invalid_local_unwind",Control.Propagate.INSTANCE) : null;
+    }
+    public static Control.Exceptional invalid(io.github.gustavo2358.air.model.Terminator term) {
+        return invalid(CfgControl.from(term));
     }
     // Constructed only from the graph's inventoried AIR nodes and typed label identities.
     static Map<CfgNodeId,Rule> project(List<CfgNode> nodes) {
+        boolean hasLocal=false;
+        for(var node:nodes)if(node instanceof CfgNode.SequenceNode sequence&&local(sequence.control())) {
+            hasLocal=true;break;
+        }
+        if(!hasLocal)return Map.of();
         var labels=new HashMap<LabelId,CfgNodeId>(); var invalid=new HashMap<OperationId,CfgNodeId>();
         for(var n:nodes) {
-            if(n instanceof CfgNode.SequenceNode s) labels.put(s.source().label(),s.id());
-            if(n instanceof CfgNode.OutcomeExit e && local(e.source())) invalid.put(e.source().header().id(),e.id());
+            if(n instanceof CfgNode.SequenceNode s) labels.put(s.label(),s.id());
+            if(n instanceof CfgNode.OutcomeExit e) invalid.put(e.operation(),e.id());
         }
         var result=new LinkedHashMap<CfgNodeId,Rule>();
         for(var n:nodes) if(n instanceof CfgNode.SequenceNode s) {
-            var t=s.source().terminator(); var id=t.header().id();
-            Rule rule=switch(t) {
-                case Operations.LocalInvoke i -> new Invoke(s.id(),id,required(labels.get(i.entry())),i.completionPorts(),required(labels.get(i.resume())),
+            var control=s.control(); var id=control.operation();
+            Rule rule=switch(control) {
+                case CfgControl.LocalInvoke i -> new Invoke(s.id(),id,required(labels.get(i.entry())),i.completionPorts(),required(labels.get(i.resume())),
                     i.reentryGuard().map(g->new ReentryGuard(g.activationKey(),required(labels.get(g.destination())))),resumeRoutes(i,labels));
-                case Operations.LocalBoundary b -> new Boundary(s.id(),id,b.port(),required(labels.get(b.defaultDestination())),b.resumeKey(),b.resumeKey().isPresent()?required(invalid.get(id)):null);
-                case Operations.LocalResume r -> new Resume(s.id(),id,required(invalid.get(id)),r.resumeKey());
-                case Operations.LocalUnwind u -> new Unwind(s.id(),id,u.count(),required(labels.get(u.destination())),required(invalid.get(id)),u.all());
+                case CfgControl.LocalBoundary b -> new Boundary(s.id(),id,b.port(),required(labels.get(b.defaultDestination())),b.resumeKey(),b.resumeKey().isPresent()?required(invalid.get(id)):null);
+                case CfgControl.LocalResume r -> new Resume(s.id(),id,required(invalid.get(id)),r.resumeKey());
+                case CfgControl.LocalUnwind u -> new Unwind(s.id(),id,u.count(),required(labels.get(u.destination())),required(invalid.get(id)),u.all());
                 default -> null;
             };
             if(rule!=null)result.put(n.id(),rule);
         }
         return Collections.unmodifiableMap(result);
     }
-    private static Map<String,CfgNodeId> resumeRoutes(Operations.LocalInvoke invoke,Map<LabelId,CfgNodeId> labels) {
+    private static Map<String,CfgNodeId> resumeRoutes(CfgControl.LocalInvoke invoke,Map<LabelId,CfgNodeId> labels) {
         var routes=new LinkedHashMap<String,CfgNodeId>();
         for(var route:invoke.resumeRoutes())routes.put(route.key(),required(labels.get(route.destination())));
         return routes;

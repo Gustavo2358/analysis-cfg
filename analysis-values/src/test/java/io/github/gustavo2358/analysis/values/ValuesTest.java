@@ -139,6 +139,26 @@ class ValuesTest {
     private static Expressions.Literal integer(OperationId op,String id,int value) {
         return new Expressions.Literal(operand(op,id,Operand.Role.VALUE_READ),new Values.IntValue(java.math.BigInteger.valueOf(value)));
     }
+    @Test void scalarDemandReusesAlreadyIndexedDeclarationsWithoutReopeningTheStore() {
+        var p=graph(new String[]{"PROGA"},new int[][]{{}},1,true,true);
+        var resident=io.github.gustavo2358.analysis.structure.ProgramStore.resident(p);
+        var calls=new int[2];
+        var units=resident.units().stream().map(unit->io.github.gustavo2358.analysis.structure.ProgramStore.UnitView.class.cast(
+            java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),new Class<?>[]{io.github.gustavo2358.analysis.structure.ProgramStore.UnitView.class},
+                (proxy,method,args)->{if(method.getName().equals("objects"))calls[0]++;return method.invoke(unit,args);}))).toList();
+        var store=io.github.gustavo2358.analysis.structure.ProgramStore.Structural.class.cast(java.lang.reflect.Proxy.newProxyInstance(
+            getClass().getClassLoader(),new Class<?>[]{io.github.gustavo2358.analysis.structure.ProgramStore.Structural.class},
+            (proxy,method,args)->{if(method.getName().equals("units")){calls[1]++;return units;}return method.invoke(resident,args);}));
+        var admission=io.github.gustavo2358.analysis.structure.AnalysisSession.open(build(p),store,
+            io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.KNOWN_SUBSET,List.of(p.units().getFirst().entries().getFirst().id()));
+        assertEquals(io.github.gustavo2358.analysis.structure.AnalysisSession.Status.ACCEPTED,admission.status(),admission.reason());
+        calls[0]=0;calls[1]=0;
+        var prepared=PossibleValuesAnalysis.prepare(admission.session().orElseThrow(),PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(p.units().getFirst().objects().getFirst().id()));
+        assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,prepared.status(),prepared.reason());
+        expected(fact(prepared.analysis().orElseThrow().execute(),before(p,0,0)),false,"PROGA");
+        assertEquals(0,calls[0],"declared objects are already correlated in the structural index");
+        assertEquals(0,calls[1],"selected Unit handles are already resolved in the structural index");
+    }
     @Test void entrySeedsContextsUnreachableAndUnicodeKeepTheirIdentity() {
         var p=graph(new String[]{null,"orphan"},new int[][]{{},{}},1,false,false);var u=p.units().getFirst();var object=u.objects().getFirst().id();
         var entries=new ArrayList<Entries.Entry>();

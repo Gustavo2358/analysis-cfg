@@ -3,41 +3,62 @@ package io.github.gustavo2358.analysis.cfg.adapters;
 import io.github.gustavo2358.air.model.Evidence;
 import io.github.gustavo2358.air.model.Ids;
 import io.github.gustavo2358.air.model.Operations;
-import io.github.gustavo2358.air.model.Terminator;
 import io.github.gustavo2358.analysis.cfg.application.CfgBuildResult;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
 import io.github.gustavo2358.analysis.cfg.domain.LocalControlRules;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNodeId;
 import io.github.gustavo2358.analysis.cfg.domain.CfgTransition;
+import io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable;
 import io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy;
 import java.io.IOException;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.function.LongConsumer;
 
 /** Explicit analysis-cfg-json 1.0.0/2.0.0 mapping; the AIR input remains the source of full AIR facts. */
 public final class CfgJsonWriter {
     public static final int DEFAULT_MAXIMUM_BYTES = 64 * 1024 * 1024;
-    private final int maximumBytes;
+    private final long maximumBytes;
 
     public CfgJsonWriter() { this(DEFAULT_MAXIMUM_BYTES); }
 
     public CfgJsonWriter(int maximumBytes) {
+        this((long)maximumBytes);
+    }
+
+    public CfgJsonWriter(long maximumBytes) {
         if (maximumBytes < 1) throw new IllegalArgumentException("positive maximumBytes required");
         this.maximumBytes = maximumBytes;
     }
 
     public byte[] encode(CfgBuildResult result) throws CfgJsonException {
+        var out = new CfgJsonBytes(maximumBytes);
+        encode(result,out);
+        return out.bytes();
+    }
+
+    void encode(CfgBuildResult result,OutputStream output) throws CfgJsonException,IOException {
+        try { encode(result,new CfgJsonBytes(output,maximumBytes)); }
+        catch(CfgJsonBytes.OutputFailure failure){throw failure.failure();}
+    }
+
+    private void encode(CfgBuildResult result,CfgJsonBytes out) throws CfgJsonException {
         Objects.requireNonNull(result, "result");
         if (result.status() != CfgBuildResult.Status.CFG_BUILT)
             throw new CfgJsonException("only CFG_BUILT can be serialized");
         if (result.options().projectionPolicy() == ProjectionPolicy.PARTIAL_ANALYSIS)
             throw new CfgJsonException("PARTIAL_ANALYSIS requires the partial analysis result contract; legacy CFG JSON cannot encode contextual uncertainty");
         var graph = result.graph().orElseThrow();
-        var out = new CfgJsonBytes(maximumBytes);
+        // Entry contextualization changes IDs, never wire kinds. Inspect each stored prototype
+        // once for schema admission; expand the logical product only when actually emitting it.
+        var schemaTransitions=graph.transitions() instanceof CfgTransitionTable table?table.stored():graph.transitions();
         // Token mappings carry their contract requirement. Inspect the product, not its source text.
         boolean requiresV5=!graph.localRules().isEmpty();
         boolean requiresV7=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&!i.resumeRoutes().isEmpty()
@@ -45,14 +66,14 @@ public final class CfgJsonWriter {
             ||r instanceof LocalControlRules.Resume x&&x.resumeKey().isPresent()||r instanceof LocalControlRules.Unwind u&&u.all());
         boolean requiresV6=graph.localRules().values().stream().anyMatch(r->r instanceof LocalControlRules.Invoke i&&i.reentryGuard().isPresent());
         boolean requiresV4=graph.nodes().stream().anyMatch(CfgNode.OutcomeExit.class::isInstance)
-            ||graph.transitions().stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
+            ||schemaTransitions.stream().anyMatch(t->t.kind()==CfgTransition.Kind.EXCEPTION);
         boolean requiresV2 = false;
-        boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.source().terminator() instanceof Operations.Opaque);
+        boolean requiresV3 = graph.nodes().stream().anyMatch(n -> n instanceof CfgNode.SequenceNode q && q.control() instanceof CfgControl.Opaque);
         for (var node : graph.nodes()) {
             if (node instanceof CfgNode.SequenceNode sequence)
-                requiresV2 |= terminatorKind(sequence.source().terminator()).requiresV2;
+                requiresV2 |= terminatorKind(sequence.control()).requiresV2;
         }
-        for (var transition : graph.transitions())
+        for (var transition : schemaTransitions)
             requiresV2 |= transitionKind(transition.kind()).requiresV2;
         out.raw("{\"schema\":\"analysis-cfg-json\",\"schemaVersion\":");
         out.string(requiresV7 ? "7.0.0" : requiresV6 ? "6.0.0" : requiresV5 ? "5.0.0" : requiresV4 ? "4.0.0" : requiresV3 ? "3.0.0" : requiresV2 ? "2.0.0" : "1.0.0");
@@ -62,13 +83,13 @@ public final class CfgJsonWriter {
         out.raw(",\"publication\":"); airId(out, result.publicationId());
         out.raw(",\"buildStatus\":\"CFG_BUILT\",\"projectionPolicy\":"); out.string(policy(result.options().projectionPolicy()));
         out.raw(",\"sourceKnowledge\":{\"publicationInventory\":");
-        out.string(inventory(graph.publication().coverage().inventory()));
+        out.string(inventory(graph.source().publicationInventory()));
         out.raw(",\"units\":[");
         boolean comma = false;
-        for (var unit : graph.publication().units()) {
+        for (var unit : graph.source().units()) {
             if (comma) out.raw(","); comma = true;
             out.raw("{\"unit\":"); airId(out, unit.id());
-            out.raw(",\"inventory\":"); out.string(inventory(unit.coverage().inventory())); out.raw("}");
+            out.raw(",\"inventory\":"); out.string(inventory(unit.inventory())); out.raw("}");
         }
         out.raw("]},\"nodes\":["); comma = false;
         for (var node : graph.nodes()) {
@@ -92,12 +113,42 @@ public final class CfgJsonWriter {
             out.raw("]");
         }
         out.raw("}");
-        return out.bytes();
     }
 
     public void write(CfgBuildResult result, Path destination) throws CfgJsonException, IOException {
-        byte[] bytes = encode(result);
-        publish(bytes, destination, Files::move);
+        write(result,destination,ignored->{ });
+    }
+
+    /** Production path: incremental atomic output with caller-owned quota/deadline accounting. */
+    public void write(CfgBuildResult result,Path destination,LongConsumer outputMeter)throws CfgJsonException,IOException {
+        validate(result);
+        Objects.requireNonNull(outputMeter);
+        Path absolute = destination.toAbsolutePath();
+        Path parent = absolute.getParent();
+        if (parent == null) throw new IOException("destination must name a file");
+        Path temporary = Files.createTempFile(parent, ".analysis-cfg-", ".tmp");
+        try {
+            try(var encoded=JsonFiles.output(new BufferedOutputStream(Files.newOutputStream(temporary)),destination);
+                var output=new BufferedOutputStream(new MeteredOutput(encoded,outputMeter))) {
+                encode(result,output);
+            }
+            move(temporary,absolute,Files::move);
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
+    }
+
+    private static final class MeteredOutput extends java.io.FilterOutputStream {
+        private final LongConsumer meter;
+        private MeteredOutput(OutputStream output,LongConsumer meter){super(output);this.meter=meter;}
+        @Override public void write(int value)throws IOException{meter.accept(1);out.write(value);}
+        @Override public void write(byte[] value,int offset,int length)throws IOException{meter.accept(length);out.write(value,offset,length);}
+    }
+
+    private static void validate(CfgBuildResult result)throws CfgJsonException {
+        Objects.requireNonNull(result, "result");
+        if(result.status()!=CfgBuildResult.Status.CFG_BUILT)throw new CfgJsonException("only CFG_BUILT can be serialized");
+        if(result.options().projectionPolicy()==ProjectionPolicy.PARTIAL_ANALYSIS)throw new CfgJsonException("PARTIAL_ANALYSIS requires the partial analysis result contract; legacy CFG JSON cannot encode contextual uncertainty");
     }
 
     @FunctionalInterface
@@ -111,14 +162,17 @@ public final class CfgJsonWriter {
         Path temporary = Files.createTempFile(parent, ".analysis-cfg-", ".tmp");
         try {
             JsonFiles.write(temporary,destination,bytes);
-            try {
-                mover.move(temporary, absolute, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (AtomicMoveNotSupportedException unsupported) {
-                // Explicit fallback: replacement here does NOT claim atomicity.
-                mover.move(temporary, absolute, StandardCopyOption.REPLACE_EXISTING);
-            }
+            move(temporary,absolute,mover);
         } finally {
             Files.deleteIfExists(temporary);
+        }
+    }
+
+    private static void move(Path temporary,Path absolute,MoveOperation mover)throws IOException {
+        try { mover.move(temporary,absolute,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING); }
+        catch(AtomicMoveNotSupportedException unsupported) {
+            // Explicit fallback: replacement here does NOT claim atomicity.
+            mover.move(temporary,absolute,StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
@@ -126,15 +180,14 @@ public final class CfgJsonWriter {
         out.raw("{\"id\":"); cfgId(out, node.id());
         switch (node) {
             case CfgNode.EntryNode entry -> {
-                out.raw(",\"kind\":\"ENTRY\",\"entry\":"); airId(out, entry.source().id());
+                out.raw(",\"kind\":\"ENTRY\",\"entry\":"); airId(out, entry.entry());
             }
             case CfgNode.SequenceNode sequence -> {
-                out.raw(",\"kind\":\"SEQUENCE\",\"label\":"); airId(out, sequence.source().label());
-                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.source().terminator()).token);
-                out.raw(",\"operation\":"); airId(out, sequence.source().terminator().header().id());
+                out.raw(",\"kind\":\"SEQUENCE\",\"label\":"); airId(out, sequence.label());
+                out.raw(",\"terminator\":{\"kind\":"); out.string(terminatorKind(sequence.control()).token);
+                out.raw(",\"operation\":"); airId(out, sequence.control().operation());
                 if(v3) {
-                    boolean open=sequence.source().terminator() instanceof Operations.Opaque o && o.envelope().control().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl
-                        || sequence.source().terminator() instanceof Operations.Invoke i && i.outcomes().remainder() instanceof io.github.gustavo2358.air.model.Scopes.WithinControl;
+                    boolean open=CfgControl.remainder(sequence.control()) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl;
                     out.raw(",\"openControlRemainder\":"+(open?"true":"false"));
                 }
                 out.raw("}");
@@ -144,14 +197,14 @@ public final class CfgJsonWriter {
                 out.raw(",\"entry\":"); airId(out, exit.entryId());
             }
             case CfgNode.OutcomeExit exit -> {
-                out.raw(",\"kind\":\"OUTCOME_EXIT\",\"operation\":");airId(out,exit.source().header().id());
+                out.raw(",\"kind\":\"OUTCOME_EXIT\",\"operation\":");airId(out,exit.operation());
                 out.raw(",\"outcome\":");
                 out.string(exit.outcome() instanceof io.github.gustavo2358.air.model.Control.HaltAlternative?"HALT":exit.outcome() instanceof io.github.gustavo2358.air.model.Control.Exceptional?"EXCEPTION":"ANY_EXCEPTION");
                 if(exit.outcome() instanceof io.github.gustavo2358.air.model.Control.Exceptional e){out.raw(",\"tag\":");out.string(e.tag());}
             }
             case CfgNode.HaltExit exit -> {
-                out.raw(",\"kind\":\"HALT_EXIT\",\"operation\":"); airId(out, exit.source().header().id());
-                out.raw(",\"haltKind\":"); out.string(haltKind(exit.source().haltKind()));
+                out.raw(",\"kind\":\"HALT_EXIT\",\"operation\":"); airId(out, exit.operation());
+                out.raw(",\"haltKind\":"); out.string(haltKind(exit.haltKind()));
             }
         }
         out.raw("}");
@@ -264,18 +317,18 @@ public final class CfgJsonWriter {
             case OPAQUE_UNKNOWN, LOCAL -> throw new IllegalArgumentException("symbolic control is retained on AIR");
         };
     }
-    private static WireKind terminatorKind(Terminator terminator) throws CfgJsonException {
-        return switch (terminator) {
-            case Operations.LocalInvoke ignored -> WireKind.LOCAL_INVOKE;
-            case Operations.LocalBoundary ignored -> WireKind.LOCAL_BOUNDARY;
-            case Operations.LocalResume ignored -> WireKind.LOCAL_RESUME;
-            case Operations.LocalUnwind ignored -> WireKind.LOCAL_UNWIND;
-            case Operations.Opaque ignored -> WireKind.OPAQUE;
-            case Operations.Jump ignored -> WireKind.JUMP;
-            case Operations.Branch ignored -> WireKind.BRANCH;
-            case Operations.Return ignored -> WireKind.RETURN;
-            case Operations.Halt ignored -> WireKind.HALT;
-            case Operations.Invoke ignored -> WireKind.INVOKE;
+    private static WireKind terminatorKind(CfgControl control) throws CfgJsonException {
+        return switch (control) {
+            case CfgControl.LocalInvoke ignored -> WireKind.LOCAL_INVOKE;
+            case CfgControl.LocalBoundary ignored -> WireKind.LOCAL_BOUNDARY;
+            case CfgControl.LocalResume ignored -> WireKind.LOCAL_RESUME;
+            case CfgControl.LocalUnwind ignored -> WireKind.LOCAL_UNWIND;
+            case CfgControl.Opaque ignored -> WireKind.OPAQUE;
+            case CfgControl.Jump ignored -> WireKind.JUMP;
+            case CfgControl.Branch ignored -> WireKind.BRANCH;
+            case CfgControl.Return ignored -> WireKind.RETURN;
+            case CfgControl.Halt ignored -> WireKind.HALT;
+            case CfgControl.Invoke ignored -> WireKind.INVOKE;
             default -> throw new CfgJsonException("terminator outside supported CFG JSON contracts");
         };
     }

@@ -7,15 +7,19 @@ final class PersistentBindings {
     private PersistentBindings() { }
     static final class Node {
         final int key,height,size;
+        final long fingerprint;
         final Candidates value;
         final Node left,right;
         Node(int key,Candidates value,Node left,Node right,ValuesWork w) {
             this.key=key;this.value=value;this.left=left;this.right=right;
             height=Math.incrementExact(Math.max(height(left),height(right)));
             size=Math.incrementExact(Math.addExact(size(left),size(right)));
+            fingerprint=fingerprint(left)+fingerprint(right)+mix(0x9e3779b97f4a7c15L*key^value.fingerprint());
             w.stateNodes=Math.incrementExact(w.stateNodes);
         }
     }
+    private static long mix(long value){value=(value^(value>>>30))*0xbf58476d1ce4e5b9L;value=(value^(value>>>27))*0x94d049bb133111ebL;return value^(value>>>31);}
+    static long fingerprint(Node n){return n==null?0:n.fingerprint;}
     static int size(Node n) { return n==null?0:n.size; }
     static int height(Node n) { return n==null?0:n.height; }
     static Candidates get(Node n,int key,ValuesWork w) {

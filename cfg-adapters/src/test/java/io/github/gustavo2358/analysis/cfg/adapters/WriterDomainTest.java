@@ -10,6 +10,7 @@ import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -82,6 +83,64 @@ class WriterDomainTest {
         assertThrows(CfgJsonException.class, () -> new CfgJsonBytes(expected.length - 1).string("a\"\\\n\u0000\u001fá😀"));
         String json = new String(new CfgJsonWriter().encode(build(MemoryFacts.mixed("P\"\\\ná😀"), ProjectionPolicy.KNOWN_SUBSET)), StandardCharsets.UTF_8);
         assertTrue(json.contains("\"publication\":\"P\\\"\\\\\\u000aá😀\""));
+    }
+    @Test void productionEncoderStreamsTheExactCompatibilityWire() throws Exception {
+        var result=build(MemoryFacts.mixed("streamed"),ProjectionPolicy.KNOWN_SUBSET);
+        var writer=new CfgJsonWriter();byte[] expected=writer.encode(result);
+        var output=new ByteArrayOutputStream(){@Override public synchronized void write(byte[] value,int offset,int length){
+            fail("CFG production encoder must not submit a resident aggregate");
+        }};
+        writer.encode(result,output);
+        assertArrayEquals(expected,output.toByteArray());
+    }
+    @Test void schemaSelectionDoesNotAllocateTheEntryTimesBodyProductBeforeFirstByte() {
+        var bean=(com.sun.management.ThreadMXBean)java.lang.management.ManagementFactory.getThreadMXBean();
+        assertTrue(bean.isThreadAllocatedMemorySupported(),"HotSpot allocation oracle required");
+        bean.setThreadAllocatedMemoryEnabled(true);long thread=Thread.currentThread().threadId();
+        for(int count:new int[]{32,128,512,2048}) {
+            var result=build(entryBodyGeometry(count),ProjectionPolicy.KNOWN_SUBSET);
+            var graph=result.graph().orElseThrow();
+            long physical=((io.github.gustavo2358.analysis.cfg.domain.CfgTransitionTable)graph.transitions()).stored().size();
+            assertEquals(2L*count,physical);
+            assertEquals((long)count*(count+1),graph.transitions().size());
+            for(int warm=0;warm<3;warm++)assertThrows(CfgJsonException.class,()->new CfgJsonWriter(1).encode(result));
+            long before=bean.getThreadAllocatedBytes(thread);
+            assertThrows(CfgJsonException.class,()->new CfgJsonWriter(1).encode(result));
+            long allocated=bean.getThreadAllocatedBytes(thread)-before;
+            assertTrue(allocated<=1_048_576+256*physical,"schema prologue expanded entry/body product: count="+count+" physical="+physical+" allocated="+allocated);
+            System.out.println("CFG_SCHEMA_SELECTION_METRICS entries="+count+" body="+count+" physical="+physical+" allocated="+allocated);
+        }
+    }
+    private static Publication entryBodyGeometry(int count) {
+        var p=new io.github.gustavo2358.air.model.Ids.PublicationId("writer-entry-body");
+        var u=new io.github.gustavo2358.air.model.Ids.UnitId(p,"unit");var origin=new io.github.gustavo2358.air.model.Ids.OriginId(p,"origin");
+        var entries=new java.util.ArrayList<io.github.gustavo2358.air.model.Entries.Entry>();
+        var sequences=new java.util.ArrayList<io.github.gustavo2358.air.model.Sequence>();
+        var initial=new io.github.gustavo2358.air.model.Ids.LabelId(u,"sequence-00000");
+        for(int i=0;i<count;i++) {
+            String suffix=String.format("%05d",i);
+            entries.add(MemoryFacts.entry(new io.github.gustavo2358.air.model.Ids.EntryId(u,"entry-"+suffix),initial,origin));
+            sequences.add(new io.github.gustavo2358.air.model.Sequence(new io.github.gustavo2358.air.model.Ids.LabelId(u,"sequence-"+suffix),List.of(),
+                    new io.github.gustavo2358.air.model.Operations.Return(MemoryFacts.header(new io.github.gustavo2358.air.model.Ids.OperationId(u,"return-"+suffix),origin),List.of()),origin));
+        }
+        var unit=MemoryFacts.unit(u,origin,entries,sequences,MemoryFacts.complete(new io.github.gustavo2358.air.model.Scopes.UnitScope(u)));
+        return new Publication(p,io.github.gustavo2358.air.model.SemanticVersion.AIR_2_0_0,
+                new io.github.gustavo2358.air.model.Capabilities.Manifest(List.of(),List.of()),List.of(),List.of(unit),List.of(),List.of(),List.of(),
+                List.of(new io.github.gustavo2358.air.model.Origins.Unavailable(origin,"synthetic header geometry")),MemoryFacts.complete(new io.github.gustavo2358.air.model.Scopes.PublicationScope(p)),List.of(),List.of());
+    }
+    @Test void atomicProductionWriterMetersTheLogicalWire() throws Exception {
+        var result=build(MemoryFacts.mixed("metered"),ProjectionPolicy.KNOWN_SUBSET);
+        var writer=new CfgJsonWriter();byte[] expected=writer.encode(result);long[] metered={0};
+        Path output=temporary.resolve("metered.json");writer.write(result,output,count->metered[0]+=count);
+        assertEquals(expected.length,metered[0]);assertArrayEquals(expected,Files.readAllBytes(output));
+    }
+    @Test void interruptedStreamingWritePreservesDestinationAndCleansTemporary() throws Exception {
+        var result=build(MemoryFacts.mixed("cancelled"),ProjectionPolicy.KNOWN_SUBSET);
+        Path output=temporary.resolve("cancelled.json");Files.writeString(output,"sentinel");
+        var failure=new RuntimeException("injected cancellation");
+        assertSame(failure,assertThrows(RuntimeException.class,()->new CfgJsonWriter().write(result,output,count->{throw failure;})));
+        assertEquals("sentinel",Files.readString(output));
+        try(var files=Files.list(temporary)){assertEquals(List.of(output),files.toList());}
     }
     @Test void invalidUnicodeIsRejectedByOutputPrimitiveAndAirModel() {
         for (String bad : List.of("P\ud800", "P\udc00", "P\ud800z")) {

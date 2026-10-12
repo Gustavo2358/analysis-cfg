@@ -44,7 +44,8 @@ final class PlanningFixtures {
     /** Controlled provider seam, delegates real admission/solve/replay; fails only a selected batch observation call. */
     static class ProviderWrapper implements AnalysisProvider<ObjectId,ValueFact> {
         final PossibleValuesProvider delegate=new PossibleValuesProvider();
-        int starts, observations;
+        int starts, observations, closes;
+        final List<RuntimeException> closeFailures = new ArrayList<>();
         public String implementation(){return delegate.implementation();} public String version(){return delegate.version();}
         public Set<String> semanticOptionNames(){return delegate.semanticOptionNames();}
         public boolean supports(AnalysisKey k){return delegate.supports(k);} public String projection(){return delegate.projection();}
@@ -58,9 +59,10 @@ final class PlanningFixtures {
                 public AnalysisKey key(){return preparedKey(key);} public AnalysisOutcome refusal(){return prepared.refusal();}
                 public Run<ObjectId,ValueFact> execute() {
                     starts++; var run=prepared.execute();
-                    return new Run<>() {
+                    return new Run<ObjectId,ValueFact>() {
                         public AnalysisOutcome outcome(){return ProviderWrapper.this.outcome(run.outcome());}
                         public Materialized<ObjectId,ValueFact> observe(List<PointQuery<ObjectId>> queries){observations++;return ProviderWrapper.this.observe(run,queries);}
+                        public void close(){closes++;run.close();if(closes<=closeFailures.size())throw closeFailures.get(closes-1);}
                     };
                 }
             };
@@ -79,6 +81,7 @@ final class PlanningFixtures {
             return new Prepared<>() {
                 public AnalysisKey key(){return key;} public AnalysisOutcome refusal(){return null;}
                 public Run<ObjectId,String> execute(){starts++;var run=prepared.execute();return new Run<>() {
+                    public void close(){run.close();}
                     public AnalysisOutcome outcome(){return new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,run.outcome().metrics());}
                     public Materialized<ObjectId,String> observe(List<PointQuery<ObjectId>> queries){
                         var batch=run.observe(queries).batch();var obs=batch.observations().stream().map(o->new ObservationBatch.Observation<>(o.query(),o.status(),o.reason(),o.value()==null?null:key.profile()+":"+key.options()+":"+key.entry().localId()+":"+o.value().candidates())).toList();

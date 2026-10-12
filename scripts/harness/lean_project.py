@@ -47,7 +47,8 @@ def prepare(root):
 
 def technical_fast(root):
     prepare(root)
-    for command in ([sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
+    for command in ([sys.executable, '-B', 'scripts/project/test_compiled_descriptors.py'],
+                    [sys.executable, '-B', 'scripts/project/check_architecture.py', '--test-profile', 'fast'],
                     [sys.executable, '-B', 'scripts/project/test_local_control_oracles.py'],
                     [sys.executable, '-B', 'scripts/project/test_cfg_wire_contract.py'],
                     [sys.executable, '-B', 'scripts/project/test_w2d_contract.py'],
@@ -73,7 +74,11 @@ def full_local(root):
     # W5 E2E consumes real producer outputs; prepare their pinned isolated builds locally.
     build = Path(os.environ.get('CFG_BUILD_ROOT', str(root / '.harness-results/build'))).resolve()
     producers = Path(tempfile.mkdtemp(prefix='full-', dir=build)) / 'w5-producers'
-    subprocess.run([sys.executable, '-B', 'scripts/project/prepare_w5_producers.py', '--work', str(producers)], cwd=root, check=True)
+    source_root = Path(os.environ.get('W2D_SOURCE_ROOT', str(root.parent))).resolve()
+    subprocess.run([sys.executable, '-B', 'scripts/project/prepare_w5_producers.py',
+                    '--work', str(producers), '--frontend', str(source_root / 'proleap-poc'),
+                    '--lower', str(source_root / 'cobol-lower'),
+                    '--air', str(build / 'air-java')], cwd=root, check=True)
     os.environ['W5_PRODUCERS'] = str(producers / 'producers.json')
     for gate in ('semantic', 'performance', 'integration'):
         subprocess.run(['bash', 'scripts/project/check-' + gate + '.sh'], cwd=root, check=True)

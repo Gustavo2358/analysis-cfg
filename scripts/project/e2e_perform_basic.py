@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 import sys
 
-from dependency_wire import read, require
+from dependency_wire import read, require, execution_metrics
 from cfg_wire_contract import verify as verify_cfg_wire
 from e2e_w2d import declaration_object, locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
 from e2e_move_data import reference
@@ -142,7 +142,7 @@ def dependency_oracle(result, model, source):
         move = 'MOVE WS-A TO WS-PGM' if producers.index(producer) == 1 else "MOVE 'PROGA'"
         line = next(i for i, text in enumerate(source.read_text().splitlines(), 1) if move in text)
         require(all(int(s['startLine']) == line == int(s['endLine']) for s in source_spans(result, support, source)), 'support reaches exact body value-producing MOVE')
-    require(result['metrics']['possibleValuesRuns'] == 1, 'ordinary forward solver')
+    require(execution_metrics(result)['possibleValuesRuns'] == 1, 'ordinary forward solver')
 
 
 def run(work, config_path):

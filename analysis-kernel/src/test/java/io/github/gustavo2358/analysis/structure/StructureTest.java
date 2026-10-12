@@ -23,22 +23,42 @@ class StructureTest {
     @Test void offsetsBucketsAndPayloadAreCanonical() {
         var p=linear(1,3,2,1); var u=p.units().getFirst(); var q=u.sequences().getFirst();
         var s=session(p); var idx=s.index();
-        assertSame(p,idx.publication()); assertSame(u,idx.unit(u.id()));
-        var node=idx.sequence(q.label()); assertSame(q,((CfgNode.SequenceNode)node.source()).source());
+        assertEquals(p.id(),idx.store().publicationId()); assertSame(u,((ProgramStore.ResidentUnit)idx.unit(u.id())).source());
+        assertEquals(p.airVersion(),idx.store().airVersion());
+        assertSame(p.coverage(),((ProgramStore.ResidentCoverage)idx.store().coverage()).source());
+        assertFalse(Arrays.stream(ProgramStore.class.getMethods())
+                .anyMatch(method -> method.getReturnType().equals(Publication.class)),
+                "shared store must not expose the resident Publication aggregate");
+        var node=idx.sequence(q.label()); assertSame(q,((ProgramStore.ResidentSequence)idx.sequence(node)).source());
         for(int offset=0;offset<4;offset++) {
             Operation op=offset==3?q.terminator():q.instructions().get(offset);
             var site=idx.site(op.header().id());
             assertSame(site,idx.site(op.header().id())); assertSame(op,site.operation());
-            assertSame(q,site.sequence()); assertSame(u,site.owner());
+            assertSame(idx.sequence(node),site.sequence()); assertSame(idx.unit(u.id()),site.owner());
             assertEquals(offset,site.offset()); assertEquals(offset==3,site.isTerminator());
         }
         assertEquals(3,idx.sites(Operations.Assign.class).size());
+        assertEquals(idx.sites(Operations.Assign.class),idx.sites(Operations.Assign.class,u.id()));
+        for(var site:idx.sites(Operations.Assign.class,u.id()))assertSame(site,idx.site(site.operation().header().id()));
+        assertTrue(idx.sites(Operations.Assign.class,new UnitId(p.id(),"absent-owner")).isEmpty());
+        assertThrows(UnsupportedOperationException.class,()->idx.sites(Operations.Assign.class,u.id()).clear());
+        assertEquals(u.objects(),List.copyOf(idx.objects()));
+        assertThrows(UnsupportedOperationException.class,()->idx.objects().clear());
         assertEquals(1,idx.sites(Operations.Return.class).size());
         assertTrue(idx.sites(Operations.Halt.class).isEmpty());
         assertThrows(UnsupportedOperationException.class,()->idx.sites(Operations.Assign.class).clear());
         for(var object:u.objects()) { assertSame(object,idx.object(object.id())); assertSame(p.storage().getFirst(),idx.directCell(object.id())); }
         var place=(Places.ObjectPlace)((Operations.Assign)q.instructions().getFirst()).destination();
         assertSame(u.objects().getFirst(),idx.referencedObject(place.header().id()));
+        var original=(Operations.Assign)q.instructions().getFirst();
+        var rehydrated=new Operations.Assign(original.header(),original.destination(),original.value());
+        assertNotSame(original,rehydrated);assertEquals(original,rehydrated);
+        assertDoesNotThrow(()->idx.requireOperation(rehydrated));
+        var literal=(Expressions.Literal)original.value();
+        var forged=new Operations.Assign(original.header(),original.destination(),
+            new Expressions.Literal(literal.header(),new Values.TextValue("MUTATED")));
+        assertThrows(IllegalArgumentException.class,()->idx.requireOperation(forged),
+            "same full AIR ID does not authorize a different immutable payload");
     }
     @Test void multipleEntriesKeepEntryReturnAndContextSeparate() {
         var p=linear(2,0,0,2); var u=p.units().getFirst(); var s=session(p); var idx=s.index();
@@ -77,11 +97,11 @@ class StructureTest {
         Map<CfgNodeId,CfgNodeId> ids=new HashMap<>(); long next=Long.MAX_VALUE;
         for(var n:g.nodes()) { ids.put(n.id(),new CfgNodeId(p.id(),next)); next-=1000003; }
         List<CfgNode> nodes=g.nodes().stream().map(n->switch(n) {
-            case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.source());
-            case CfgNode.EntryNode e -> new CfgNode.EntryNode(ids.get(n.id()),e.source());
+            case CfgNode.SequenceNode q -> (CfgNode)new CfgNode.SequenceNode(ids.get(n.id()),q.label(),q.operations(),q.control());
+            case CfgNode.EntryNode e -> new CfgNode.EntryNode(ids.get(n.id()),e.entry(),e.initialLabel());
             case CfgNode.NormalExit e -> new CfgNode.NormalExit(ids.get(n.id()),e.publicationId(),e.unitId(),e.entryId());
-            case CfgNode.OutcomeExit e -> new CfgNode.OutcomeExit(ids.get(n.id()),e.source(),e.outcome());
-            case CfgNode.HaltExit h -> new CfgNode.HaltExit(ids.get(n.id()),h.source());
+            case CfgNode.OutcomeExit e -> new CfgNode.OutcomeExit(ids.get(n.id()),e.operation(),e.outcome());
+            case CfgNode.HaltExit h -> new CfgNode.HaltExit(ids.get(n.id()),h.operation(),h.haltKind());
         }).toList();
         var graph=new CfgGraph(p,nodes,g.transitions().stream().map(e->new CfgTransition(ids.get(e.from()),ids.get(e.to()),e.kind(),e.activationEntry())).toList());
         var s=AnalysisSession.open(withGraph(b,graph),p,ProjectionPolicy.KNOWN_SUBSET,p.units().getFirst().entries()).session().orElseThrow();
@@ -122,6 +142,18 @@ class StructureTest {
         assertTrue(empty.contexts().isEmpty());
         var s=session(p); var v=s.context(p.units().getFirst().entries().getFirst().id());
         assertThrows(IllegalArgumentException.class,()->v.successors(empty.index().sequence(p.units().getFirst().sequences().getFirst().label())));
+        boolean[] catalogRequested={false};var original=ProgramStore.resident(p);
+        var observed=(ProgramStore.Structural)java.lang.reflect.Proxy.newProxyInstance(
+            ProgramStore.class.getClassLoader(),new Class<?>[]{ProgramStore.Structural.class},(proxy,method,arguments)->{
+                if(method.getName().equals("declarationInventory"))catalogRequested[0]=true;
+                return method.invoke(original,arguments);
+            });
+        var otherPolicy=build.options().projectionPolicy()==ProjectionPolicy.KNOWN_SUBSET
+            ?ProjectionPolicy.PARTIAL_ANALYSIS:ProjectionPolicy.KNOWN_SUBSET;
+        var refused=AnalysisSession.open(build,observed,otherPolicy,List.of());
+        assertEquals(AnalysisSession.Status.INVALID_INPUT,refused.status());
+        assertEquals("projection policy mismatch",refused.reason());
+        assertFalse(catalogRequested[0],"rejected structural metadata must not construct a native declaration catalogue");
     }
     @Test void cycleAndSelfLoopKeepLiteralControl() {
         var b=linear(1,0,0,1); var u=b.units().getFirst();

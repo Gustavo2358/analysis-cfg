@@ -10,16 +10,63 @@ import java.util.Objects;
 /** Selected activation Entry, not a local invocation frame or a reachability certificate. */
 public final class ContextView {
     private final ProgramIndex index;
-    private final Entries.Entry entry;
+    private final ProgramStore.EntryView entry;
     private final int ordinal;
-    ContextView(ProgramIndex index, Entries.Entry entry) {
+    ContextView(ProgramIndex index, ProgramStore.EntryView entry) {
         this.index = index; this.entry = entry; ordinal = index.entryOrdinals.get(entry.id());
     }
-    public Entries.Entry entry() { return entry; }
+    public Entries.Entry entry() { return entry.materialize(); }
+    public ProgramStore.EntryView entryView() { return entry; }
     public ProgramIndex.Node entryNode() { return index.entryNodes.get(entry.id()); }
     public ProgramIndex.Node normalExit() { return index.normalExits.get(entry.id()); }
     public EdgeCursor successors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, true); }
     public EdgeCursor predecessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node, false); }
+    /** Stored ordinary edges only; the caller handles the original open relation separately. */
+    public EdgeCursor knownSuccessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node,true,true,false); }
+    /** Original bounded relation only, with the same activation ownership as successors. */
+    public EdgeCursor unknownSuccessors(ProgramIndex.Node node) { requireOrdinary(); return cursor(node,true,false,true); }
+    /** Exact effective bound, including the admitted partial-projection policy. */
+    public io.github.gustavo2358.air.model.Scopes.ControlBound unknownControl(ProgramIndex.Node node) {
+        requireOrdinary();Objects.requireNonNull(node);
+        if(node.identity!=index.identity||!node.owner().id().equals(entry.id().unit()))throw new IllegalArgumentException("foreign node");
+        return OpenControl.bound(node,index.policy);
+    }
+    /** Opaque exact destination-group identity for ordinary structural discovery only. */
+    public OpenGroup unknownGroup(ProgramIndex.Node node) {
+        var bound=unknownControl(node);
+        return bound instanceof io.github.gustavo2358.air.model.Scopes.WithinControl within
+            ?new OpenGroup(index.identity,entry.id(),within.scope()):null;
+    }
+    /** Immutable snapshot/owner/full-scope key; never a license to group edge transfers. */
+    public static final class OpenGroup {
+        private final Object indexIdentity;
+        private final io.github.gustavo2358.air.model.Ids.EntryId activation;
+        private final io.github.gustavo2358.air.model.Scopes.ControlScope scope;
+        private OpenGroup(Object indexIdentity,io.github.gustavo2358.air.model.Ids.EntryId activation,
+                io.github.gustavo2358.air.model.Scopes.ControlScope scope){this.indexIdentity=indexIdentity;this.activation=activation;this.scope=scope;}
+        @Override public int hashCode(){return 31*(31*System.identityHashCode(indexIdentity)+activation.hashCode())+scope.hashCode();}
+        @Override public boolean equals(Object other){return other instanceof OpenGroup group
+            &&indexIdentity==group.indexIdentity&&activation.equals(group.activation)&&scope.equals(group.scope);}
+        /** Conservative key capacity, charging temporary traversal before allocation. */
+        public long keyBytes(java.util.function.LongConsumer reserveScratch) {
+            Objects.requireNonNull(reserveScratch);reserveScratch.accept(128);
+            long bytes=512;var pending=new java.util.ArrayDeque<io.github.gustavo2358.air.model.Scopes.ControlScope>();pending.add(scope);
+            while(!pending.isEmpty()) {
+                reserveScratch.accept(0);
+                var current=pending.removeLast();bytes=Math.addExact(bytes,96);
+                if(current instanceof io.github.gustavo2358.air.model.Scopes.UnitControl unit)bytes=Math.addExact(bytes,unitBytes(unit.unit()));
+                else if(current instanceof io.github.gustavo2358.air.model.Scopes.LabelsControl labels)for(var label:labels.labels()) {
+                    reserveScratch.accept(0);bytes=Math.addExact(bytes,96+unitBytes(label.unit())+textBytes(label.localId()));
+                }
+                else if(current instanceof io.github.gustavo2358.air.model.Scopes.ControlUnion union) {
+                    reserveScratch.accept(64L*union.members().size());pending.addAll(union.members());
+                }
+            }
+            return bytes;
+        }
+        private static long textBytes(String text){return 32+2L*text.length();}
+        private static long unitBytes(io.github.gustavo2358.air.model.Ids.UnitId unit){return 96+textBytes(unit.publication().localId())+textBytes(unit.localId());}
+    }
 
     private void requireOrdinary() {
         if(!index.localRules.isEmpty())throw new IllegalArgumentException("local control requires a traversal point with its stack");
@@ -76,39 +123,52 @@ public final class ContextView {
     }
 
     private EdgeCursor cursor(ProgramIndex.Node node, boolean forward) {
+        return cursor(node,forward,true,true);
+    }
+    private EdgeCursor cursor(ProgramIndex.Node node,boolean forward,boolean stored,boolean bounds) {
         Objects.requireNonNull(node, "node");
         if (node.identity != index.identity) throw new IllegalArgumentException("node from another index");
         long key = LongIntDirectory.key(ordinal, node.ordinal);
         int head = (forward ? index.forwardHeads : index.backwardHeads).get(key);
-        return new EdgeCursor(index, forward ? index.forwardNext : index.backwardNext, head, node, entry, forward);
+        int shared=-1;
+        if(index.factored&&node.owner().id().equals(entry.id().unit())) {
+            var anchor=node;
+            if(!forward&&node.source() instanceof CfgNode.NormalExit exit) {
+                anchor=exit.entryId().equals(entry.id())?index.returnRepresentatives.get(entry.id().unit()):null;
+            }
+            if(anchor!=null)shared=(forward?index.forwardHeads:index.backwardHeads).get(LongIntDirectory.key(-1,anchor.ordinal));
+        }
+        return new EdgeCursor(index, forward ? index.forwardNext : index.backwardNext, stored?head:-1, stored?shared:-1, node, entry, forward,bounds);
     }
 
     /** Stored edges retain identity; bounded unknown edges are transient views over original nodes. */
     public static final class EdgeCursor {
         private final ProgramIndex index;
         private final int[] next;
-        private int position;
+        private int position, sharedPosition;
         private int current = -1;
         private long edgesVisited;
         private final ProgramIndex.Node anchor;
-        private final Entries.Entry entry;
+        private final ProgramStore.EntryView entry;
         private final boolean forward;
         private final boolean exactLabels;
         private final java.util.Iterator<ProgramIndex.Node> candidates;
         private ProgramIndex.Node symbolicSource, symbolicTarget;
-        private CfgTransition symbolicEdge;
-        EdgeCursor(ProgramIndex index, int[] next, int position, ProgramIndex.Node anchor, Entries.Entry entry, boolean forward) {
-            this.index = index; this.next = next; this.position = position; this.anchor = anchor; this.entry = entry; this.forward = forward;
+        private CfgTransition symbolicEdge,boundEdge;
+        EdgeCursor(ProgramIndex index, int[] next, int position,int sharedPosition, ProgramIndex.Node anchor, ProgramStore.EntryView entry, boolean forward,boolean bounds) {
+            this.index = index; this.next = next; this.position = position;this.sharedPosition=sharedPosition; this.anchor = anchor; this.entry = entry; this.forward = forward;
             var sources = index.openSources.getOrDefault(entry.id().unit(), java.util.List.of());
             var labels=forward ? index.labelTargets.get(anchor) : null;
             exactLabels=labels!=null;
-            candidates=(exactLabels
+            candidates=(!bounds?java.util.List.<ProgramIndex.Node>of():exactLabels
                 ? anchor.owner().id().equals(entry.id().unit()) ? labels : java.util.List.<ProgramIndex.Node>of()
                 : sources.isEmpty() || forward && !(OpenControl.bound(anchor,index.policy) instanceof io.github.gustavo2358.air.model.Scopes.WithinControl)
                     ? java.util.List.<ProgramIndex.Node>of() : forward ? index.unitNodes.get(entry.id().unit()) : sources).iterator();
         }
         public boolean advance() {
-            symbolicEdge = null; current = position;
+            symbolicEdge = null;boundEdge=null;
+            if(position==-1){position=sharedPosition;sharedPosition=-1;}
+            current = position;
             if (current != -1) { position = next[current]; edgesVisited = Math.incrementExact(edgesVisited); return true; }
             while (candidates.hasNext()) {
                 var candidate = candidates.next(); var source = forward ? anchor : candidate; var target = forward ? candidate : anchor;
@@ -120,9 +180,19 @@ public final class ContextView {
             return false;
         }
         private void requireCurrent() { if (current == -1 && symbolicEdge == null) throw new NoSuchElementException("cursor has no current edge"); }
-        public CfgTransition transition() { requireCurrent(); return symbolicEdge != null ? symbolicEdge : index.edges[current]; }
+        public CfgTransition transition() {
+            requireCurrent();if(symbolicEdge!=null)return symbolicEdge;
+            var row=index.edges[current];
+            if(index.entry[current]>=0||row.activationEntry().equals(entry.id()))return row;
+            if(boundEdge==null)boundEdge=new CfgTransition(row.from(),target().source().id(),row.kind(),entry.id());
+            return boundEdge;
+        }
         public ProgramIndex.Node source() { requireCurrent(); return symbolicEdge != null ? symbolicSource : index.nodes[index.from[current]]; }
-        public ProgramIndex.Node target() { requireCurrent(); return symbolicEdge != null ? symbolicTarget : index.nodes[index.to[current]]; }
+        public ProgramIndex.Node target() {
+            requireCurrent();if(symbolicEdge!=null)return symbolicTarget;
+            var kind=index.edges[current].kind();
+            return index.entry[current]<0&&(kind==CfgTransition.Kind.RETURN||kind==CfgTransition.Kind.OPAQUE_RETURN)?index.normalExits.get(entry.id()):index.nodes[index.to[current]];
+        }
         /** Actual cursor edge reads, independent of index-construction counters. */
         public long edgesVisited() { return edgesVisited; }
     }

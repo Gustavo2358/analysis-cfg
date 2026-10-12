@@ -8,6 +8,7 @@ import io.github.gustavo2358.analysis.solver.Direction;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
 import io.github.gustavo2358.analysis.structure.ContextView;
 import io.github.gustavo2358.analysis.structure.ProgramIndex;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
 import static io.github.gustavo2358.analysis.query.ObservationBatch.*;
 
@@ -33,18 +34,21 @@ public final class BatchReplayer {
             Direction direction,S unreachable,Iterable<PointQuery<T>> requests,Comparator<T> subjects,
             Transfer<S> transfer,Projection<S,T,V> projection) {
         Objects.requireNonNull(session);Objects.requireNonNull(result);Objects.requireNonNull(direction);
+        var program=session.index().store();program.progress(ProgramStore.ExecutionPhase.REPLAY);
         if(result.status()!=DataflowResult.Status.STABLE)throw new IllegalArgumentException("stable result required");
         for(var context:session.contexts())if(!result.contains(context,context.entryNode()))
             throw new IllegalArgumentException("stable result belongs to another session or context selection");
         var queries=new LinkedHashSet<PointQuery<T>>();long raw=0;
-        for(var q:requests){queries.add(Objects.requireNonNull(q));raw=Math.incrementExact(raw);}
+        for(var q:requests){program.progress(ProgramStore.ExecutionPhase.REPLAY);queries.add(Objects.requireNonNull(q));raw=Math.incrementExact(raw);}
         var ordered=new ArrayList<>(queries);
-        ordered.sort(Comparator.<PointQuery<T>,ProgramPoint>comparing(PointQuery::point,ProgramPoint.ORDER).thenComparing(PointQuery::subject,subjects));
+        var order=Comparator.<PointQuery<T>,ProgramPoint>comparing(PointQuery::point,ProgramPoint.ORDER).thenComparing(PointQuery::subject,subjects);
+        ordered.sort((a,b)->{program.progress(ProgramStore.ExecutionPhase.SORT);return order.compare(a,b);});
         var answers=new HashMap<PointQuery<T>,Observation<T,V>>();
         var groups=new LinkedHashMap<Group,List<Selected<T>>>();
         var count=new Counts();
         try {
             for(var q:ordered) {
+                program.progress(ProgramStore.ExecutionPhase.REPLAY);
                 var p=q.point();var context=session.context(p.entry());
                 PointReason reason=context==null?PointReason.CONTEXT_NOT_SELECTED:null;
                 var site=p.operation()==null?null:session.index().site(p.operation());
@@ -68,7 +72,8 @@ public final class BatchReplayer {
             }
             boolean forward=direction==Direction.FORWARD;
             for(var group:groups.entrySet()) {
-                var context=group.getKey().context();var sequence=((io.github.gustavo2358.analysis.cfg.domain.CfgNode.SequenceNode)group.getKey().node().source()).source();
+                program.progress(ProgramStore.ExecutionPhase.REPLAY);
+                var context=group.getKey().context();var sequence=session.index().sequence(group.getKey().node());
                 ProgramIndex.Node node=session.index().sequence(sequence.label());
                 var selected=group.getValue();selected.sort(Comparator.comparingInt(Selected<T>::boundary));
                 if(!forward)Collections.reverse(selected);
@@ -81,10 +86,12 @@ public final class BatchReplayer {
                 int cursor=forward?0:Math.incrementExact(sequence.instructions().size());
                 count.groups=Math.addExact(count.groups,states.size());
                 for(var q:selected) {
+                    program.progress(ProgramStore.ExecutionPhase.REPLAY);
                     while(cursor!=q.boundary()) {
                         int offset=forward?cursor:cursor-1;
                         Operation operation=offset==sequence.instructions().size()?sequence.terminator():sequence.instructions().get(offset);
                         for(int root=0;root<states.size();root++) {
+                            program.progress(ProgramStore.ExecutionPhase.REPLAY);
                             count.operations=Math.incrementExact(count.operations);
                             states.set(root,Objects.requireNonNull(transfer.apply(states.get(root),operation)));
                         }
@@ -96,6 +103,7 @@ public final class BatchReplayer {
                         if(!outcomeStates.containsKey(key)) {
                             var roots=new ArrayList<S>();
                             for(var state:states) {
+                                program.progress(ProgramStore.ExecutionPhase.REPLAY);
                                 roots.add(Objects.requireNonNull(projection.transferOutcome(q.query(),state)));
                                 count.operations=Math.incrementExact(count.operations);
                             }
@@ -110,9 +118,11 @@ public final class BatchReplayer {
             }
             var output=new ArrayList<Observation<T,V>>();long answered=0,unsupported=0;
             for(var q:ordered) {
+                program.progress(ProgramStore.ExecutionPhase.REPLAY);
                 var answer=Objects.requireNonNull(answers.get(q));output.add(answer);
                 if(answer.status()==QueryStatus.VALUE)answered=Math.incrementExact(answered);else unsupported=Math.incrementExact(unsupported);
             }
+            program.progress(ProgramStore.ExecutionPhase.REPLAY);
             return new ObservationBatch<>(Status.COMPLETE,null,output,new Metrics(raw,ordered.size(),count.groups,count.operations,count.maxOffset,answered,unsupported,0,0));
         } catch(ObservationException failure) {
             return new ObservationBatch<>(Status.FAILED,"OBSERVATION_ERROR",List.of(),new Metrics(raw,ordered.size(),count.groups,count.operations,count.maxOffset,0,0,ordered.size(),1));

@@ -9,13 +9,14 @@ import java.util.*;
 /** One immutable byte image, represented by spans rather than one allocation per octet. */
 final class ByteImage {
     /** Dense literals retain their source payload; a repeated octet needs one span. */
-    record Payload(Values.BytesValue bytes,boolean repeated) {
-        Payload { Objects.requireNonNull(bytes);if(repeated&&bytes.octets().size()!=1)throw new IllegalArgumentException("repeat requires one octet"); }
+    record Payload(List<Integer> octets,boolean repeated) {
+        Payload(Values.BytesValue bytes,boolean repeated){this(bytes.octets(),repeated);}
+        Payload { Objects.requireNonNull(octets);if(!BytePayloadArena.stored(octets))octets=List.copyOf(octets);if(repeated&&octets.size()!=1)throw new IllegalArgumentException("repeat requires one octet"); }
         int advance(int offset,BigInteger delta) {return repeated?0:Math.addExact(offset,delta.intValueExact());}
-        boolean fits(int offset,BigInteger count) {return offset>=0&&(repeated?offset==0:BigInteger.valueOf(offset).add(count).compareTo(BigInteger.valueOf(bytes.octets().size()))<=0);}
+        boolean fits(int offset,BigInteger count) {return offset>=0&&(repeated?offset==0:BigInteger.valueOf(offset).add(count).compareTo(BigInteger.valueOf(octets.size()))<=0);}
         Values.BytesValue materialize(int offset,BigInteger count) {
             int size=count.intValueExact();
-            return new Values.BytesValue(repeated?Collections.nCopies(size,bytes.octets().getFirst()):bytes.octets().subList(offset,Math.addExact(offset,size)));
+            return new Values.BytesValue(repeated?Collections.nCopies(size,octets.getFirst()):octets.subList(offset,Math.addExact(offset,size)));
         }
     }
     record LogicalSupport(ObjectId object,int event) { }
@@ -90,6 +91,11 @@ final class ByteImage {
     static ByteImage literal(Values.BytesValue bytes,int producer) {
         var size=BigInteger.valueOf(bytes.octets().size());
         return new ByteImage(Optional.of(size),size.signum()==0?List.of():List.of(new Part(StorageRange.exact(BigInteger.ZERO,size),Optional.of(new Payload(bytes,false)),0,producer,BigInteger.ZERO,Map.of(),Set.of())));
+    }
+    static ByteImage storedLiteral(List<Integer> octets,int producer) {
+        if(!BytePayloadArena.stored(octets))throw new IllegalArgumentException("native immutable byte payload required");
+        var size=BigInteger.valueOf(octets.size());
+        return new ByteImage(Optional.of(size),List.of(new Part(StorageRange.exact(BigInteger.ZERO,size),Optional.of(new Payload(octets,false)),0,producer,BigInteger.ZERO,Map.of(),Set.of())));
     }
     record Repeat(int octet,int count) {
         Repeat {if(octet<0||octet>255||count<=0)throw new IllegalArgumentException("invalid byte run");}

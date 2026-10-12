@@ -58,6 +58,7 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
         var scoped = owner.selectEntries(List.of(key.entry()));
         var admission = PossibleValuesAnalysis.prepare(scoped,key.profile(),demand(key));
         return new Prepared<>() {
+            public void close(){admission.analysis().ifPresent(PossibleValuesAnalysis::close);}
             public AnalysisKey key() { return key; }
             public AnalysisOutcome refusal() {
                 return admission.status() == PossibleValuesAnalysis.Status.ACCEPTED ? null : new AnalysisOutcome(key,
@@ -93,16 +94,29 @@ public final class PossibleValuesProvider implements AnalysisProvider<ObjectId,V
                 execution.preparationMetrics().forEach((k,v) -> metrics.put("prepare_"+k,v));
                 execution.solveMetrics().forEach((k,v) -> metrics.put("solve_"+k,v));
                 var outcome = new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,metrics);
-                return new Run<>() {
-                    public AnalysisOutcome outcome() { return outcome; }
-                    public Materialized<ObjectId,ValueFact> observe(List<PointQuery<ObjectId>> queries) {
-                        var observations = execution.observe(queries);
-                        var work = new TreeMap<String,Long>(observations.quality());
-                        observations.stateMetrics().forEach((k,v) -> work.put("replay_"+k,v));
-                        return new Materialized<>(observations.batch(),work);
-                    }
-                };
+                return new ProviderRun(outcome,execution);
             }
         };
+    }
+    /** A closed public handle keeps only detached outcome metadata, never a captured engine. */
+    private static final class ProviderRun implements JointRun<ObjectId,ValueFact> {
+        private final AnalysisOutcome outcome;
+        private PossibleValuesAnalysis.Execution execution;
+        private ProviderRun(AnalysisOutcome outcome,PossibleValuesAnalysis.Execution execution){this.outcome=outcome;this.execution=execution;}
+        public AnalysisOutcome outcome(){return outcome;}
+        public Materialized<ObjectId,ValueFact> observe(List<PointQuery<ObjectId>> queries) {
+            var active=execution;if(active==null)throw new IllegalStateException("closed provider execution");
+            return materialized(active.observe(queries));
+        }
+        public List<Materialized<ObjectId,ValueFact>> observeBatches(List<List<PointQuery<ObjectId>>> batches) {
+            var active=execution;if(active==null)throw new IllegalStateException("closed provider execution");
+            return active.observeBatches(batches).stream().map(ProviderRun::materialized).toList();
+        }
+        private static Materialized<ObjectId,ValueFact> materialized(PossibleValuesAnalysis.Execution.Observations observations) {
+            var work=new TreeMap<String,Long>(observations.quality());
+            observations.stateMetrics().forEach((k,v)->work.put("replay_"+k,v));
+            return new Materialized<>(observations.batch(),work);
+        }
+        public void close(){var owned=execution;execution=null;if(owned!=null)owned.close();}
     }
 }

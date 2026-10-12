@@ -21,7 +21,7 @@ class ScaleTest {
         long v=sequences+2L*entries,e=entries*(1L+sequences),o=sequences+(long)instructions;
         long c=objects>0?1:0,refs=c+objects+entries+(objects>0?instructions:0);
         long buckets=(sequences>1?2:1)+(instructions>0?1:0);
-        long visits=3+3L*objects+2*c+2L*sequences+(objects>0?4L:1L)*instructions+2L*entries+v+2*e+buckets;
+        long visits=3+3L*objects+2*c+2L*sequences+(objects>0?4L:1L)*instructions+2L*entries+v+2*(sequences+entries)+buckets;
         assertEquals(v,m.nodesIndexed(),"nodes indexed once"); assertEquals(e,m.edgesIndexed(),"edges indexed once");
         assertEquals(o,m.operationsIndexed(),"operations indexed once"); assertEquals(objects,m.objectsIndexed());
         assertEquals(c,m.locationsIndexed()); assertEquals(refs,m.referencesResolved(),"reference work follows occurrences");

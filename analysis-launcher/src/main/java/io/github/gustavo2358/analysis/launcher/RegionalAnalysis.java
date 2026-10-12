@@ -36,6 +36,7 @@ public final class RegionalAnalysis {
         }
         DataflowAirReader.Read read;
         try {read=DataflowAirReader.forPartialAnalysis().read(input);}
+        catch(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted failure){err.println("INPUT_RESOURCE_LIMIT: "+failure.getMessage());return 7;}
         catch(AirJsonException failure){err.println("AIR_INPUT: "+failure.code());return switch(failure.code()){case INPUT_ERROR,VERSION_MISMATCH->3;case INVALID_IR,UNSUPPORTED_CAPABILITY->4;case IMPLEMENTATION_LIMIT,INCOMPLETE_VALIDATION,RESOURCE_LIMIT->7;};}
         catch(IOException failure){err.println("INPUT_IO");return 3;}
         Publication publication=read.publication();

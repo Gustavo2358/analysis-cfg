@@ -4,6 +4,7 @@ import io.github.gustavo2358.analysis.consumers.*;
 import io.github.gustavo2358.analysis.plan.*;
 import io.github.gustavo2358.analysis.query.*;
 import io.github.gustavo2358.analysis.structure.AnalysisSession;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
 import static io.github.gustavo2358.analysis.application.PreparedAnalysisResult.*;
 
@@ -14,6 +15,8 @@ public final class PlanningExecution implements AutoCloseable {
     private AnalysisRegistry registry;
     private final Map<AnalysisKey,CachedRun> runs = new HashMap<>();
     private final Set<Long> executed = new HashSet<>();
+    private final List<FactStorage<?>> factStores = new ArrayList<>();
+    private final List<AutoCloseable> planStores=new ArrayList<>();
     private long epoch;
     private boolean executing;
     public PlanningExecution(AnalysisSession session, AnalysisRegistry registry) {
@@ -22,15 +25,38 @@ public final class PlanningExecution implements AutoCloseable {
     public <F> ExecutionPlan<F> plan(List<ConsumerRegistration<F>> registrations) {
         requireOpen(); if (executing) throw new IllegalStateException("registration during execution requires a later explicit epoch");
         long next = Math.incrementExact(epoch);
-        var plan = SitePlanner.compile(identity,next,session,registry,registrations); epoch = next; return plan;
+        int first=planStores.size();
+        try{var plan = SitePlanner.compile(identity,next,session,registry,registrations,planStores::add,this::requireOpen);epoch = next;return plan;}
+        catch(RuntimeException|Error failure){
+            for(int at=planStores.size()-1;at>=first;at--)try{planStores.remove(at).close();}
+                catch(Exception|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }
     }
     public <F> PreparedAnalysisResult<F> execute(String resultId, ExecutionPlan<F> plan) {
+        return execute(resultId,plan,null);
+    }
+    /** Explicit complete typed storage, never an automatic codec for arbitrary F.
+     * Successful fact views are borrowed until this execution closes. Failed
+     * transactions and aborted epochs retire their storage without publication. */
+    public <F> PreparedAnalysisResult<F> executeStored(String resultId,ExecutionPlan<F> plan,
+            java.util.function.Function<String,? extends FactStorage<F>> storage) {
+        return execute(resultId,plan,Objects.requireNonNull(storage));
+    }
+    private <F> PreparedAnalysisResult<F> execute(String resultId,ExecutionPlan<F> plan,
+            java.util.function.Function<String,? extends FactStorage<F>> storage) {
         requireOpen(); Objects.requireNonNull(resultId);
         if (executing || plan.owner != identity || !executed.add(plan.epoch)) throw new IllegalStateException("foreign or already executed planning epoch");
-        executing = true;
-        try { return executePlan(resultId,plan); } finally { executing = false; }
+        executing = true;int firstStore=factStores.size();
+        try { return executePlan(resultId,plan,storage); }
+        catch(RuntimeException|Error failure) {
+            for(int i=factStores.size()-1;i>=firstStore;i--)try{factStores.remove(i).close();}
+                catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }finally { executing = false; }
     }
-    private <F> PreparedAnalysisResult<F> executePlan(String resultId, ExecutionPlan<F> plan) {
+    private <F> PreparedAnalysisResult<F> executePlan(String resultId, ExecutionPlan<F> plan,
+            java.util.function.Function<String,? extends FactStorage<F>> storage) {
         var analysis = new Counts("analysisRuns","analysisCacheHits","analysisAdmissionCacheHits");
         var observations = new Counts("observationBatchesExecuted","queryRequests","uniqueQueries","sequencesReplayed","operationsReplayed",
             "queriesAnswered","unsupportedQueries","queriesNotMaterialized","observationFailures",
@@ -49,13 +75,40 @@ public final class PlanningExecution implements AutoCloseable {
         selectedRuns.forEach((key,run) -> outcomes.put(key,run.outcome()));
         var batches = new TreeMap<String,BatchResult>();
         var answers = new TreeMap<String,Map<PointQuery<?>,ObservationBatch.Observation<?,?>>>();
+        long jointBatchCount=0;
+        for(var batch:plan.batches.values())if(selectedRuns.get(batch.id.analysisKey()).jointObservations()&&plan.batchCount(batch.id.analysisKey())>1)jointBatchCount=Math.incrementExact(jointBatchCount);
+        boolean joint=jointBatchCount>1;
+        // Only new transient group/typed-query/result-reference controls. Existing
+        // detached observation storage is not advertised as native paged storage.
+        var budget=joint?session.index().store().executionBudget():Optional.<ProgramStore.ExecutionBudget>empty();
+        var grouping=budget.isPresent()?budget.orElseThrow().reserve(ProgramStore.CapacityPool.SCRATCH,
+                Math.addExact(256L,Math.multiplyExact(256L,jointBatchCount)),ProgramStore.ExecutionPhase.REPLAY):null;
+        try(grouping) {
+        Map<AnalysisKey,List<ExecutionPlan.BatchPlan>> compatible=joint?new HashMap<>():Map.of();
+        if(joint)for(var batch:plan.batches.values())if(selectedRuns.get(batch.id.analysisKey()).jointObservations()&&plan.batchCount(batch.id.analysisKey())>1)
+            compatible.computeIfAbsent(batch.id.analysisKey(),ignored->new ArrayList<>()).add(batch);
+        long references=0;
+        for(var group:compatible.values())if(group.size()>1)for(var batch:group)
+            references=Math.addExact(references,Math.multiplyExact(96L,batch.queries.size()));
+        if(grouping!=null&&references!=0)grouping.grow(references,ProgramStore.ExecutionPhase.REPLAY);
+        Map<String,BatchResult> jointAnswers=joint?new HashMap<>():Map.of();
         for (var batch : plan.batches.values()) {
             var run = selectedRuns.get(batch.id.analysisKey()); BatchResult result;
             if (run.outcome().status() != AnalysisOutcome.Status.STABLE) {
                 result = new BatchResult(batch.id,BatchStatus.NOT_STARTED,"DEPENDENCY_UNAVAILABLE",List.of(),
                     Map.of("queryRequests",batch.rawRequests,"uniqueQueries",(long)batch.queries.size(),"queriesNotMaterialized",(long)batch.queries.size()));
             } else {
-                observations.add("observationBatchesExecuted",1); result = run.observe(batch);
+                observations.add("observationBatchesExecuted",1);
+                var group=compatible.get(batch.id.analysisKey());
+                if(group==null||group.size()==1)result=run.observe(batch);
+                else {
+                    if(!jointAnswers.containsKey(batch.id.id())) {
+                        var results=run.observeBatches(group);
+                        if(results.size()!=group.size())throw new IllegalStateException("provider joint batch count mismatch");
+                        for(int at=0;at<group.size();at++)jointAnswers.put(group.get(at).id.id(),results.get(at));
+                    }
+                    result=jointAnswers.remove(batch.id.id());
+                }
             }
             for (String name : observations.snapshot().keySet()) if (!name.equals("observationBatchesExecuted"))
                 observations.add(name,result.metrics().getOrDefault(name,0L));
@@ -63,6 +116,7 @@ public final class PlanningExecution implements AutoCloseable {
             var index = new HashMap<PointQuery<?>,ObservationBatch.Observation<?,?>>();
             for (var observation : result.observations()) index.put(observation.query(),observation);
             answers.put(batch.id.id(),Map.copyOf(index));
+        }
         }
         var completed = new ArrayList<ConsumerOutcome<F>>();
         for (var registration : plan.registrations) {
@@ -73,7 +127,13 @@ public final class PlanningExecution implements AutoCloseable {
                 consumers.add("consumersNotStarted",1); completed.add(new ConsumerOutcome<>(id,ConsumerStatus.NOT_STARTED,"DEPENDENCY_UNAVAILABLE",List.of())); continue;
             }
             var facts = new ResolvedFacts(dependencies,plan.requests.get(id),outcomes,batches,answers,consumers);
-            var staging = new Staging<F>(consumers);
+            FactStorage<F> typed=null;
+            if(storage!=null) {
+                typed=Objects.requireNonNull(storage.apply(id));
+                try{if(typed.size()!=0)throw new IllegalArgumentException("consumer fact storage must be new and empty");factStores.add(typed);}
+                catch(RuntimeException|Error failure){try{typed.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+            }
+            var staging = new Staging<F>(consumers,typed,this::requireOpen);
             try {
                 for (var site : plan.sites.get(id)) {
                     consumers.add("consumerInvocations",1); registration.consumer().consume(site,facts,staging);
@@ -81,19 +141,25 @@ public final class PlanningExecution implements AutoCloseable {
                 var bundle = staging.commit(); consumers.add("consumersComplete",1);
                 completed.add(new ConsumerOutcome<>(id,ConsumerStatus.COMPLETE,null,bundle));
             } catch (FactConsumer.ConsumerException failure) {
-                staging.discard(); consumers.add("consumerFailures",1);
+                try{staging.discard();}
+                catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);throw failure;}
+                consumers.add("consumerFailures",1);
                 completed.add(new ConsumerOutcome<>(id,ConsumerStatus.FAILED,"CONSUMER_ERROR",List.of()));
+            } catch(RuntimeException|Error failure) {
+                try{staging.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;
             } finally { staging.close(); }
         }
         boolean complete = outcomes.values().stream().allMatch(r -> r.status() == AnalysisOutcome.Status.STABLE)
             && batches.values().stream().allMatch(b -> b.status() == BatchStatus.COMPLETE)
             && completed.stream().allMatch(c -> c.status() == ConsumerStatus.COMPLETE);
-        return new PreparedAnalysisResult<>(resultId,session.index().publication().id(),plan.epoch,List.copyOf(outcomes.values()),List.copyOf(batches.values()),
+        return new PreparedAnalysisResult<>(resultId,session.index().store().publicationId(),plan.epoch,List.copyOf(outcomes.values()),List.copyOf(batches.values()),
             plan.consumers(),completed,complete ? PreparationStatus.COMPLETE : PreparationStatus.INCOMPLETE,
             Map.of("planning",plan.metrics,"analysis",analysis.snapshot(),"observation",observations.snapshot(),"consumer",consumers.snapshot()));
     }
     private <T,V> CachedRun start(AnalysisProvider<T,V> provider, AnalysisKey key, Counts counts) {
         var prepared = Objects.requireNonNull(provider.prepare(session,key));
+        AnalysisProvider.Run<T,V> run=null;
+        try(prepared) {
         if (!key.equals(prepared.key())) throw new IllegalArgumentException("provider prepared wrong AnalysisKey");
         var refusal = prepared.refusal();
         if (refusal != null) {
@@ -103,14 +169,23 @@ public final class PlanningExecution implements AutoCloseable {
                 public BatchResult observe(ExecutionPlan.BatchPlan batch) { throw new IllegalStateException("refused run"); }
             };
         }
-        counts.add("analysisRuns",1); var run = Objects.requireNonNull(prepared.execute());
-        var outcome = Objects.requireNonNull(run.outcome());
-        if (!key.equals(outcome.key()) || outcome.status() != AnalysisOutcome.Status.STABLE) throw new IllegalArgumentException("provider execution binding mismatch");
-        return new BoundRun<>(provider.subjectType(),provider.factType(),key,outcome,run);
+        counts.add("analysisRuns",1); run = Objects.requireNonNull(prepared.execute());
+            var outcome = Objects.requireNonNull(run.outcome());
+            if (!key.equals(outcome.key()) || outcome.status() != AnalysisOutcome.Status.STABLE) throw new IllegalArgumentException("provider execution binding mismatch");
+            return new BoundRun<>(provider.subjectType(),provider.factType(),key,outcome,run);
+        } catch (RuntimeException | Error failure) {
+            if(run!=null)try { run.close(); } catch (RuntimeException | Error cleanup) { if (cleanup != failure) failure.addSuppressed(cleanup); }
+            throw failure;
+        }
     }
     private interface CachedRun {
         AnalysisOutcome outcome();
         BatchResult observe(ExecutionPlan.BatchPlan batch);
+        default boolean jointObservations(){return false;}
+        default List<BatchResult> observeBatches(List<ExecutionPlan.BatchPlan> batches) {
+            var results=new ArrayList<BatchResult>();for(var batch:batches)results.add(observe(batch));return List.copyOf(results);
+        }
+        default void close() { }
     }
     /** Only a registered provider can supply this inseparable execution/materializer. No external run injection. */
     private static final class BoundRun<T,V> implements CachedRun {
@@ -123,17 +198,37 @@ public final class PlanningExecution implements AutoCloseable {
             this.subjects = subjects; this.facts = facts; this.key = key; this.outcome = outcome; this.execution = execution;
         }
         public AnalysisOutcome outcome() { return outcome; }
-        public BatchResult observe(ExecutionPlan.BatchPlan batch) {
+        public void close() { execution.close(); }
+        public boolean jointObservations(){return execution instanceof AnalysisProvider.JointRun<?,?>;}
+        private List<PointQuery<T>> queries(ExecutionPlan.BatchPlan batch) {
             if (!key.equals(batch.id.analysisKey()) || subjects != batch.id.subjectType() || facts != batch.id.factType())
                 throw new IllegalArgumentException("wrong batch bound to analysis key");
             var queries = new ArrayList<PointQuery<T>>();
             for (var query : batch.queries) queries.add(new PointQuery<>(query.point(),subjects.cast(query.subject())));
+            return List.copyOf(queries);
+        }
+        public List<BatchResult> observeBatches(List<ExecutionPlan.BatchPlan> batches) {
+            if(!(execution instanceof AnalysisProvider.JointRun<T,V> joint))return CachedRun.super.observeBatches(batches);
+            var requests=new ArrayList<List<PointQuery<T>>>();for(var batch:batches)requests.add(queries(batch));
+            List<AnalysisProvider.Materialized<T,V>> observations;
+            try{observations=joint.observeBatches(List.copyOf(requests));}
+            catch(ObservationBatch.ObservationException failure){return CachedRun.super.observeBatches(batches);}
+            if(observations.size()!=batches.size())throw new IllegalStateException("provider joint batch count mismatch");
+            var results=new ArrayList<BatchResult>();
+            for(int at=0;at<batches.size();at++)results.add(bind(batches.get(at),requests.get(at),observations.get(at)));
+            return List.copyOf(results);
+        }
+        public BatchResult observe(ExecutionPlan.BatchPlan batch) {
+            var queries=queries(batch);
             AnalysisProvider.Materialized<T,V> materialized;
             try { materialized = execution.observe(List.copyOf(queries)); }
             catch (ObservationBatch.ObservationException failure) {
                 materialized = new AnalysisProvider.Materialized<>(new ObservationBatch<>(ObservationBatch.Status.FAILED,"OBSERVATION_ERROR",List.of(),
                     new ObservationBatch.Metrics(queries.size(),queries.size(),0,0,0,0,0,queries.size(),1)),Map.of());
             }
+            return bind(batch,queries,materialized);
+        }
+        private BatchResult bind(ExecutionPlan.BatchPlan batch,List<PointQuery<T>> queries,AnalysisProvider.Materialized<T,V> materialized) {
             var result = materialized.batch(); var m = result.metrics();
             if (result.status() == ObservationBatch.Status.COMPLETE) {
                 var expected = new HashSet<>(queries); var received = new HashSet<PointQuery<T>>();
@@ -153,20 +248,27 @@ public final class PlanningExecution implements AutoCloseable {
         }
     }
     private static final class Staging<F> implements FactSink<F> {
-        private final List<F> facts = new ArrayList<>();
+        private final List<F> facts;
+        private final FactStorage<F> storage;
+        private final Runnable owner;
         private final Counts counts;
         private boolean open = true;
-        Staging(Counts counts) { this.counts = counts; }
+        private boolean committed;
+        Staging(Counts counts,FactStorage<F> storage,Runnable owner) {
+            this.counts=counts;this.storage=storage;this.owner=owner;
+            facts=storage==null?new ArrayList<>():null;
+        }
         public void emit(F fact) {
             if (!open) throw new IllegalStateException("closed consumer staging");
-            facts.add(Objects.requireNonNull(fact)); counts.add("factsStaged",1);
+            Objects.requireNonNull(fact);if(storage==null)facts.add(fact);else storage.append(fact);counts.add("factsStaged",1);
         }
         List<F> commit() {
-            var bundle = List.copyOf(facts); counts.add("factsCommitted",bundle.size()); counts.add("factsEmitted",bundle.size());
+            List<F> bundle=storage==null?List.copyOf(facts):new StoredFacts<>(storage,owner);
+            counts.add("factsCommitted",bundle.size());counts.add("factsEmitted",bundle.size());committed=true;
             close(); return bundle;
         }
-        void discard() { counts.add("factsDiscarded",facts.size()); close(); }
-        void close() { open = false; facts.clear(); }
+        void discard() { counts.add("factsDiscarded",storage==null?facts.size():storage.size()); close(); }
+        void close() {if(!open)return;open=false;if(storage==null)facts.clear();else if(!committed)storage.close();}
     }
     private static final class ResolvedFacts implements PreparedFacts {
         private final Map<AnalysisKey,AnalysisOutcome> analyses;
@@ -198,6 +300,23 @@ public final class PlanningExecution implements AutoCloseable {
     private void requireOpen() { if (session == null) throw new IllegalStateException("closed execution lifetime"); }
     @Override public void close() {
         if (executing) throw new IllegalStateException("cannot close during execution");
-        runs.clear(); executed.clear(); session = null; registry = null;
+        if (session == null) return;
+        session = null; registry = null;
+        Throwable failure = null;
+        try {
+            for(int at=planStores.size()-1;at>=0;at--)try{planStores.get(at).close();}
+                catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            for(var store:factStores)try{store.close();}
+                catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            for (var run : runs.values()) {
+                try { run.close(); }
+                catch (RuntimeException | Error cleanup) {
+                    if (failure == null) failure = cleanup;
+                    else if (cleanup != failure) failure.addSuppressed(cleanup);
+                }
+            }
+        } finally { runs.clear(); executed.clear();factStores.clear();planStores.clear(); }
+        if (failure instanceof RuntimeException runtime) throw runtime;
+        if (failure instanceof Error error) throw error;
     }
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * CFG_BUILT means a product exists, not that control is exhaustive. Inventory completeness and evidence
- * remain in graph().publication() at Publication/Unit scope; every failure has no graph. No AIR profile claim.
+ * remain in graph().source() at Publication/Unit scope; every failure has no graph. No AIR profile claim.
  */
 public record CfgBuildResult(
         Status status,
@@ -43,8 +43,8 @@ public record CfgBuildResult(
                     || options.projectionPolicy() == io.github.gustavo2358.analysis.cfg.domain.ProjectionPolicy.PARTIAL_ANALYSIS
                         && preflight.unprovedOperationPreconditions().isPresent())
                     || !unsupportedCapabilities.isEmpty() || !projectionIssues.isEmpty()
-                    || !product.publication().id().equals(publicationId)
-                    || !product.publication().airVersion().equals(airVersion)) {
+                    || !product.source().publicationId().equals(publicationId)
+                    || !product.source().airVersion().equals(airVersion)) {
                 throw new IllegalArgumentException("CFG product disagrees with preflight or publication metadata");
             }
         }

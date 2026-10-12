@@ -83,3 +83,33 @@ joins allocate only for a changed result. Complete value/support equality remain
 the join law. No historical interning cache is retained. Independent source oracles
 cover branch filtering, caller prerequisites, cyclic ancestors, evidence and all
 uncertainties; an irrelevant rooted tail cannot add work or change the query.
+
+## Managed SOURCE consumer frontier (2026-10-10)
+
+The legitimate SourceAdmissionSnapshot now owns derived control, candidate and
+canonical-writer lifetimes. SourceControlSnapshot retains exact affected/grounded
+flags in pages. SourceQualifiedSnapshot retains ordered source-only candidates
+and remainders in pages, including full raw UTF-16 handles and interpreted prefix
+lengths. Neither is executable SOURCE/AIR correlation or conditional nominal
+evaluation. SourceSnapshotWriter can embed evidence, qualified occurrences and
+native files into one root JsonOutput buffer and meter; it does not reconstruct
+UnitEvidence or QualifiedSourceDependencies. Explicit/native owner expiry retires
+derived pages before another query and verification after the root flush prevents
+publication from an expired owner. Streams and page backends remain borrowed.
+
+The original mandatory FAST passed 1,279 methods, zero failures/errors/skips,
+in 1,173.493 seconds. Exact post-FAST comparison covered all 1,416 production
+classes, 15 runtime jars, 2,200 consumer files and 651 unchanged producer files
+at air-java a0aeb827ef53765815aa501c4687f197be77ac73. The 33 added methods cover
+control (8), lifetime (3), candidates (9), writer (7), shared composition (6);
+all previous 1,246 mandatory methods are unchanged. Reviewed compiled inventory
+changes retain the original architectural guards and public descriptors.
+
+The original 818,022,612-byte source input passed full shared SOURCE section
+composition under the original 128m/default resource limits in 227.416741638
+seconds (JVM-only, concurrent with FAST, not an isolated curve). The independent
+oracle checked every one of 32,788 evidence entries and 8,192 native rows;
+all resource pools were released. This is a capacity witness, NOT the real CLI.
+The original large dependencies CLI remains OOM/RED in resident SOURCE decode.
+Paged SOURCE/AIR correlation, conditional nominal consumers and atomic root
+publication in both CLI input routes remain required. Campaign GLOBAL_PARTIAL.

@@ -4,6 +4,7 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import io.github.gustavo2358.analysis.storage.StatementEffects;
 import io.github.gustavo2358.analysis.storage.StorageIndex;
+import io.github.gustavo2358.analysis.structure.ProgramStore;
 import java.util.*;
 
 /** Finite producer event, independent of the number of paths or solver visits. */
@@ -17,7 +18,10 @@ public record DefinitionEvent(EntryId entry,Optional<OperationId> operation,Opti
         this(entry,operation,destination,slot,outcome,Optional.of(storage),kind,unknown,origin,premises,uncertainties,reasons,Optional.empty());
     }
     public static DefinitionEvent logicalInitial(EntryId entry,Entries.InitialCondition condition,int slot,ObjectId object,StorageIndex.Resolution resolution) {
-        var reasons=new LinkedHashSet<>(resolution.uncertainties());reasons.add(((Entries.PossibleLiterals)condition.value()).remainder());
+        return logicalInitial(entry,ProgramStore.residentInitial(condition),slot,object,resolution);
+    }
+    public static DefinitionEvent logicalInitial(EntryId entry,ProgramStore.InitialConditionView condition,int slot,ObjectId object,StorageIndex.Resolution resolution) {
+        var reasons=new LinkedHashSet<>(resolution.uncertainties());reasons.add(condition.reason());
         return new DefinitionEvent(entry,Optional.empty(),Optional.of(condition.place().header().id()),slot,Optional.empty(),Optional.empty(),Kind.ENTRY_POSSIBILITY,false,
             condition.origin(),condition.premises(),List.copyOf(reasons),List.of("LOGICAL_SOURCE_EVIDENCE"),Optional.of(object));
     }
@@ -38,11 +42,22 @@ public record DefinitionEvent(EntryId entry,Optional<OperationId> operation,Opti
         return new DefinitionEvent(entry,Optional.of(operation.header().id()),write.occurrence(),write.slot(),outcome,target.location().base().id(),kind,unknown,operation.header().origin(),target.premises(),List.copyOf(uncertainty),List.copyOf(reasons));
     }
     public static DefinitionEvent initial(EntryId entry,Entries.InitialCondition condition,int slot,StatementEffects.Target target,StorageIndex.Resolution resolution) {
-        var value=condition.value();var kind=value instanceof Entries.LiteralInitial?Kind.INITIAL_CONDITION:value instanceof Entries.PossibleLiterals?Kind.ENTRY_POSSIBILITY:value instanceof Entries.Preserve?Kind.ENTRY_PRESERVE
-            :value instanceof Entries.ParameterInitial?Kind.ENTRY_PARAMETER:value instanceof Entries.ExternalUnknown?Kind.ENTRY_EXTERNAL:Kind.ENTRY_UNINITIALIZED;
-        var uncertainty=new LinkedHashSet<UncertaintyId>();if(value instanceof Entries.ExternalUnknown u)uncertainty.add(u.reason());if(value instanceof Entries.Uninitialized u)uncertainty.add(u.reason());if(value instanceof Entries.PossibleLiterals p)uncertainty.add(p.remainder());uncertainty.addAll(resolution.uncertainties());
+        return initial(entry,ProgramStore.residentInitial(condition),slot,target,resolution);
+    }
+    public static DefinitionEvent initial(EntryId entry,ProgramStore.InitialConditionView condition,int slot,StatementEffects.Target target,StorageIndex.Resolution resolution) {
+        var kind=switch(condition.kind()) {
+            case LITERAL -> Kind.INITIAL_CONDITION;
+            case POSSIBLE -> Kind.ENTRY_POSSIBILITY;
+            case PRESERVE -> Kind.ENTRY_PRESERVE;
+            case PARAMETER -> Kind.ENTRY_PARAMETER;
+            case EXTERNAL_UNKNOWN -> Kind.ENTRY_EXTERNAL;
+            case UNINITIALIZED -> Kind.ENTRY_UNINITIALIZED;
+        };
+        var uncertainty=new LinkedHashSet<UncertaintyId>();
+        if(condition.kind()==ProgramStore.InitialKind.EXTERNAL_UNKNOWN||condition.kind()==ProgramStore.InitialKind.UNINITIALIZED||condition.possible())uncertainty.add(condition.reason());
+        uncertainty.addAll(resolution.uncertainties());
         var premises=new LinkedHashSet<>(condition.premises());premises.addAll(target.premises());
-        return new DefinitionEvent(entry,Optional.empty(),Optional.of(condition.place().header().id()),slot,Optional.empty(),target.location().base().id(),kind,!(value instanceof Entries.LiteralInitial||value instanceof Entries.PossibleLiterals)||!target.sourceApplicable(),condition.origin(),List.copyOf(premises),List.copyOf(uncertainty),target.reasons());
+        return new DefinitionEvent(entry,Optional.empty(),Optional.of(condition.place().header().id()),slot,Optional.empty(),target.location().base().id(),kind,!(condition.literal()||condition.possible())||!target.sourceApplicable(),condition.origin(),List.copyOf(premises),List.copyOf(uncertainty),target.reasons());
     }
     private static <T extends Id> List<T> ordered(List<T> ids){return ids.stream().distinct().sorted(Comparator.comparing((T id)->id.publication().localId()).thenComparing(Id::localId)).toList();}
 

@@ -16,10 +16,10 @@ ROOT=Path(__file__).resolve().parents[2]
 INVENTORY='docs/evals/cp6/w1d-w1-inventory.json'
 PREFIX='io.github.gustavo2358.analysis.structure.'
 TESTS={
- 'AdmissionTest':set('realBuildIsAccepted missingBranchEdgeIsInvalid missingOrphanIsInvalid equalLookingReplacementSequenceIsInvalid equalLookingForeignSnapshotIsInvalid equalLookingForeignEntrySelectionIsInvalid duplicateAndWrongContextEdgesAreInvalid missingEntryExitHaltAndReplacedHaltAreInvalid foreignEntryNodeAndDuplicateSequenceRoleAreInvalid unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome'.split()),
+ 'AdmissionTest':set('realBuildIsAccepted detachedStructuralStoreIsAcceptedWithoutPublicationAggregate missingBranchEdgeIsInvalid missingOrphanIsInvalid replacedCompactControlIsInvalid equalLookingForeignSnapshotIsInvalid equalLookingForeignEntrySelectionIsInvalid duplicateAndWrongContextEdgesAreInvalid missingEntryExitHaltAndReplacedHaltAreInvalid foreignEntryNodeAndDuplicateSequenceRoleAreInvalid unsupportedProfileAndPolicyMismatchHaveDistinctTaxonomy incompleteUpstreamValidationDoesNotBecomeSemanticSizeOutcome'.split()),
  'StructureTest':set('offsetsBucketsAndPayloadAreCanonical multipleEntriesKeepEntryReturnAndContextSeparate sameTargetBranchKeepsTwoOutcomesAndBackwardEdges orphanIsIndexedWithoutInventedReachability sparseNodeIdsRoundTripWithoutDensePublicAssumption fullOwnersAndDisplayRenamingDoNotCollide physicalOrderDoesNotDefineControlAndSameSnapshotIsDeterministic emptySelectionCreatesNoContextsAndForeignHandleIsRejected cycleAndSelfLoopKeepLiteralControl'.split()),
  'ScaleTest':set('s1LongSequence s2WideDeclarations s4AdjacencyIsLinear s8DemandedContextsOnly s16EverySizeOfSameProfileIsAdmitted primitiveDirectoryRetainsSparseKeysAcrossGrowth retentionOracleCountsCopiedAirButNotSuppliedPolicy'.split())}
-SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/{name}.java' for name in ['ActivationControl','CallerSupport','AnalysisSession','ProgramIndex','IndexBuilder','ContextView','OpenControl','IndexMetrics','LongIntDirectory']}
+SOURCES={f'analysis-kernel/src/main/java/io/github/gustavo2358/analysis/structure/{name}.java' for name in ['ActivationControl','CallerSupport','AnalysisSession','ProgramIndex','ProgramStore','OperationTable','IndexBuilder','ContextView','OpenControl','IndexMetrics','LongIntDirectory']}
 DENIED=('java.io.','java.nio.file.','java.net.','java.lang.reflect.','io.github.gustavo2358.air.json.',
         'io.github.gustavo2358.air.validation.AirValidator','analysis.cfg.application.BuildCfg',
         'analysis.cfg.application.CfgBuildCoordinator','analysis.cfg.domain.CoreCfgProjection',
@@ -74,7 +74,7 @@ def verify_metrics(output:str)->list[dict]:
         s,i,d,k,selected=(r[x] for x in ['sequences','instructions','objects','entries','selected'])
         c=int(d>0); v=s+2*k; e=k*(s+1); buckets=(2 if s>1 else 1)+int(i>0)
         checks={'nodesIndexed':v,'edgesIndexed':e,'operationsIndexed':s+i,'objectsIndexed':d,'locationsIndexed':c,
-                'referencesResolved':c+d+k+(i if d else 0),'structuralVisits':3+3*d+2*c+2*s+(4 if d else 1)*i+2*k+v+2*e+buckets,
+                'referencesResolved':c+d+k+(i if d else 0),'structuralVisits':3+3*d+2*c+2*s+(4 if d else 1)*i+2*k+v+2*(s+k)+buckets,
                 'queryEdgeReads':2*selected*(s+1),'retainedNodeHandles':v,'retainedSiteHandles':s+i,'additionalAirCfgPayloads':0}
         for field,value in checks.items():
             if r.get(field)!=value: raise Failure('W1 ledger/retention mismatch: '+field)
@@ -100,10 +100,8 @@ def architecture(root:Path, update:bool=False)->None:
             if any(d in target for d in DENIED): raise Failure('W1 forbidden bytecode dependency: '+source+' -> '+target)
             if not target.startswith(('java.',PREFIX,'io.github.gustavo2358.air.model.','io.github.gustavo2358.air.validation.ValidationOptions','io.github.gustavo2358.air.validation.ValidationResult','io.github.gustavo2358.analysis.cfg.')):
                 raise Failure('W1 dependency outside approved DAG: '+target)
-    descriptors={}
-    for path in paths:
-        cls=path[:-6].replace('/','.')
-        descriptors[cls]=command(root,['javap','-classpath',str(classes)+os.pathsep+cp,'-public','-s',cls])
+    from compiled_descriptors import public_descriptors
+    descriptors={p[:-6].replace('/','.'):value for p,value in public_descriptors(paths,str(classes)+os.pathsep+cp,lambda args:command(root,args)).items()}
     tree=(root/'analysis-kernel/target/architecture-dependencies.tgf').read_text()
     from check_architecture import parse_tgf
     coordinates=set(parse_tgf(root/'analysis-kernel/target/architecture-dependencies.tgf'))

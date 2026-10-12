@@ -92,6 +92,11 @@
       "id": "FD-W11",
       "status": "DONE",
       "path": "docs/work/active/FD-W11.yaml"
+    },
+    {
+      "id": "WORK-AIR-SCALE",
+      "path": "docs/work/active/WORK-AIR-SCALE.json",
+      "status": "IN_PROGRESS"
     }
   ],
   "history": [

@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import sys
 
-from dependency_wire import read, require
+from dependency_wire import read, require, execution_metrics
 from cfg_wire_contract import verify as verify_cfg_wire
 from prepare_w2d_producers import ROOT, git, require_local
 
@@ -239,7 +239,7 @@ def dependency_oracle(result, air, source, opened, semantic):
     require([c['referenceName'] for c in site['candidates']] == names, 'exact known dependencies')
     require([c['rawValue'] for c in site['rawCandidates']] == raw, 'raw values preserve padding')
     require([c['rawValue'] for c in site['candidates']] == raw, 'interpreted candidates retain raw values')
-    require(result['metrics']['possibleValuesRuns'] == 1, 'one normal fixed-point run')
+    require(execution_metrics(result)['possibleValuesRuns'] == 1, 'one normal fixed-point run')
     require(len(result['edges']) == len(names), 'one edge per known candidate')
     require([e['candidate'] for e in result['edges']] == site['candidates'], 'edge candidates preserve supports')
     require(all(e['site'] == site['operation'] and e['caller'] == site['caller'] and e['openSite'] for e in result['edges']), 'same caller and CALL site')

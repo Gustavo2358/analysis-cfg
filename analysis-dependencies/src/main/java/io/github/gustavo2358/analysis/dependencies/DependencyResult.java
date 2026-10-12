@@ -4,7 +4,8 @@ import io.github.gustavo2358.air.model.*;
 import io.github.gustavo2358.air.model.Ids.*;
 import java.util.*;
 
-/** Detached dependency facts; 1.2.0 additionally represents semantic preparation limits. */
+/** Detached dependency facts; an explicit native lease may borrow canonical metadata.
+ * Such metadata expires with its checked SnapshotProgram. Ordinary callers still receive copies. */
 public record DependencyResult(PublicationId publication,SemanticVersion airVersion,List<DependencySiteFact> sites,
         List<Edge> edges,Map<String,Long> metrics,Evidence.InventoryStatus publicationInventory,
         List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons,FileDependencyResult fileDependencies,SourceDependencyResult sourceDependencies,Optional<SourceQualifiedDependencyResult> sourceQualifiedDependencies,List<TargetResolver.Resolution> programDependencies) {
@@ -23,7 +24,11 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,fileDependencies,sourceDependencies,Optional.empty());
     }
     public DependencyResult withSourceEvidence(io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies evidence) {
-        var source=SourceQualifiedDependencyResult.admit(evidence,publication.localId());
+        return withSourceEvidence(SourceQualifiedDependencyResult.admit(evidence,publication.localId()));
+    }
+    /** Reuse a certificate already admitted by the input port; result construction rechecks AIR identity. */
+    public DependencyResult withSourceEvidence(SourceQualifiedDependencyResult source) {
+        Objects.requireNonNull(source);
         var reasons=new TreeSet<>(analysisReasons);
         if(source.nativeFiles().stream().anyMatch(SourceQualifiedDependencyResult.NativeFileResult::remainder))reasons.add("SOURCE_NATIVE_FILE_REMAINDER");
         return new DependencyResult(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,List.copyOf(reasons),fileDependencies,sourceDependencies,Optional.of(source),programDependencies);
@@ -41,13 +46,49 @@ public record DependencyResult(PublicationId publication,SemanticVersion airVers
             Evidence.InventoryStatus publicationInventory,List<Origins.Origin> origins,List<Origins.Artifact> artifacts,List<UncertaintyId> sourceUncertaintyRefs,List<String> analysisReasons) {
         this(publication,airVersion,sites,edges,metrics,publicationInventory,origins,artifacts,sourceUncertaintyRefs,analysisReasons,FileDependencyResult.unavailable());
     }
-    public boolean partial() { return sourceQualifiedDependencies.stream().anyMatch(s->s.nativeFiles().stream().anyMatch(SourceQualifiedDependencyResult.NativeFileResult::remainder))||sourceDependencies.available()&&sourceDependencies.partial()||!analysisReasons.isEmpty()||sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL); }
-    public boolean structuralScope() { return sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN)||sites.isEmpty()&&analysisReasons.stream().anyMatch(r->!r.startsWith("CONDITIONAL_")&&!Set.of("SOURCE_CONTROL_UNAVAILABLE","SOURCE_NATIVE_FILE_REMAINDER").contains(r)); }
+    public boolean partial() {
+        // A known reason must not bypass expiry of the owned fact/status view.
+        boolean ownedPartial=sites instanceof ResultList<?> owned&&owned.partial();
+        return sourceQualifiedDependencies.stream().anyMatch(s->s.nativeFiles().stream().anyMatch(SourceQualifiedDependencyResult.NativeFileResult::remainder))||sourceDependencies.available()&&sourceDependencies.partial()||!analysisReasons.isEmpty()||(sites instanceof ResultList<?>?ownedPartial:sites.stream().anyMatch(s->s.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL));
+    }
+    public boolean structuralScope() { return (sites instanceof ResultList<?> owned?owned.structural():sites.stream().anyMatch(s->s.reachability()==DependencySiteFact.Reachability.UNKNOWN))||sites.isEmpty()&&analysisReasons.stream().anyMatch(r->!r.startsWith("CONDITIONAL_")&&!Set.of("SOURCE_CONTROL_UNAVAILABLE","SOURCE_NATIVE_FILE_REMAINDER").contains(r)); }
     public DependencyResult {
-        programDependencies=List.copyOf(programDependencies);
+        programDependencies=resultCopy(programDependencies);
         Objects.requireNonNull(sourceQualifiedDependencies);sourceQualifiedDependencies.ifPresent(s->{if(s.evidence().air().size()!=1 || !s.evidence().air().getFirst().publication().equals(publication.localId()))throw new IllegalArgumentException("source/AIR identity mismatch");});
         Objects.requireNonNull(sourceDependencies);Objects.requireNonNull(fileDependencies);analysisReasons=List.copyOf(analysisReasons);if(analysisReasons.stream().anyMatch(String::isBlank))throw new IllegalArgumentException("empty analysis reason");
-        Objects.requireNonNull(publication);Objects.requireNonNull(airVersion);sites=List.copyOf(sites);edges=List.copyOf(edges);
-        metrics=Map.copyOf(metrics);Objects.requireNonNull(publicationInventory);origins=List.copyOf(origins);artifacts=List.copyOf(artifacts);sourceUncertaintyRefs=List.copyOf(sourceUncertaintyRefs);
+        Objects.requireNonNull(publication);Objects.requireNonNull(airVersion);sites=resultCopy(sites);edges=resultCopy(edges);
+        metrics=Map.copyOf(metrics);Objects.requireNonNull(publicationInventory);origins=metadataCopy(origins);artifacts=metadataCopy(artifacts);sourceUncertaintyRefs=metadataCopy(sourceUncertaintyRefs);
+    }
+    private static <T> List<T> resultCopy(List<T> values){return values instanceof ResultList<?>?values:List.copyOf(values);}
+    /** Package-owned immutable result views only; arbitrary public Lists cannot
+     * bypass ordinary detached copy semantics. get is explicit materialization. */
+    static <T> List<T> borrowedResult(int count,java.util.function.IntFunction<T> access,Runnable owner,
+            java.util.function.BooleanSupplier partial,java.util.function.BooleanSupplier structural){return new ResultList<>(count,access,owner,partial,structural);}
+    private static final class ResultList<T> extends AbstractList<T> implements RandomAccess {
+        private final int count;private final java.util.function.IntFunction<T> access;private final Runnable owner;
+        private final java.util.function.BooleanSupplier partial,structural;
+        ResultList(int count,java.util.function.IntFunction<T> access,Runnable owner,java.util.function.BooleanSupplier partial,java.util.function.BooleanSupplier structural){
+            if(count<0)throw new IllegalArgumentException("negative result count");this.count=count;this.access=Objects.requireNonNull(access);this.owner=Objects.requireNonNull(owner);this.partial=Objects.requireNonNull(partial);this.structural=Objects.requireNonNull(structural);owner.run();
+        }
+        boolean partial(){owner.run();return partial.getAsBoolean();}boolean structural(){owner.run();return structural.getAsBoolean();}
+        @Override public int size(){owner.run();return count;}
+        @Override public T get(int ordinal){owner.run();Objects.checkIndex(ordinal,count);return Objects.requireNonNull(access.apply(ordinal));}
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed result");}
+    }
+    /** True only for the package's canonical, immutable native metadata lease. */
+    public static boolean isBorrowedMetadata(List<?> values){return values instanceof MetadataList<?>;}
+    private static <T> List<T> metadataCopy(List<T> values){return isBorrowedMetadata(values)?values:List.copyOf(values);}
+    static <T> List<T> borrowedMetadata(long count,java.util.function.IntFunction<T> access,Runnable owner){
+        return new MetadataList<>(Math.toIntExact(count),access,owner);
+    }
+    private static final class MetadataList<T> extends AbstractList<T> implements RandomAccess {
+        private final int count;private final java.util.function.IntFunction<T> access;private final Runnable owner;
+        MetadataList(int count,java.util.function.IntFunction<T> access,Runnable owner){
+            if(count<0)throw new IllegalArgumentException("negative metadata inventory");
+            this.count=count;this.access=Objects.requireNonNull(access);this.owner=Objects.requireNonNull(owner);owner.run();
+        }
+        @Override public int size(){owner.run();return count;}
+        @Override public T get(int ordinal){owner.run();Objects.checkIndex(ordinal,count);return Objects.requireNonNull(access.apply(ordinal));}
+        @Override public void clear(){throw new UnsupportedOperationException("immutable borrowed metadata");}
     }
 }

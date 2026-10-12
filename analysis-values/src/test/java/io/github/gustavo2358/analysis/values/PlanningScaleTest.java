@@ -83,7 +83,7 @@ class PlanningScaleTest {
                 assertEquals(n,metric(result,"observation","uniqueQueries"),"no query cap");assertEquals(n,metric(result,"observation","queriesAnswered"));
                 assertEquals(1,metric(result,"analysis","analysisRuns"),"independent batches share run");
                 assertEquals(independent?n:1,metric(result,"observation","observationBatchesExecuted"),"no batch cap");
-                assertEquals(independent?(long)n*(n+1)/2:n,metric(result,"observation","operationsReplayed"));
+                assertEquals(n,metric(result,"observation","operationsReplayed"),"compatible independent batches share the exact prefix without a batch cap");
                 for(var c:result.consumers()) {
                     var fact=c.facts().getFirst().observation().value();assertEquals(List.of(new Values.TextValue("literal")),fact.candidates());assertFalse(fact.effectiveUnknownRemainder());assertEquals(1,fact.candidateSupports().size());
                 }

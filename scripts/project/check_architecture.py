@@ -110,7 +110,7 @@ EXPECTED_PRODUCTION_IMPORTS = {
 }
 # Deliberately enumerated core CFG additions; never discover/allow arbitrary sources.
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildCoordinator.java"].update({
-    DOMAIN_CLASS + "CoreCfgProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProjectionIssue",
+    DOMAIN_CLASS + "CoreCfgProjection", DOMAIN_CLASS + "CfgGraph", DOMAIN_CLASS + "CfgProgram", DOMAIN_CLASS + "CfgProjectionIssue",
     "java.util.Optional",
 })
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "application/CfgBuildResult.java"].update({
@@ -122,28 +122,59 @@ EXPECTED_PRODUCTION_IMPORTS.update({
     },
     SOURCE_ROOT + "domain/CfgNode.java": {
         "io.github.gustavo2358.air.model.Entries", "io.github.gustavo2358.air.model.Ids.EntryId",
+        "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Ids.OperationId",
         "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
-        "io.github.gustavo2358.air.model.Sequence", "java.util.Objects",
+        "io.github.gustavo2358.air.model.Sequence", "java.util.List", "java.util.Objects", "java.util.Optional",
+    },
+    SOURCE_ROOT + "domain/CfgControl.java": {
+        "io.github.gustavo2358.air.model.Control",
+        "io.github.gustavo2358.air.model.Ids.CompletionPortId",
+        "io.github.gustavo2358.air.model.Ids.LabelId",
+        "io.github.gustavo2358.air.model.Ids.OperationId",
+        "io.github.gustavo2358.air.model.Operations",
+        "io.github.gustavo2358.air.model.Scopes",
+        "io.github.gustavo2358.air.model.Terminator",
+        "java.math.BigInteger", "java.util.ArrayList", "java.util.List", "java.util.Objects",
+        "java.util.Optional",
     },
     SOURCE_ROOT + "domain/CfgTransition.java": {
         "io.github.gustavo2358.air.model.Ids.EntryId", "java.util.Objects",
     },
     SOURCE_ROOT + "domain/CfgGraph.java": {
-        "io.github.gustavo2358.air.model.Operations", PUBLICATION, "java.util.HashMap",
+        PUBLICATION, "java.lang.ref.WeakReference", "java.util.HashMap",
         "java.util.HashSet", "java.util.List", "java.util.Map", "java.util.Objects", "java.util.ArrayList",
+    },
+    SOURCE_ROOT + "domain/CfgSource.java": {
+        "io.github.gustavo2358.air.model.Capabilities", "io.github.gustavo2358.air.model.Evidence",
+        "io.github.gustavo2358.air.model.Ids.PublicationId", "io.github.gustavo2358.air.model.Ids.UnitId",
+        PUBLICATION, "io.github.gustavo2358.air.model.SemanticVersion", "java.util.List", "java.util.Objects", "java.util.function.IntFunction",
     },
     SOURCE_ROOT + "domain/CfgProjectionIssue.java": {
         "io.github.gustavo2358.air.model.Ids.Id", "java.util.Objects",
     },
     SOURCE_ROOT + "domain/ProjectionPolicy.java": {"io.github.gustavo2358.air.model.Evidence"},
     SOURCE_ROOT + "domain/CoreCfgProjection.java": {
-        "io.github.gustavo2358.air.model.Entries",
         "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Operations",
-        PUBLICATION, "io.github.gustavo2358.air.model.Sequence", "io.github.gustavo2358.air.model.Unit",
-        "java.util.ArrayList", "java.util.Comparator", "java.util.HashMap", "java.util.List", "java.util.Map",
+        PUBLICATION, "java.util.ArrayList", "java.util.List",
         "java.util.Objects",
     },
+    SOURCE_ROOT + "domain/CfgProgram.java": {
+        "io.github.gustavo2358.air.model.Capabilities", "io.github.gustavo2358.air.model.Evidence",
+        "io.github.gustavo2358.air.model.Ids.EntryId", "io.github.gustavo2358.air.model.Ids.LabelId",
+        "io.github.gustavo2358.air.model.Ids.OperationId", "io.github.gustavo2358.air.model.Ids.UnitId",
+        "io.github.gustavo2358.air.model.NamePolicies", PUBLICATION,
+        "io.github.gustavo2358.air.model.Unit", "java.util.Comparator", "java.util.List",
+        "java.util.Objects", "java.util.Set", "java.util.function.Consumer", "java.util.function.IntFunction",
+    },
 })
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgTransitionTable.java"] = {
+    "io.github.gustavo2358.air.model.Ids.UnitId", "java.util.AbstractList", "java.util.ArrayList",
+    "java.util.HashSet", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
+}
+EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNodeInventory.java"] = {
+    "java.util.AbstractList", "java.util.List", "java.util.Objects", "java.util.RandomAccess",
+    "java.util.function.IntFunction", "java.util.function.IntUnaryOperator",
+}
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgNode.java"].add(
     "io.github.gustavo2358.air.model.Operations")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CfgGraph.java"].update({
@@ -153,18 +184,29 @@ EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].add(
     "io.github.gustavo2358.air.model.Capabilities")
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/CoreCfgProjection.java"].update({"io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Scopes"})
 EXPECTED_PRODUCTION_IMPORTS[SOURCE_ROOT + "domain/LocalControlRules.java"] = {
-    "io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Operations",
-    "io.github.gustavo2358.air.model.Terminator", "io.github.gustavo2358.air.model.Ids.OperationId",
+    "io.github.gustavo2358.air.model.Control", "io.github.gustavo2358.air.model.Ids.OperationId",
     "io.github.gustavo2358.air.model.Ids.LabelId", "io.github.gustavo2358.air.model.Ids.CompletionPortId",
     "java.math.BigInteger", "java.util.Collections", "java.util.HashMap", "java.util.LinkedHashMap",
     "java.util.List", "java.util.Map", "java.util.Objects",
     "java.util.Optional",
 }
 CFG_CLASS_NAMES = {
+    "CfgProgram", "CfgProgram$AdmittedSnapshot", "CfgProgram$UnitView", "CfgProgram$EntryView", "CfgProgram$SequenceView",
+    "CfgProgram$Resident", "CfgProgram$ResidentUnit", "CfgProgram$OperationIds",
+    "CfgProgram$NodeStore", "CfgProgram$ResidentNodes", "CfgNodeInventory", "CfgNodeInventory$Roles",
+    "CfgProgram$Routing", "CfgProgram$ResidentRouting",
+    "CfgControl", "CfgControl$Jump", "CfgControl$Branch", "CfgControl$Return", "CfgControl$Halt",
+    "CfgControl$Invoke", "CfgControl$Opaque", "CfgControl$ReentryGuard", "CfgControl$ResumeRoute",
+    "CfgControl$LocalInvoke", "CfgControl$LocalBoundary", "CfgControl$LocalResume",
+    "CfgControl$LocalUnwind", "CfgControl$Unsupported",
     "LocalControlRules", "LocalControlRules$ReentryGuard", "LocalControlRules$Rule", "LocalControlRules$Invoke", "LocalControlRules$Boundary",
     "LocalControlRules$Resume", "LocalControlRules$Unwind", "LocalControlRules$Stack", "LocalControlRules$Step", "LocalControlRules$RecursiveActivation",
     "CfgNodeId", "CfgNode", "CfgNode$EntryNode", "CfgNode$SequenceNode", "CfgNode$NormalExit", "CfgNode$HaltExit", "CfgNode$OutcomeExit",
+    "CfgTransitionTable", "CfgTransitionTable$Builder", "CfgTransitionTable$Group",
+    "CfgTransitionTable$Storage", "CfgTransitionTable$ResidentStorage", "CfgTransitionTable$PhysicalRows",
+    "CfgTransitionTable$GroupWriter", "CfgTransitionTable$ResidentGroup",
     "CfgTransition", "CfgTransition$Kind", "CfgGraph", "CfgGraph$1",
+    "CfgSource", "CfgSource$UnitInventory", "CfgSource$UnitInventories",
     "CfgProjectionIssue", "CfgProjectionIssue$Code", "CoreCfgProjection", "ProjectionPolicy",
 }
 EXPECTED_CLASSFILES = {
@@ -184,8 +226,9 @@ EXPECTED_TEST_CASES = {
     "io.github.gustavo2358.analysis.cfg.application.CfgPreflightTest": 4,
     "io.github.gustavo2358.analysis.cfg.application.CheckedPreflightTest": 3,
     "io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistryTest": 4,
-    DOMAIN_CLASS + "LocalControlProjectionTest": 1,
-    DOMAIN_CLASS + "EvalCfg025Test": 17,
+    DOMAIN_CLASS + "LocalControlProjectionTest": 2,
+    DOMAIN_CLASS + "CfgGraphRetentionTest": 4,
+    DOMAIN_CLASS + "EvalCfg025Test": 18,
     DOMAIN_CLASS + "EvalCfg028Test": 22,
     DOMAIN_CLASS + "EvalCfg029Test": 25,
     DOMAIN_CLASS + "EvalCfg030Test": 20,
@@ -706,17 +749,33 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
     if "java.util.Optional<" + DOMAIN_CLASS + "CfgGraph> graph()" not in result:
         raise GateFailure("CfgBuildResult must expose the real typed optional CFG product")
 
+    entry = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$EntryNode"],
+        root, capture=True,
+    ).stdout or ""
+    require_descriptor(entry, "()Lio/github/gustavo2358/air/model/Ids$EntryId;", "EntryNode.entry")
+    require_descriptor(entry, "()Ljava/util/Optional;", "EntryNode.initialLabel")
+
+    sequence = run(
+        [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$SequenceNode"],
+        root, capture=True,
+    ).stdout or ""
+    require_descriptor(sequence, "()Lio/github/gustavo2358/air/model/Ids$LabelId;", "SequenceNode.label")
+    require_descriptor(sequence, "()Ljava/util/List;", "SequenceNode.operations")
+    require_descriptor(sequence, "()Lio/github/gustavo2358/analysis/cfg/domain/CfgControl;", "SequenceNode.control")
+
     halt = run(
         [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$HaltExit"],
         root, capture=True,
     ).stdout or ""
-    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Operations$Halt;", "HaltExit.source")
+    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Ids$OperationId;", "HaltExit.operation")
+    require_descriptor(halt, "()Lio/github/gustavo2358/air/model/Operations$HaltKind;", "HaltExit.haltKind")
 
     outside = run(
         [javap, "-classpath", classpath, "-p", "-s", DOMAIN_CLASS + "CfgNode$OutcomeExit"],
         root, capture=True,
     ).stdout or ""
-    require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Terminator;", "OutcomeExit.source")
+    require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Ids$OperationId;", "OutcomeExit.operation")
     require_descriptor(outside, "()Lio/github/gustavo2358/air/model/Control$InvocationAlternative;", "OutcomeExit.outcome")
 
     graph = run(
@@ -728,6 +787,10 @@ def verify_javap(javap: str, root: Path, classes: Path, air_jar: Path) -> None:
             raise GateFailure("CfgGraph must expose its typed " + method + " inventory")
     if "java.util.List<io.github.gustavo2358.air.model.Capabilities$Capability> preciseControlCapabilities()" not in graph:
         raise GateFailure("CfgGraph must declare capability consumption scoped to precise control")
+    require_descriptor(graph, "()Lio/github/gustavo2358/analysis/cfg/domain/CfgSource;", "CfgGraph.source")
+    require_descriptor(graph, "(Lio/github/gustavo2358/air/model/Publication;)Z", "CfgGraph.wasProjectedFrom")
+    if "io.github.gustavo2358.air.model.Publication publication" in graph:
+        raise GateFailure("CfgGraph must not retain the full AIR Publication")
 
     preflight = run(
         [javap, "-classpath", classpath, "-verbose", "-c", "-p", "-s", PREFLIGHT_CLASS],

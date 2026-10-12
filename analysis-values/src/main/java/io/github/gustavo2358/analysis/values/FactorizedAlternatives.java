@@ -11,7 +11,12 @@ final class FactorizedAlternatives<T> {
     static final class Node<T> {
         final int level;
         final Map<T,Node<T>> edges;
-        private Node(int level,Map<T,Node<T>> edges){this.level=level;this.edges=Map.copyOf(edges);}
+        final long fingerprint;
+        private Node(int level,Map<T,Node<T>> edges){
+            this.level=level;this.edges=Map.copyOf(edges);long unordered=0;
+            for(var edge:this.edges.entrySet())unordered+=Long.rotateLeft(0x9e3779b97f4a7c15L*Objects.hashCode(edge.getKey())+edge.getValue().fingerprint,17);
+            fingerprint=0x517cc1b727220a95L*level+unordered;
+        }
         boolean terminal(){return level==Integer.MAX_VALUE;}
     }
     record Size(long nodes,long alternatives,long maxComponent) { }
@@ -19,15 +24,19 @@ final class FactorizedAlternatives<T> {
     private record Pair<T>(Node<T> a,Node<T> b) { }
     final Node<T> terminal=new Node<>(Integer.MAX_VALUE,Map.of());
     private final Map<Key<T>,Node<T>> interned=new HashMap<>();
-    private long internedEdges,unionPairs,projectedAlternatives;
+    private long internedEdges,allocatedNodes,allocatedEdges,retiredNodes,retiredEdges,unionPairs,projectedAlternatives;
     private final Map<Node<T>,Size> componentSizes=new IdentityHashMap<>();
+    private final Runnable progress;
+    FactorizedAlternatives(){this(()->{});}
+    FactorizedAlternatives(Runnable progress){this.progress=Objects.requireNonNull(progress);}
 
     Node<T> node(int level,Map<T,Node<T>> edges) {
-        var live=new HashMap<T,Node<T>>();edges.forEach((value,next)->{if(next!=null)live.put(value,next);});
+        progress.run();
+        var live=new HashMap<T,Node<T>>();edges.forEach((value,next)->{progress.run();if(next!=null)live.put(value,next);});
         if(live.isEmpty())return null;
         if(live.values().stream().anyMatch(n->n.level<=level))throw new IllegalArgumentException("unordered factor");
         var key=new Key<>(level,Map.copyOf(live));var known=interned.get(key);if(known!=null)return known;
-        var result=new Node<>(level,key.edges());interned.put(key,result);internedEdges+=live.size();return result;
+        var result=new Node<>(level,key.edges());interned.put(key,result);allocatedNodes++;allocatedEdges+=live.size();internedEdges+=live.size();return result;
     }
     Node<T> singleton(NavigableMap<Integer,T> values) {
         var result=terminal;
@@ -39,6 +48,7 @@ final class FactorizedAlternatives<T> {
         final Node<T> node;
         final Iterator<Map.Entry<T,Node<T>>> remaining;
         Frame(Node<T> node){this.node=node;this.remaining=node.edges.entrySet().iterator();}
+        Frame(Node<T> node,Iterator<Map.Entry<T,Node<T>>> remaining){this.node=node;this.remaining=remaining;}
     }
     private static final class UnionFrame<T> {
         final Pair<T> pair;
@@ -55,6 +65,7 @@ final class FactorizedAlternatives<T> {
         var memo=new HashMap<Pair<T>,Node<T>>();var pending=new ArrayDeque<UnionFrame<T>>();
         var first=new UnionFrame<>(a,b);pending.push(first);unionPairs++;
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(frame.current==null&&frame.remaining.hasNext())frame.current=frame.remaining.next();
             if(frame.current==null) {
@@ -73,6 +84,22 @@ final class FactorizedAlternatives<T> {
         }
         return memo.get(first.pair);
     }
+    /** Balanced exact union for many alternatives; avoids growing-prefix copies. */
+    Node<T> unionAll(Iterable<Node<T>> values) {
+        var bins=new ArrayList<Node<T>>();
+        for(var value:values) {
+            progress.run();
+            if(value==null)continue;var carry=value;int rank=0;
+            while(true) {
+                while(bins.size()<=rank)bins.add(null);
+                var existing=bins.get(rank);
+                if(existing==null){bins.set(rank,carry);break;}
+                bins.set(rank,null);carry=union(existing,carry);rank++;
+            }
+        }
+        Node<T> result=null;for(int rank=bins.size()-1;rank>=0;rank--)if(bins.get(rank)!=null)result=union(result,bins.get(rank));
+        return result;
+    }
     /** Memoized post-order image. Prune rejected edges before visiting their suffixes.
      * A null image is memoized too (restriction can empty a shared suffix).
      */
@@ -82,6 +109,7 @@ final class FactorizedAlternatives<T> {
         var done=new IdentityHashMap<Node<T>,Node<T>>();var pending=new ArrayDeque<Frame<T>>();
         pending.push(new Frame<>(root));
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(frame.remaining.hasNext()) {
                 var edge=frame.remaining.next();if(!include.test(frame.node,edge.getKey()))continue;
@@ -99,6 +127,7 @@ final class FactorizedAlternatives<T> {
         return rewrite(root,(n,v)->true,(n,done)->{
             var edges=new HashMap<T,Node<T>>();var fn=updates.get(n.level);
             n.edges.forEach((value,next)->{
+                progress.run();
                 var changed=fn==null?value:fn.apply(value);
                 edges.put(changed,union(edges.get(changed),done.get(next)));
             });
@@ -109,21 +138,39 @@ final class FactorizedAlternatives<T> {
     Node<T> project(Node<T> root,Set<Integer> selected) {
         return rewrite(root,(n,v)->true,(n,done)->{
             if(selected.contains(n.level)) {
-                var edges=new HashMap<T,Node<T>>();n.edges.forEach((v,next)->edges.put(v,done.get(next)));
+                var edges=new HashMap<T,Node<T>>();n.edges.forEach((v,next)->{progress.run();edges.put(v,done.get(next));});
                 return node(n.level,edges);
             }
-            Node<T> result=null;for(var next:n.edges.values())result=union(result,done.get(next));
-            return result;
+            var children=new ArrayList<Node<T>>(n.edges.size());for(var next:n.edges.values())children.add(done.get(next));
+            return unionAll(children);
         });
     }
     /** Keep matching source edges in the original BEFORE relation, retaining other dimensions. */
     Node<T> restrict(Node<T> root,Map<Integer,T> selected) {
-        BiPredicate<Node<T>,T> matches=(n,v)->selected.get(n.level)==null||selected.get(n.level).equals(v);
-        return rewrite(root,matches,(n,done)->{
-            var edges=new HashMap<T,Node<T>>();
-            n.edges.forEach((v,next)->{if(matches.test(n,v))edges.put(v,done.get(next));});
-            return node(n.level,edges);
-        });
+        if(root==null||root.terminal())return root;
+        var done=new IdentityHashMap<Node<T>,Node<T>>();var pending=new ArrayDeque<Frame<T>>();
+        pending.push(restrictionFrame(root,selected));
+        while(!pending.isEmpty()) {
+            progress.run();
+            var frame=pending.peek();
+            if(frame.remaining.hasNext()) {
+                var child=frame.remaining.next().getValue();
+                if(child.terminal())done.put(child,child);else if(!done.containsKey(child))pending.push(restrictionFrame(child,selected));
+            } else {
+                var edges=new HashMap<T,Node<T>>();
+                if(selected.containsKey(frame.node.level)) {
+                    T value=selected.get(frame.node.level);var child=frame.node.edges.get(value);
+                    if(child!=null&&done.get(child)!=null)edges.put(value,done.get(child));
+                } else frame.node.edges.forEach((value,child)->{if(done.get(child)!=null)edges.put(value,done.get(child));});
+                done.put(frame.node,node(frame.node.level,edges));pending.pop();
+            }
+        }
+        return done.get(root);
+    }
+    private Frame<T> restrictionFrame(Node<T> node,Map<Integer,T> selected) {
+        if(!selected.containsKey(node.level))return new Frame<>(node);
+        T value=selected.get(node.level);var child=node.edges.get(value);
+        return new Frame<>(node,child==null?Collections.emptyIterator():List.of(Map.entry(value,child)).iterator());
     }
     List<Map<Integer,T>> selections(Node<T> projected) {
         var result=new ArrayList<Map<Integer,T>>();var path=new HashMap<Integer,T>();
@@ -132,6 +179,7 @@ final class FactorizedAlternatives<T> {
             if(projected.terminal())result.add(Map.of());else pending.push(new Frame<>(projected));
         }
         while(!pending.isEmpty()) {
+            progress.run();
             var frame=pending.peek();
             if(!frame.remaining.hasNext()){path.remove(frame.node.level);pending.pop();continue;}
             var edge=frame.remaining.next();path.put(frame.node.level,edge.getKey());
@@ -149,17 +197,46 @@ final class FactorizedAlternatives<T> {
         return componentSizes.computeIfAbsent(root,node->{
             if(node.edges.values().stream().allMatch(Node::terminal))
                 return new Size(1,node.edges.size(),node.edges.size());
-            return size(List.of(node));
+            return size(List.of(node),progress);
         });
     }
     static Size size(Collection<? extends Node<?>> roots) {
+        return size(roots,()->{});
+    }
+    private static Size size(Collection<? extends Node<?>> roots,Runnable progress) {
         var visited=Collections.newSetFromMap(new IdentityHashMap<Node<?>,Boolean>());var pending=new ArrayDeque<Node<?>>();
         roots.forEach(n->{if(n!=null)pending.add(n);});long edges=0;var components=new HashMap<Integer,Set<Object>>();
         while(!pending.isEmpty()) {
+            progress.run();
             var node=pending.removeFirst();if(node.terminal()||!visited.add(node))continue;
             edges+=node.edges.size();components.computeIfAbsent(node.level,ignored->new HashSet<>()).addAll(node.edges.keySet());pending.addAll(node.edges.values());
         }
         return new Size(visited.size(),edges,components.values().stream().mapToLong(Set::size).max().orElse(0));
     }
-    Map<String,Long> metrics(){return Map.of("internedNodes",(long)interned.size(),"internedAlternatives",internedEdges,"relationUnionPairs",unionPairs,"projectedAlternatives",projectedAlternatives);}
+    /** Retire only nodes unreachable from every result root that the solver retains. */
+    void retain(Collection<? extends Node<T>> roots) {
+        var live=Collections.newSetFromMap(new IdentityHashMap<Node<T>,Boolean>());var pending=new ArrayDeque<Node<T>>();
+        roots.forEach(root->{if(root!=null&&!root.terminal())pending.add(root);});
+        while(!pending.isEmpty()) {
+            progress.run();
+            var node=pending.removeFirst();if(!live.add(node))continue;
+            for(var next:node.edges.values())if(!next.terminal())pending.add(next);
+        }
+        var entries=interned.entrySet().iterator();
+        while(entries.hasNext()) {
+            progress.run();
+            var entry=entries.next();var node=entry.getValue();if(live.contains(node))continue;
+            entries.remove();retiredNodes++;retiredEdges+=node.edges.size();internedEdges-=node.edges.size();componentSizes.remove(node);
+        }
+        if(internedEdges<0)throw new IllegalStateException("negative live relation edge count");
+    }
+    Map<String,Long> metrics(){
+        var result=new LinkedHashMap<String,Long>();
+        result.put("internedNodes",(long)interned.size());result.put("internedAlternatives",internedEdges);
+        result.put("allocatedNodes",allocatedNodes);result.put("allocatedAlternatives",allocatedEdges);
+        result.put("retiredNodes",retiredNodes);result.put("retiredAlternatives",retiredEdges);
+        result.put("relationUnionPairs",unionPairs);result.put("projectedAlternatives",projectedAlternatives);
+        return Map.copyOf(result);
+    }
+    long fingerprint(Node<T> root){return root==null?0:root.fingerprint;}
 }

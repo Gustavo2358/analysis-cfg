@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 import sys
 
-from dependency_wire import read, require
+from dependency_wire import read, require, execution_metrics
 from cfg_wire_contract import verify as verify_cfg_wire
 from e2e_w2d import declaration_object, locked_sp, open_call_model, execute, runtime, source_spans, text_leaf, literal_text
 from prepare_w2d_producers import ROOT, git, require_local
@@ -143,7 +143,7 @@ def dependency_oracle(result, model, source, case):
                     'support reaches its exact literal/copy occurrence')
         require(site['rawCandidates'][index]['supports']==support and result['edges'][index]['candidate']==candidate
                 and result['edges'][index]['caller']==site['caller'] and result['edges'][index]['site']==site['operation'], 'edge and raw/interpreted support consistency')
-    require(result['metrics']['possibleValuesRuns'] == 1, 'normal forward fixed point runs once')
+    require(execution_metrics(result)['possibleValuesRuns'] == 1, 'normal forward fixed point runs once')
 
 
 def run(work, config_path):

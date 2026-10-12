@@ -64,8 +64,8 @@ class EvalCfg025Test {
         Map<CfgNodeId, NodeObservation> nodes = new HashMap<>();
         for (CfgNode node : graph.nodes()) {
             NodeObservation observation = switch (node) {
-                case CfgNode.EntryNode entry -> entryNode(entry.source().id());
-                case CfgNode.SequenceNode sequence -> sequenceNode(sequence.source().label());
+                case CfgNode.EntryNode entry -> entryNode(entry.entry());
+                case CfgNode.SequenceNode sequence -> sequenceNode(sequence.label());
                 case CfgNode.NormalExit exit -> new NodeObservation(Role.NORMAL_EXIT,
                         exit.publicationId(), exit.unitId(), exit.entryId());
                 case CfgNode.OutcomeExit ignored -> throw new AssertionError("outside outcomes belong to exceptional control tests");
@@ -96,6 +96,31 @@ class EvalCfg025Test {
         assertEquals(SemanticVersion.AIR_2_0_0, result.airVersion());
         assertEquals(AirValidator.validate(publication), result.preflight());
         assertTrue(result.projectionIssues().isEmpty());
+    }
+
+    @Test
+    void detachedProgramPortUsesTheResidentProjectionSemantics() {
+        Publication publication = minimal();
+        CfgProgram resident = CfgProgram.resident(publication);
+        CfgProgram detached = new CfgProgram() {
+            @Override public CfgSource source() { return resident.source(); }
+            @Override public List<Capabilities.Capability> requiredCapabilities() {
+                return resident.requiredCapabilities();
+            }
+            @Override public Set<Capabilities.Capability> namePolicyExtensions() {
+                return resident.namePolicyExtensions();
+            }
+            @Override public void units(java.util.function.Consumer<UnitView> consumer) {
+                resident.units(consumer);
+            }
+        };
+        CfgGraph expected = CoreCfgProjection.project(publication);
+        CfgGraph actual = CoreCfgProjection.project(detached, ProjectionPolicy.KNOWN_SUBSET);
+        assertEquals(expected, actual);
+        assertEquals(minimalExpected(), observe(actual));
+        assertTrue(CoreCfgProjection.unsupported(detached, ProjectionPolicy.KNOWN_SUBSET).isEmpty());
+        assertTrue(expected.wasProjectedFrom(publication));
+        assertFalse(actual.wasProjectedFrom(publication));
     }
 
     @Test
@@ -149,8 +174,8 @@ class EvalCfg025Test {
                 List.of(orphan, returning(L))))));
         CfgNode.SequenceNode node = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
                 .map(CfgNode.SequenceNode.class::cast)
-                .filter(sequence -> sequence.source().label().equals(orphan.label())).findFirst().orElseThrow();
-        assertSame(orphan, node.source());
+                .filter(sequence -> sequence.label().equals(orphan.label())).findFirst().orElseThrow();
+        assertEquals(orphan.label(), node.label());
         assertTrue(graph.transitions().stream().noneMatch(edge -> edge.to().equals(node.id())));
         assertTrue(observe(graph).transitions().contains(returningTo(orphan.label(), E)));
     }
@@ -215,18 +240,20 @@ class EvalCfg025Test {
         Sequence originalSequence = originalSequences.getFirst();
         Entries.Entry originalEntry = originalUnit.entries().getFirst();
         CfgGraph graph = graph(publication);
-        assertSame(publication, graph.publication());
+        assertEquals(CfgSource.from(publication), graph.source());
         assertSame(originalUnits, publication.units());
         assertSame(originalUnit, publication.units().getFirst());
         assertSame(originalSequences, originalUnit.sequences());
         assertSame(originalSequence, originalSequences.getFirst());
         assertEquals(originalHash, publication.hashCode());
-        assertSame(originalEntry, graph.entries().getFirst().source());
+        assertEquals(originalEntry.id(), graph.entries().getFirst().entry());
         CfgNode.SequenceNode node = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
                 .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
-        assertSame(originalSequence, node.source());
-        assertSame(originalSequence.terminator(), node.source().terminator());
-        assertSame(originalSequence.instructions(), node.source().instructions());
+        assertEquals(originalSequence.label(), node.label());
+        assertEquals(CfgControl.from(originalSequence.terminator()), node.control());
+        assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
+                .anyMatch(component -> component.getType().equals(Sequence.class)
+                        || component.getType().equals(Terminator.class)));
         assertThrows(UnsupportedOperationException.class, () -> graph.nodes().clear());
         assertThrows(UnsupportedOperationException.class, () -> graph.transitions().clear());
         assertThrows(UnsupportedOperationException.class, () -> graph.entries().clear());
@@ -249,7 +276,7 @@ class EvalCfg025Test {
         List<CfgNode.EntryNode> entries = graph.entries();
         List<CfgNode.NormalExit> exits = graph.normalExits();
 
-        assertEquals(List.of(E, second), entries.stream().map(node -> node.source().id()).toList());
+        assertEquals(List.of(E, second), entries.stream().map(CfgNode.EntryNode::entry).toList());
         assertEquals(List.of(E, second), exits.stream().map(CfgNode.NormalExit::entryId).toList());
         assertAll(
                 () -> assertSame(entries, graph.entries(), "entries must reuse its materialized list"),
@@ -290,9 +317,10 @@ class EvalCfg025Test {
                 signature, entry(E, L).state(), ORIGIN)), List.of(new Sequence(L, List.of(), terminator, ORIGIN))))));
         CfgNode.SequenceNode sequence = graph.nodes().stream().filter(CfgNode.SequenceNode.class::isInstance)
                 .map(CfgNode.SequenceNode.class::cast).findFirst().orElseThrow();
-        assertSame(terminator, sequence.source().terminator());
-        assertSame(terminator.values(), ((Operations.Return) sequence.source().terminator()).values());
-        assertEquals(values, ((Operations.Return) sequence.source().terminator()).values());
+        assertEquals(new CfgControl.Return(terminator.header().id()), sequence.control());
+        assertSame(terminator.values(), values);
+        assertFalse(java.util.Arrays.stream(CfgNode.SequenceNode.class.getRecordComponents())
+                .anyMatch(component -> Terminator.class.isAssignableFrom(component.getType())));
         assertEquals(minimalExpected(), observe(graph));
     }
 

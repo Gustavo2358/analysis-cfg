@@ -12,15 +12,20 @@ public final class SourceInventories {
     }
     static List<Node> copyNodes(List<Node> nodes){return nodes instanceof Nodes?nodes:List.copyOf(nodes);}
     static List<Derivation> copyDerivations(List<Derivation> steps){return steps instanceof Steps?steps:List.copyOf(steps);}
+    static List<Node> copyNodes(List<Node> nodes,Runnable progress){return nodes instanceof Nodes?nodes:List.copyOf(SourceAdmission.input(nodes,progress));}
+    static List<Derivation> copyDerivations(List<Derivation> steps,Runnable progress){return steps instanceof Steps?steps:List.copyOf(SourceAdmission.input(steps,progress));}
     public static final class Builder {
         private final Pool<String> strings=new Pool<>();
         private final Pool<Support> supports=new Pool<>();
         private final Pool<List<String>> proofs=new Pool<>();
         private final Rows nodes=new Rows(4),steps=new Rows(7);
+        private Runnable progress;
         private boolean frozen;
+        public Builder(){this(()->{});}
+        public Builder(Runnable progress){this.progress=Objects.requireNonNull(progress);progress.run();}
         public int nodeCount(){return nodes.count;}
         public int derivationCount(){return steps.count;}
-        private void writable(){if(frozen)throw new IllegalStateException("source inventory already frozen");}
+        private void writable(){if(frozen)throw new IllegalStateException("source inventory already frozen");progress.run();}
         public void addNode(Node node) {
             writable();Objects.requireNonNull(node);
             nodes.add4(strings.id(node.id()),strings.id(node.context()),strings.id(node.location()),supports.id(node.support()));
@@ -32,20 +37,22 @@ public final class SourceInventories {
         private int optional(List<String> values){return values.isEmpty()?-1:strings.id(values.getFirst());}
         public Snapshot build() {
             writable();frozen=true;
-            var text=strings.freeze().toArray(String[]::new);var support=supports.freeze().toArray(Support[]::new);var proof=proofs.freeze();
+            try {
+            var text=strings.freeze(progress).toArray(String[]::new);var support=supports.freeze(progress).toArray(Support[]::new);var proof=proofs.freeze(progress);
             var nodeRows=new Nodes(text,support,nodes.freeze());var stepRows=new Steps(text,proof,steps.freeze());
             // Expand bounded small snapshots once, preserving canonical dictionary payloads.
             // Large snapshots retain only columns, never a cache of expanded historical rows.
             if((long)nodeRows.size()+stepRows.size()<=INLINE_ROWS)
-                return new Snapshot(List.copyOf(nodeRows),List.copyOf(stepRows));
+                return new Snapshot(List.copyOf(SourceAdmission.input(nodeRows,progress)),List.copyOf(SourceAdmission.input(stepRows,progress)));
             return new Snapshot(nodeRows,stepRows);
+            } finally {progress=null;}
         }
     }
     private static final class Pool<T> {
         private Map<T,Integer> ordinals=new HashMap<>();
         private List<T> values=new ArrayList<>();
         int id(T value){var known=ordinals.get(value);if(known!=null)return known;int result=values.size();values.add(value);ordinals.put(value,result);return result;}
-        List<T> freeze(){var result=List.copyOf(values);ordinals=null;values=null;return result;}
+        List<T> freeze(Runnable progress){var result=List.copyOf(SourceAdmission.input(values,progress));ordinals=null;values=null;return result;}
     }
     private static final class Rows {
         private final int width;private int[] data;private int count;

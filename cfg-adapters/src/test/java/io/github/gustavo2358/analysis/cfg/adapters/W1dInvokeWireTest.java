@@ -4,8 +4,8 @@ import io.github.gustavo2358.air.json.AirJson;
 import io.github.gustavo2358.analysis.cfg.application.*;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
 import io.github.gustavo2358.analysis.cfg.domain.CfgGraph;
+import io.github.gustavo2358.analysis.cfg.domain.CfgControl;
 import io.github.gustavo2358.analysis.cfg.domain.CfgNode;
-import io.github.gustavo2358.air.model.Operations;
 import java.util.List;
 import java.util.Optional;
 import java.nio.file.*;
@@ -48,7 +48,7 @@ final class W1dInvokeWireTest {
     @Test void invokeNodeRequiresV2EvenWithoutTransitions() throws Exception {
         var full = realInvoke();
         var node = full.graph().orElseThrow().nodes().stream().filter(n -> n instanceof CfgNode.SequenceNode s
-                && s.source().terminator() instanceof Operations.Invoke).findFirst().orElseThrow();
+                && s.control() instanceof CfgControl.Invoke).findFirst().orElseThrow();
         String json = new String(new CfgJsonWriter().encode(withNodes(full, List.of(node))), StandardCharsets.UTF_8);
         assertTrue(json.contains("\"schemaVersion\":\"2.0.0\""));
         assertTrue(json.contains("\"terminator\":{\"kind\":\"INVOKE\""));
@@ -59,7 +59,7 @@ final class W1dInvokeWireTest {
         var full = realInvoke();
         // Original AIR contains Invoke, but this independently constructed CFG product does not.
         var legacyNodes = full.graph().orElseThrow().nodes().stream().filter(n -> n instanceof CfgNode.SequenceNode s
-                && s.source().terminator() instanceof Operations.Return).toList();
+                && s.control() instanceof CfgControl.Return).toList();
         assertFalse(legacyNodes.isEmpty());
         var legacy = withNodes(full, legacyNodes);
         var writer = new CfgJsonWriter();
@@ -80,6 +80,6 @@ final class W1dInvokeWireTest {
     private static CfgBuildResult withNodes(CfgBuildResult full, List<CfgNode> nodes) {
         return new CfgBuildResult(full.status(), full.publicationId(), full.airVersion(), full.options(), full.preflight(),
                 full.unsupportedCapabilities(), full.projectionIssues(),
-                Optional.of(new CfgGraph(full.graph().orElseThrow().publication(), nodes, List.of())));
+                Optional.of(new CfgGraph(full.graph().orElseThrow().source(), nodes, List.of())));
     }
 }

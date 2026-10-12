@@ -20,7 +20,7 @@ class PartialProjectionLawTest {
         p=EvidenceMonotonicityTest.changed(p,W1dEffectsTest.replace(invoke,invoke.effectBound(),new Control.InvocationOutcomes(List.of(invoke.outcomes().known().getFirst(),Control.Diverge.INSTANCE),Scopes.NoControl.INSTANCE)));
         var defaults=BuildOptions.defaults();var options=new BuildOptions(defaults.validation(),ProjectionPolicy.PARTIAL_ANALYSIS);
         var cfg=new CfgBuildCoordinator(SemanticInterpreterRegistry.empty()).build(p,options);
-        assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());assertSame(p,cfg.graph().orElseThrow().publication());
+        assertEquals(CfgBuildResult.Status.CFG_BUILT,cfg.status());assertEquals(io.github.gustavo2358.analysis.cfg.domain.CfgSource.from(p),cfg.graph().orElseThrow().source());
         var session=AnalysisSession.open(cfg,p,options.projectionPolicy(),u.entries()).session().orElseThrow();var context=session.contexts().iterator().next();
         assertFalse(context.predecessors(context.entryNode()).advance(),"unknown control never re-enters an invocation boundary");
         assertTrue(session.index().partialControl(u.id()));

@@ -16,16 +16,16 @@ public final class ReachingDefinitions {
     private final StatementEffects effects;
     private final StoragePartition partition;
     private final AnalysisSession session;
-    private final Map<Operation,List<Plan>> operations=new IdentityHashMap<>();
-    private final Map<Operation,Map<Control.OutcomeKey,List<Plan>>> outcomes=new IdentityHashMap<>();
-    private final Map<Operation,List<Plan>> otherwise=new IdentityHashMap<>();
+    private final Map<OperationId,List<Plan>> operations;
+    private final Map<OperationId,Map<Control.OutcomeKey,List<Plan>>> outcomes;
+    private final Map<OperationId,List<Plan>> otherwise;
     private final Map<EntryId,List<Initial>> initial=new HashMap<>();
     private final Map<EntryId,List<LogicalInitial>> logicalInitial=new HashMap<>();
-    private record LogicalInitial(int slot,Entries.InitialCondition condition,ObjectId object,StorageIndex.Resolution resolution) { }
+    private record LogicalInitial(int slot,ProgramStore.InitialConditionView condition,ObjectId object,StorageIndex.Resolution resolution) { }
     private final Map<UnitId,Boolean> controlOpen=new HashMap<>();
-    private record Plan(Operation operation,StatementEffects.Write write,StatementEffects.Target target,
+    private record Plan(StatementEffects.OperationRef occurrence,StatementEffects.Write write,StatementEffects.Target target,
                         Optional<Control.OutcomeKey> outcome,List<StoragePartition.Segment> segments,StatementEffects.LogicalTarget logical) { }
-    private record Initial(int slot,Entries.InitialCondition condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
+    private record Initial(int slot,ProgramStore.InitialConditionView condition,StatementEffects.Target target,List<StoragePartition.Segment> segments) { }
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<ReachingDefinitions> analysis) { }
     public static Admission prepare(StatementEffects effects) {
@@ -33,7 +33,8 @@ public final class ReachingDefinitions {
     }
     public ReachingDefinitions(StatementEffects effects) {
         this.effects=Objects.requireNonNull(effects);session=effects.storage().session();partition=new StoragePartition(effects);
-        for(var unit:session.index().publication().units()) {
+        operations=new OperationTable<>(session.index().store());outcomes=new OperationTable<>(session.index().store());otherwise=new OperationTable<>(session.index().store());
+        for(var unit:session.index().store().units()) {
             boolean open=effects.storage().session().index().partialControl(unit.id()) || effects.storage().session().index().unprovedPreconditions(unit.id());
             for(var sequence:unit.sequences()) {
                 var terminator=sequence.terminator();
@@ -44,17 +45,17 @@ public final class ReachingDefinitions {
         }
         for(var statement:effects.statements()) {
             var op=statement.operation();var normal=Optional.<Control.OutcomeKey>of(Control.NormalOutcome.INSTANCE);
-            operations.put(op,compile(op,statement.writes(),normal));
-            otherwise.put(op,compile(op,statement.otherwise(),Optional.empty()));
+            operations.put(op.header().id(),compile(statement.reference(),statement.writes(),normal));
+            otherwise.put(op.header().id(),compile(statement.reference(),statement.otherwise(),Optional.empty()));
             var choices=new HashMap<Control.OutcomeKey,List<Plan>>();
-            statement.outcomes().forEach((key,writes)->choices.put(key,compile(op,writes,Optional.of(key))));
-            outcomes.put(op,Map.copyOf(choices));
+            statement.outcomes().forEach((key,writes)->choices.put(key,compile(statement.reference(),writes,Optional.of(key))));
+            outcomes.put(op.header().id(),Map.copyOf(choices));
         }
         for(var context:session.contexts()) {
             var seeds=new ArrayList<Initial>();var logicalSeeds=new ArrayList<LogicalInitial>();int slot=0;
-            for(var fact:EntryFacts.admitted(effects.storage(),context.entry())) {
-                var condition=fact.condition();var resolution=fact.resolution();
-                if(condition.value() instanceof Entries.PossibleLiterals&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
+            for(var fact:EntryFacts.admitted(effects.storage(),context.entryView())) {
+                var condition=fact.conditionView();var resolution=fact.resolution();
+                if(condition.possible()&&condition.place() instanceof Places.ObjectPlace object&&!resolution.exact()) {
                     logicalSeeds.add(new LogicalInitial(slot++,condition,object.object(),resolution));continue;
                 }
                 for(var target:effects.targets(resolution,fact.strength())) {
@@ -63,10 +64,10 @@ public final class ReachingDefinitions {
                 }
                 slot=Math.incrementExact(slot);
             }
-            initial.put(context.entry().id(),List.copyOf(seeds));logicalInitial.put(context.entry().id(),List.copyOf(logicalSeeds));
+            initial.put(context.entryView().id(),List.copyOf(seeds));logicalInitial.put(context.entryView().id(),List.copyOf(logicalSeeds));
         }
     }
-    private List<Plan> compile(Operation operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
+    private List<Plan> compile(StatementEffects.OperationRef operation,List<StatementEffects.Write> writes,Optional<Control.OutcomeKey> outcome) {
         var result=new ArrayList<Plan>();
         for(var write:writes) {
             for(var target:write.targets())result.add(new Plan(operation,write,target,outcome,List.copyOf(partition.intersecting(target.location())),null));
@@ -87,7 +88,8 @@ public final class ReachingDefinitions {
         private final EntryId entry;
         private final SegmentMap<Set<EventHandle>> bindings;
         private final Map<ObjectId,Set<EventHandle>> logical;
-        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings,Map<ObjectId,Set<EventHandle>> logical){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);}
+        private final long fingerprint;
+        private State(EntryId entry,SegmentMap<Set<EventHandle>> bindings,Map<ObjectId,Set<EventHandle>> logical){this.entry=entry;this.bindings=bindings;this.logical=Map.copyOf(logical);fingerprint=Objects.hashCode(entry)+Long.rotateLeft(bindings.fingerprint(),13)+Long.rotateLeft(this.logical.hashCode(),29);}
         public boolean reached(){return entry!=null;}
         public int explicitSegments(){return bindings.size();}
     }
@@ -121,7 +123,7 @@ public final class ReachingDefinitions {
             if(session!=owner.session)throw new IllegalArgumentException("foreign session");
             var result=new ArrayList<Boundary<State>>();
             for(var context:session.contexts()) {
-                var entry=context.entry().id();var root=new SegmentMap<Set<EventHandle>>();
+                var entry=context.entryView().id();var root=new SegmentMap<Set<EventHandle>>();
                 for(var seed:owner.initial.get(entry)) {
                     var event=intern(DefinitionEvent.initial(entry,seed.condition(),seed.slot(),seed.target(),owner.effects.storage().resolve(seed.condition().place())));
                     for(var segment:seed.segments()) {
@@ -150,12 +152,13 @@ public final class ReachingDefinitions {
             var logical=new HashMap<>(a.logical);b.logical.forEach((key,events)->{work.joinEntryVisited();logical.merge(key,events,this::union);});
             return result.root==a.bindings&&logical.equals(a.logical)?new Join<>(a,false):new Join<>(new State(a.entry,result.root,logical),true);
         }
+        @Override public long stateFingerprint(State state){return state.fingerprint;}
         @Override public boolean equivalent(State a,State b,DomainWork work) {
             if(a==b)return true;if(!Objects.equals(a.entry,b.entry)||a.bindings.size()!=b.bindings.size()||!a.logical.equals(b.logical))return false;
             var equal=new boolean[]{true};a.bindings.forEach((key,value)->{work.stateCompareEntry();if(!value.equals(b.bindings.get(key)))equal[0]=false;});return equal[0];
         }
         private EventHandle event(EntryId entry,Plan plan) {
-            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(p.logical==null?DefinitionEvent.write(entry,p.operation,p.write,p.target,p.outcome):DefinitionEvent.logicalWrite(entry,p.operation,p.write,p.logical,p.outcome)));
+            return events.computeIfAbsent(entry,ignored->new IdentityHashMap<>()).computeIfAbsent(plan,p->intern(p.logical==null?DefinitionEvent.write(entry,p.occurrence.value(),p.write,p.target,p.outcome):DefinitionEvent.logicalWrite(entry,p.occurrence.value(),p.write,p.logical,p.outcome)));
         }
         private State apply(State state,List<Plan> plans,boolean forceMay) {
             if(!state.reached())return state;var root=state.bindings;var logical=new HashMap<>(state.logical);
@@ -172,21 +175,25 @@ public final class ReachingDefinitions {
             return root==state.bindings&&logical.equals(state.logical)?state:new State(state.entry,root,logical);
         }
         private State operation(State state,Operation operation) {
-            var plans=owner.operations.get(operation);
+            owner.session.index().requireOperation(operation);
+            var plans=owner.operations.get(operation.header().id());
             if(plans==null)throw new IllegalArgumentException("foreign operation snapshot");
             return apply(state,plans,false);
         }
         @Override public State transferBlock(AnalysisPoint point,State anchor,DomainWork work) {
             if(!(point.node().source() instanceof CfgNode.SequenceNode node))return anchor;
-            var state=anchor;for(var operation:node.source().instructions()){work.operationTransferred();state=operation(state,operation);}
-            work.operationTransferred();return operation(state,node.source().terminator());
+            var sequence=owner.session.index().sequence(point.node());
+            var state=anchor;for(var operation:sequence.instructions()){work.operationTransferred();state=operation(state,operation);}
+            work.operationTransferred();return operation(state,sequence.terminator());
         }
         @Override public State transferEdge(AnalysisPoint point,CfgTransition edge,State state,DomainWork work) {
-            if(!(point.node().source() instanceof CfgNode.SequenceNode node)||!(node.source().terminator() instanceof Operations.Invoke invoke))return state;
-            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke).get(Control.NormalOutcome.INSTANCE),false);
+            if(!(point.node().source() instanceof CfgNode.SequenceNode))return state;
+            var terminator=owner.session.index().sequence(point.node()).terminator();
+            if(!(terminator instanceof Operations.Invoke invoke))return state;
+            if(edge.kind()==CfgTransition.Kind.INVOKE_NORMAL)return apply(state,owner.outcomes.get(invoke.header().id()).get(Control.NormalOutcome.INSTANCE),false);
             // Open control does not identify the completed outcome. Preserve every possible old definition.
-            state=apply(state,owner.otherwise.get(invoke),true);
-            for(var plans:owner.outcomes.get(invoke).values())state=apply(state,plans,true);return state;
+            state=apply(state,owner.otherwise.get(invoke.header().id()),true);
+            for(var plans:owner.outcomes.get(invoke.header().id()).values())state=apply(state,plans,true);return state;
         }
     }
     public static final class Execution {
@@ -221,7 +228,7 @@ public final class ReachingDefinitions {
                 }
                 @Override public State transferOutcome(PointQuery<T> query,State before) {
                     var operation=owner.session.index().site(query.point().operation()).operation();
-                    return engine.apply(before,owner.outcomes.get(operation).get(query.point().outcome()),false);
+                    return engine.apply(before,owner.outcomes.get(operation.header().id()).get(query.point().outcome()),false);
                 }
             });
         }
@@ -251,11 +258,11 @@ public final class ReachingDefinitions {
             return new DefinitionFact(query.point(),state.reached()?DefinitionFact.Reachability.REACHABLE:DefinitionFact.Reachability.UNREACHABLE_IN_MODEL,output,state.reached()?unknown:null,!(resolution.remainder() instanceof Scopes.NoMemory),source,evidenceOrder(premises),evidenceOrder(origins),evidenceOrder(uncertainties));
         }
         private boolean sourceOpen(PointQuery<StorageSubject> query) {
-            var publication=owner.session.index().publication();var unit=owner.session.index().unit(query.point().entry().unit());
-            return publication.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!publication.coverage().uncertainties().isEmpty()
+            var store=owner.session.index().store();var unit=owner.session.index().unit(query.point().entry().unit());
+            return store.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!store.coverage().uncertainties().isEmpty()
                 ||unit.coverage().inventory()!=Evidence.InventoryStatus.COMPLETE||!unit.coverage().uncertainties().isEmpty()
                 ||owner.controlOpen.getOrDefault(unit.id(),false)
-                ||!owner.session.context(query.point().entry()).entry().state().uncertainties().isEmpty()
+                ||!owner.session.context(query.point().entry()).entryView().state().uncertainties().isEmpty()
                 ||owner.effects.storage().explicitObjects(query.subject()).stream().map(owner.session.index()::object)
                     .anyMatch(object->object.coverage()!=Evidence.CoverageStatus.MODELED||open(object.precision().storage())||open(object.precision().values()));
         }

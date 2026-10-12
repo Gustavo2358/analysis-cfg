@@ -75,9 +75,22 @@ public final class TextPredicate {
     /** Equality pads the shorter logical text with spaces; it assumes no collating order. */
     public static int sourceEquality(Collection<String> left,boolean leftOpen,Collection<String> right,boolean rightOpen) {
         if(leftOpen||rightOpen||left.isEmpty()||right.isEmpty())return BOTH;
-        int result=0;
-        for(var a:left)for(var b:right){int length=Math.max(a.codePointCount(0,a.length()),b.codePointCount(0,b.length()));result|=fit(a,length).equals(fit(b,length))?TRUE:FALSE;}
-        return result;
+        // Padding with U+0020 gives an equivalence relation: a pair is equal iff its
+        // two trailing-space-normalized scalar strings match. TRUE needs one shared
+        // class; FALSE is absent only when every candidate on both sides is one class.
+        // This computes the same existential truth image without materializing pairs
+        // or fitted LogicalText runs. Tabs, other whitespace and leading spaces remain.
+        var classes=new HashSet<String>();for(var value:left)classes.add(withoutTrailingSpaces(value));
+        String sole=classes.iterator().next();boolean allEqual=classes.size()==1,same=false;
+        for(var value:right) {
+            String normalized=withoutTrailingSpaces(value);same|=classes.contains(normalized);
+            if(!sole.equals(normalized))allEqual=false;
+        }
+        return (same?TRUE:0)|(allEqual?0:FALSE);
+    }
+    private static String withoutTrailingSpaces(String value) {
+        int end=value.length();while(end>0&&value.charAt(end-1)==' ')end--;
+        return end==value.length()?value:value.substring(0,end);
     }
     static Text text(Expression expression,Function<Place,Text> read) {
         if(expression instanceof Expressions.Literal literal&&literal.value() instanceof Values.TextValue value)

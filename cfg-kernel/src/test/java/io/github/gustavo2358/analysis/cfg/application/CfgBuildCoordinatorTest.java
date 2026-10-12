@@ -7,6 +7,7 @@ import io.github.gustavo2358.air.validation.ValidationIssue;
 import io.github.gustavo2358.air.validation.ValidationOptions;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreter;
 import io.github.gustavo2358.analysis.cfg.extension.SemanticInterpreterRegistry;
+import io.github.gustavo2358.analysis.cfg.domain.CfgSource;
 import io.github.gustavo2358.analysis.cfg.testing.AirPublications;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,7 @@ class CfgBuildCoordinatorTest {
         assertEquals(AirValidator.validate(publication), result.preflight());
         assertEquals(List.of(), result.unsupportedCapabilities());
         assertTrue(result.graph().orElseThrow().nodes().isEmpty());
-        assertSame(publication, result.graph().orElseThrow().publication());
+        assertEquals(CfgSource.from(publication), result.graph().orElseThrow().source());
     }
 
     @Test
@@ -135,7 +136,7 @@ class CfgBuildCoordinatorTest {
         assertTrue(restricted.graph().isEmpty(),"resource failure has no CFG");
         var recovered=builder.build(publication,BuildOptions.defaults());
         assertEquals(sufficient,recovered,"no cached resource failure or poisoned state");
-        assertSame(publication,recovered.graph().orElseThrow().publication());
+        assertEquals(CfgSource.from(publication),recovered.graph().orElseThrow().source());
     }
 
     @Test void genericIncompleteWithoutResourceIssueRemainsDistinct() {

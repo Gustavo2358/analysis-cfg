@@ -9,10 +9,14 @@ final class LogicalText {
     private final int length;
     private final boolean complete;
     private final int hash;
+    private final LogicalTextArena owner;
     private LogicalText(List<Run> runs,int length) {
         this.runs=List.copyOf(runs);this.length=length;
-        complete=runs.stream().noneMatch(r->r.scalar()<0);hash=this.runs.hashCode();
+        complete=runs.stream().noneMatch(r->r.scalar()<0);hash=this.runs.hashCode();owner=null;
     }
+    private LogicalText(List<Run> runs,int length,LogicalTextArena owner,int hash,boolean complete){this.runs=runs;this.length=length;this.owner=owner;this.hash=hash;this.complete=complete;}
+    /** The arena publishes only canonical immutable run views; do not copy them into heap. */
+    static LogicalText stored(List<Run> runs,int length,LogicalTextArena owner,int hash,boolean complete){return new LogicalText(runs,length,owner,hash,complete);}
     private static void append(List<Run> runs,int scalar,int length) {
         if(length==0)return;
         if(!runs.isEmpty()&&runs.getLast().scalar()==scalar) {
@@ -44,16 +48,23 @@ final class LogicalText {
     }
     LogicalText fill(int count) {
         if(length!=1||count<0)throw new IllegalArgumentException("fill requires one scalar and a natural count");
+        if(owner!=null){var result=owner.builder();result.append(runs.getFirst().scalar(),count);return result.finish();}
         return new LogicalText(count==0?List.of():List.of(new Run(runs.getFirst().scalar(),count)),count);
     }
     LogicalText fit(int length,int pad) {
         if(length<0)throw new IllegalArgumentException("negative text length");
         if(length<=this.length)return slice(0,length);
+        if(owner!=null){var result=owner.builder();result.append(this);result.append(pad,length-this.length);return result.finish();}
         var result=new ArrayList<>(runs);append(result,pad,length-this.length);return new LogicalText(result,length);
     }
     LogicalText slice(int start,int length) {
         if(start<0||length<0||start>this.length-length)throw new IllegalArgumentException("logical slice outside text");
         if(start==0&&length==this.length)return this;
+        if(owner!=null){
+            var result=owner.builder();int cursor=0,end=start+length;
+            for(var run:runs){int next=cursor+run.length();if(next>start&&cursor<end)result.append(run.scalar(),Math.min(next,end)-Math.max(cursor,start));cursor=next;if(cursor>=end)break;}
+            return result.finish();
+        }
         var result=new ArrayList<Run>();int cursor=0,end=start+length;
         for(var run:runs) {
             int next=cursor+run.length();
@@ -64,6 +75,8 @@ final class LogicalText {
     }
     LogicalText concat(LogicalText right) {
         int combined=Math.addExact(length,right.length);
+        var selected=owner!=null?owner:right.owner;
+        if(selected!=null){var result=selected.builder();result.append(this);result.append(right);return result.finish();}
         var result=new ArrayList<>(runs);for(var run:right.runs)append(result,run.scalar(),run.length());
         return new LogicalText(result,combined);
     }

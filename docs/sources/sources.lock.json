@@ -150,8 +150,8 @@
   },
   "air_java": {
     "repository": "Gustavo2358/air-java",
-    "commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
-    "canonical_ref": "fix/general-memory-20261005",
+    "commit": "a0aeb827ef53765815aa501c4687f197be77ac73",
+    "canonical_ref": "feat/paged-air-snapshot",
     "role": "shared_java_model_and_validator",
     "library_version": "0.1.0-SNAPSHOT",
     "analysis_ir": {
@@ -196,9 +196,17 @@
       "air-model/src/main/java/io/github/gustavo2358/air/model/Values.java",
       "air-json/src/test/resources/scalar-assign.canonical.json",
       "air-model/src/main/java/io/github/gustavo2358/air/model/MemoryCodecs.java",
-      "air-json/src/test/resources/regional.canonical.json"
+      "air-json/src/test/resources/regional.canonical.json",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/AirShape.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/AirSnapshot.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/AirSnapshotBuilder.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/PublicationProjection.java",
+      "air-model/src/main/java/io/github/gustavo2358/air/model/PublicationSource.java",
+      "docs/architecture/paged-snapshot.md",
+      "air-model/src/main/java/io/github/gustavo2358/air/validation/SnapshotIdentityKeys.java",
+      "docs/architecture/paged-identity-keys.md"
     ],
-    "observed_on": "2026-10-06",
+    "observed_on": "2026-10-10",
     "modules": {
       "parent": {
         "path": "pom.xml",
@@ -220,12 +228,67 @@
     "move_data_validation": "docs/work/history/WORK-CFG-035.md",
     "ep_w5_evidence": "EP-W5 pinned snapshot; focused, selected vertical and FAST evidence in docs/work/ep-w5-qualification.md; REAL CASE unavailable.",
     "logical_text_w2": "Local producer FAST PASS; fixed logical ranges and expression transport. Selected source E2E qualification in docs/product/logical-text-w2.md.",
-    "evidence_level": "General memory model/codec implementation: local FAST and complete local qualification, with final documentation-only commit proven bytecode identical. Remote CI not dispatched; human review pending.",
+    "evidence_level": "Producer local FAST PASS:281 model/145 transport,481 classfiles/7715 dependencies and unchanged compiled boundaries in34.534s; clean Maven install passed17.359s. Exact immutable TEXT_PAIR reuse uses16 fixed slots comparing both child keys within the original4096B control claim; no String/typed-ID history or skipped character/namespace checks. The unchanged nominal law catches redundant pair probes; a2MiB wrapped-slot/middle-character case preserves source/typed equality. Fault injection keeps2000characters and all0/1/5/100 positions with distinct adjacent blocks. Removing child comparisons in an isolated mutant fails independent integer order. Consumer focused backend/admission/regional23 methods PASS; new complete consumer FAST1158 required methods/zero skips and all original boundaries PASS755.266s. New unchanged407297668B physical Java21 public CLI PASS214.09s,21 semantic fields/83 origins/CFG; unchanged406942781B Cell Java21 PASS199.56s,21 fields/46 origins/CFG. Both original128MiB/eight-minute envelope, no profiling, entire outputs match prior large products including metrics; executable classes unchanged. These are individual finite runs, not medians or universal bounds. Visibility/demand-driven proof changes from6d85657 unchanged. Consumer final remote FAST pending. Signature indexes, connected/scoped proof graphs and other variable stores retain resident/int limitations: AS-W08/W09/W10 global qualification PARTIAL.",
     "status": "LOCAL_CHECKPOINT / HUMAN_REVIEW_PENDING",
+    "native_type_proof_checkpoint": {
+      "commit": "9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae",
+      "previous_commit": "650a5466f497c27399b06e803e203b6da9a3cf13",
+      "api_impact": "COMPATIBLE",
+      "validation": "Producer original FAST PASS29.983s:282 model/145 transport,484 classfiles/7748 dependencies,44 harness tests. Independent native retention RED32 in TypeResolver and then RED32 in proofs becomes GREEN; full identities,unknown/missing equal-hash IDs,foreign owners,late local/outside-scope proofs,complete resident/native diagnostics and expiry remain exact.",
+      "integration": "The same144490643-byte/16 Assign physical input first failed OOM47.24s during producer650 admission. Consumer physical repeat and coherent FAST remain pending. Prior evidence_level describes the historical650 checkpoint,not execution of this new pin.",
+      "limits": "Identity-key copies removed from native types/proof subjects/signature maps/site caches. Proof graphs,scoped premise bodies,type values and other cardinality-dependent stores remain resident; AS-W09/W10 PARTIAL. No quota/dimension/rule/schema change or merge."
+    },
+    "physical_initial_codec_checkpoint": {
+      "commit": "7315f75ff5c468e62fd7237ad98bbb86206e2313",
+      "previous_commit": "9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae",
+      "api_impact": "COMPATIBLE / additive encodingStatus and encodedOctet; no wire or AIR variant change",
+      "validation": "Producer coherent FAST PASS29.409s:282 model/145 transport,484 classfiles/7755 dependencies,44 harness tests. Existing independent IANA/ASCII/status/fit/initial checks strengthened; mixed codec octet equality and I17 contradictions preserve exact native/resident ValidationResult in both orders.",
+      "integration": "Strict local pin7315 qualified with consumer4af: coherent dependency/build and admission9/RegionalInitial5 PASS; compiled architecture guards PASS. Isolated real CLI Java21/Xmx128m/original quotas: Initial16 small2.44s,large24440175B22.88/22.67/22.89s,median22.88s; unchanged21-field/83-origin/67-operation/full-CFG oracle PASS and all three products byte-identical. Original cold144490643B repeat106.60s preserves both complete reference products. Original consumer FAST1204 required methods,zero skips,PASS777.356s. Post-FAST1348 runtime classes including complete path inventory,2175 consumer/649 producer tracked files,21 material inputs and15 libraries match their frozen hashes. Prior22.46s remains intermediate smoke,not final qualification.",
+      "limits": "Codec validation avoids materialized octet catalogues; initial overlap checks borrow literal+codec descriptors and compare exact primitive octets. Decoded initial bodies,proof/state tables and other cardinality-dependent stores still require AS-W09/W10 work. No quota/rule/dimension change,push or merge."
+    },
+    "native_entry_borrowing_checkpoint": {
+      "commit": "8b596372e7ba712de3a186b64200be94d7b4481a",
+      "previous_commit": "7315f75ff5c468e62fd7237ad98bbb86206e2313",
+      "api_impact": "AIR model/wire unchanged; consumer adds borrowed Entry/state/condition views with explicit resident materialization",
+      "validation": "Producer original FAST PASS29.649s:282 model/145 transport/44 harness. Consumer native Entry/shared-label2,initial/coexistence25 and structural/RD19 laws PASS; controlled Entry materialization mutant RED. Original FAST unit/contract batch PASS1204 required methods,zero skips; enclosing FAST exited1 at W5 compiled inventory drift. Reviewed W5 diff replaces only DefaultValuePlan's resident Entry edge with EntryView; original mechanical capture updated it,then all seven original W1/W2/W3/W4/W5/W1D/storage compiled guards reran without update. No executable changed between tests and final guards; this is composed local evidence,not a successful exit of the original FAST command.",
+      "integration": "InitialCatalogue512 same173757655B Java21/Xmx128m/original quotas: isolated large122.73/121.30/122.10s,median122.10s; final small976079B8.09s. Unchanged independent21-field/83-origin/67-operation/full-CFG oracle PASS; three large products byte-identical. Original cold144490643B106.38s preserves both complete reference products,but overlaps FAST and is not an isolated benchmark. Post-test1364 runtime classes and complete path inventory,2175 consumer/649 producer tracked files,21 historical plus4 catalogue inputs and15 libraries match frozen hashes before documentation/inventory capture edits.",
+      "limits": "Borrowed headers and initial descriptors remove eager Entry literal catalogues,not all cardinality-dependent state. A separate admitted InitialCell512 fixture156064090B still fails OOM93.17s in TextProfile's initial consistency map; its frozen small pre-fix reference and unchanged original17 CALL sites are preserved. AS-W09/W10 remain PARTIAL. No quota/rule/schema change,push or merge."
+    },
+    "native_initial_cell_consistency_checkpoint": {
+      "producer_commit": "8b596372e7ba712de3a186b64200be94d7b4481a",
+      "consumer_base": "f84f9cf3ee3364114b34382ab94c9592b6e59168",
+      "validation": "TextProfile retains canonical InitialConditionView instead of all decoded strong initial text bodies,with exact previous/current same-Cell comparison.25 initial/coexistence laws and2 native Entry parity laws PASS;existing nominal law now compares complete PossibleValues candidates/supports/premises/origins/remainders with resident execution. All seven original compiled guards PASS without inventory refresh. Original full consumer FAST PASS1204 required methods,zero skips,777.095s,including every downstream contract check;producer original FAST282/145/44 PASS29.649s remains applicable on identical8b sources.",
+      "integration": "Admitted InitialCell512156064090B was OOM93.17s in TextProfile. Same Java21/Xmx128m/default quota/eight-minute actual CLI passes isolated106.78/106.32/106.69s,median106.69s;small2480474B30.84s. Independent immutable pre-fix reference oracle PASS20 semantic fields/fullCFG. Three complete large CFG/dependency pairs are byte-identical to one another and to the pre-fix small reference,including operational metrics. Additional independent native boundary oracle observes all512 initial Cells with complete300000-character values and all producer/Cell identities,supports,premises,origins and remainders:PASS95.91s,all pools released. Small boundary oracle PASS23.63s;isolated drop-initials mutant RED23.39s at Cell0,with production classfiles unchanged.",
+      "integrity": "Post-FAST1364 runtime class hashes;2175 consumer/649 producer tracked files;21 historical+4 Entry+4 Cell material inputs;4 immutable reference products;15 historical libraries;14 independently frozen installed runtime libraries;additional oracle source/class all match frozen hashes before C0 documentation edits.",
+      "limits": "Finite strong-initial payload/Entry-header qualification,not complete AS-W09/W10 spill/funding or global21-family qualification. Explicit resident APIs still materialize values. PossibleLiterals candidate aggregates and other cardinality-dependent stores remain subject to further audit. No schema/rule/quota change,push or merge."
+    },
+    "previous_ci": {
+      "checked_commit": "9da08d5aaa3351f1569c7db9ad0e6fea7cc453ae",
+      "status": "PASS",
+      "context": "PR30 exact producer9da08d5; remote contracts jobs114079325310/114079308588 (runs38007423531/38007418347) both completed SUCCESS,observed2026-10-10T00:06:38Z. Local FAST282/145 PASS29.983s. Prior650 remote runs37969756139/37969748975 SUCCESS remain historical,not the verdict for this pin. Consumer physical repeat,coherent FAST and human review pending;no merge."
+    },
+    "physical_json_access_checkpoint": {
+      "producer_commit": "a0aeb827ef53765815aa501c4687f197be77ac73",
+      "previous_commit": "0ab2ef8e0abbf17f63477a178adb5a21025aa565",
+      "api_impact": "COMPATIBLE / additive physical owner-bound staging port; AIR grammar and model/wire unchanged",
+      "validation": "Original producer FAST PASS43.149s:282 model/147 transport/44 harness;498 classfiles/7945 dependencies. Literal-wire numeric lexemes,escaped UTF16,strict raw UTF8,decoded duplicate names,20000depth,short/zero reads,all primitive storage faults,simultaneous funded projections,double close and expiry PASS. Existing AIR entrypoints continue selecting BINDING.",
+      "integration": "Actual consumer physical class8 PASS;typed builder/binder14 plus physical8 PASS22;53 independent historical source fixtures+one literal supplement coverall45shapes;2048nestedterms/fullUTF16/numericintbounds/duplicateordinals/failurecleanup PASS. Real31word fingerprint collision distinguishesall30fields;hash-only mutant RED. Original818022612B source typed metadata storage passes128m/default quotas after nativeexpiry fix:170.047s JVM-only/allpools0. Original consumer FAST02 PASS817.192s/1220mandatory/zero skips/all compiled guards. Strict complete-class-path/source-hash audit confirms final capacity bytes match both changed consumer modules. Nine new core/three adapterclasses reviewed;no Maven DAG or existingresidentcodec descriptor change. Physical/typed storage is NOT source or AIR admission. FAST01 preflight rejected stale workflow pin before tests;local workflowref nowmatchesa0. Prior checkpoints remain historical.",
+      "limits": "Typed SOURCE storage/mapping qualified locally only. Paged mandatory admission/certificates and managed SOURCE CLI output remain pending. Resident source API unchanged. Original distinct metadata CLI OOM remainsRED. No remote publication or merge."
+    },
     "ci": {
-      "checked_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
+      "checked_commit": "a0aeb827ef53765815aa501c4687f197be77ac73",
       "status": "NOT_RUN",
-      "context": "local qualification only"
+      "context": "Exact producera0aeb827 is local only;remote publication authorization pending. Original producer FAST282/147/44 PASS43.149s qualifies explicit physical JSON access;AIR grammar defaults unchanged. Consumer original local FAST02 PASS817.192s/1220mandatory/all compiled guards for typed storage foundation;SOURCE admission/CLI stillpending. Previous0ab CopyBytes FAST30.223s and earlier remote CI remain historical. No remote CI or merge is claimed."
+    },
+    "air_scale_access": {
+      "previous_commit": "c2f80b59b7c38fa6efb9a20f0fa79644c697d8a4",
+      "previous_evidence_level": "General memory model/codec implementation: local FAST and complete local qualification, with final documentation-only commit proven bytecode identical. Remote CI not dispatched; human review pending.",
+      "producer_pr": "https://github.com/Gustavo2358/air-java/pull/30",
+      "api_impact": "COMPATIBLE",
+      "old_production_files_unchanged": 51,
+      "all_three_poms_unchanged": true,
+      "validation": "206 model and 143 transport checks; final producer FAST 29.665s. Declaration/entry-seed/duplicate/owner/deep/wide/failure laws plus actual missing-freeze RED/GREEN PASS.",
+      "limits": "Official snapshot access/builder and complete identity-key foundation only; no complete paged validation/JSON/CLI claim."
     }
   },
   "proleap_poc": {

@@ -10,10 +10,10 @@ import java.util.*;
 public final class AnalysisSession {
     private final ProgramIndex index;
     private final Map<EntryId, ContextView> contexts;
-    private AnalysisSession(ProgramIndex index, Collection<Entries.Entry> selected) {
+    private AnalysisSession(ProgramIndex index, Collection<ProgramStore.EntryView> selected) {
         this.index = index;
         Map<EntryId, ContextView> views = new LinkedHashMap<>();
-        for (Entries.Entry entry : selected) views.computeIfAbsent(entry.id(), ignored -> new ContextView(index, entry));
+        for (var entry : selected) views.computeIfAbsent(entry.id(), ignored -> new ContextView(index, entry));
         contexts = Collections.unmodifiableMap(views);
     }
     public enum Status { ACCEPTED, INVALID_INPUT, UNSUPPORTED }
@@ -36,11 +36,11 @@ public final class AnalysisSession {
      * The new view has its own contextual handles; it does not mutate this session or any stable run.
      */
     public AnalysisSession selectEntries(Collection<EntryId> selectedEntries) {
-        var selected = new ArrayList<Entries.Entry>();
+        var selected = new ArrayList<ProgramStore.EntryView>();
         for (var id : selectedEntries) {
             var context = contexts.get(Objects.requireNonNull(id));
             if (context == null) throw new IllegalArgumentException("Entry not selected by owning session");
-            selected.add(context.entry());
+            selected.add(context.entryView());
         }
         return new AnalysisSession(index, selected);
     }
@@ -56,15 +56,36 @@ public final class AnalysisSession {
                                  Collection<Entries.Entry> selectedEntries) {
         if (result == null || snapshot == null || policy == null || selectedEntries == null)
             return new Admission(Status.INVALID_INPUT, "null structural input", Optional.empty());
+        if (result.graph().isPresent() && !result.graph().orElseThrow().wasProjectedFrom(snapshot))
+            return new Admission(Status.INVALID_INPUT, "foreign CFG source", Optional.empty());
+        List<EntryId> selectedIds = new ArrayList<>();
+        for (Entries.Entry selected : selectedEntries) {
+            boolean owned = selected != null && snapshot.units().stream()
+                    .flatMap(unit -> unit.entries().stream()).anyMatch(entry -> entry == selected);
+            if (!owned) return new Admission(Status.INVALID_INPUT, "foreign selected Entry", Optional.empty());
+            selectedIds.add(selected.id());
+        }
+        return open(result, ProgramStore.resident(snapshot), policy, selectedIds);
+    }
+
+    /**
+     * Admits a structural store without requiring a resident Publication aggregate. The CFG and the
+     * store are correlated by metadata and by the complete typed node/edge/payload inventory.
+     */
+    public static Admission open(CfgBuildResult result, ProgramStore.Structural store,
+                                 ProjectionPolicy policy, Collection<EntryId> selectedEntries) {
+        if (result == null || store == null || policy == null || selectedEntries == null)
+            return new Admission(Status.INVALID_INPUT, "null structural input", Optional.empty());
         if (result.status() == CfgBuildResult.Status.VALIDATION_LIMIT
                 || result.status() == CfgBuildResult.Status.INCOMPLETE_VALIDATION)
             throw new IllegalStateException("a successful complete CFG build is required; upstream validation did not complete");
         try {
-            var builder = new IndexBuilder(result, snapshot, policy);
+            var builder = new IndexBuilder(result, store, policy);
             ProgramIndex index = builder.build();
-            List<Entries.Entry> selected = new ArrayList<>();
-            for (Entries.Entry entry : selectedEntries) {
-                IndexBuilder.valid(entry != null && index.entry(entry.id()) == entry, "foreign selected Entry");
+            List<ProgramStore.EntryView> selected = new ArrayList<>();
+            for (EntryId id : selectedEntries) {
+                var entry = id == null ? null : index.entryView(id);
+                IndexBuilder.valid(entry != null, "foreign selected Entry");
                 if(index.entryNodes.get(entry.id())==null) throw new IndexBuilder.Rejection(Status.UNSUPPORTED,"selected Entry body unavailable");
                 selected.add(entry);
             }

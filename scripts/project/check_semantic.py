@@ -20,6 +20,7 @@ SUITE_030 = "io.github.gustavo2358.analysis.cfg.domain.EvalCfg030Test"
 # Manual obligations: do not infer this inventory from production code, test source, or reports.
 EXPECTED_METHODS_025 = {
     "entryReturnAndNormalExitMatchIndependentOracle",
+    "detachedProgramPortUsesTheResidentProjectionSemantics",
     "missingInitialLabelIsInvalidIrAndIsNotRepaired",
     "sequenceCannotBeConstructedWithoutTerminator",
     "returnNeverFallsThroughToPhysicalNextSequence",

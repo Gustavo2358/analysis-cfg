@@ -52,23 +52,33 @@ final class RegionalProviderSupport {
                 execution.preparationMetrics().forEach((k,v) -> metrics.put("prepare_"+k,v));
                 execution.solveMetrics().forEach((k,v) -> metrics.put("solve_"+k,v));
                 var outcome = new AnalysisOutcome(key,AnalysisOutcome.Status.STABLE,null,metrics);
-                return new AnalysisProvider.Run<>() {
-                    public AnalysisOutcome outcome() { return outcome; }
-                    public AnalysisProvider.Materialized<T,V> observe(List<PointQuery<T>> queries) {
-                        var before=execution.metrics();var observations=observer.apply(execution,queries);var metrics=new TreeMap<String,Long>();
-                        execution.metrics().forEach((k,v)->metrics.put("replay_"+k,v-before.get(k)));
-                        for(String quality:List.of("modelOpenResults","sourceOpenResults","effectiveOpenResults","closedInModelResults"))metrics.put(quality,0L);
-                        for(var observation:observations.observations())if(observation.value()!=null) {
-                            var value=observation.value();
-                            if(Boolean.TRUE.equals(value.modelValueRemainder()))metrics.merge("modelOpenResults",1L,Math::addExact);
-                            if(Boolean.FALSE.equals(value.modelValueRemainder()))metrics.merge("closedInModelResults",1L,Math::addExact);
-                            if(value.sourceUnknownRemainder())metrics.merge("sourceOpenResults",1L,Math::addExact);
-                            if(value.effectiveUnknownRemainder())metrics.merge("effectiveOpenResults",1L,Math::addExact);
-                        }
-                        return new AnalysisProvider.Materialized<>(observations,metrics);
-                    }
-                };
+                return new ProviderRun<>(outcome,execution,observer);
             }
         };
+    }
+    private static final class ProviderRun<T,V extends TextValueFact> implements AnalysisProvider.Run<T,V> {
+        private final AnalysisOutcome outcome;
+        private final java.util.function.BiFunction<RegionalValuesAnalysis.Execution,List<PointQuery<T>>,ObservationBatch<T,V>> observer;
+        private RegionalValuesAnalysis.Execution execution;
+        private ProviderRun(AnalysisOutcome outcome,RegionalValuesAnalysis.Execution execution,
+                java.util.function.BiFunction<RegionalValuesAnalysis.Execution,List<PointQuery<T>>,ObservationBatch<T,V>> observer) {
+            this.outcome=outcome;this.execution=execution;this.observer=observer;
+        }
+        public AnalysisOutcome outcome(){return outcome;}
+        public AnalysisProvider.Materialized<T,V> observe(List<PointQuery<T>> queries) {
+            var active=execution;if(active==null)throw new IllegalStateException("closed provider execution");
+            var before=active.metrics();var observations=observer.apply(active,queries);var metrics=new TreeMap<String,Long>();
+            active.metrics().forEach((k,v)->metrics.put("replay_"+k,v-before.get(k)));
+            for(String quality:List.of("modelOpenResults","sourceOpenResults","effectiveOpenResults","closedInModelResults"))metrics.put(quality,0L);
+            for(var observation:observations.observations())if(observation.value()!=null) {
+                var value=observation.value();
+                if(Boolean.TRUE.equals(value.modelValueRemainder()))metrics.merge("modelOpenResults",1L,Math::addExact);
+                if(Boolean.FALSE.equals(value.modelValueRemainder()))metrics.merge("closedInModelResults",1L,Math::addExact);
+                if(value.sourceUnknownRemainder())metrics.merge("sourceOpenResults",1L,Math::addExact);
+                if(value.effectiveUnknownRemainder())metrics.merge("effectiveOpenResults",1L,Math::addExact);
+            }
+            return new AnalysisProvider.Materialized<>(observations,metrics);
+        }
+        public void close(){var owned=execution;execution=null;if(owned!=null)owned.close();}
     }
 }

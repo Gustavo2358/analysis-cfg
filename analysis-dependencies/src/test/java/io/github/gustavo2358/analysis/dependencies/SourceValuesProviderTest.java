@@ -6,6 +6,21 @@ import io.github.gustavo2358.analysis.dependencies.source.*;
 import static io.github.gustavo2358.analysis.dependencies.source.QualifiedSourceDependencies.*;
 
 class SourceValuesProviderTest {
+    @Test void sharedBudgetStopsSourceIndexPreparationBeforeStateAllocation() {
+        var unit=fixture(List.of(new NominalValues.Assignment("s0","P",read("Q"))),List.of(),List.of());
+        var resources=new io.github.gustavo2358.analysis.solver.AnalysisResources(
+                new io.github.gustavo2358.analysis.solver.AnalysisResources.Limits(64_000_000,64_000_000,0,256_000_000,4,0,1_000_000));
+        try(var pages=new io.github.gustavo2358.analysis.solver.ResidentPageStore(4096,resources)) {
+            long borrowedHeap=resources.heapUsed();
+            var failure=assertThrows(io.github.gustavo2358.analysis.solver.AnalysisResources.Exhausted.class,
+                    ()->new SourceValuesProvider(unit,Set.of("s2"),pages,resources));
+            assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Resource.WORK,failure.resource());
+            assertEquals(io.github.gustavo2358.analysis.solver.AnalysisResources.Phase.INDEX,failure.phase());
+            assertEquals(0,pages.statistics().livePages());assertEquals(borrowedHeap,resources.heapUsed());
+            assertDoesNotThrow(pages::flush,"failure cannot close its borrowed page owner");
+        }
+        assertEquals(0,resources.heapUsed());
+    }
     static final Location LOCATION=new Location("synthetic.cbl",1,0,1,10);
     static final Provenance ORIGIN=new Provenance(LOCATION,LOCATION,List.of(),true);
     static final UnitId UNIT=new UnitId("synthetic",List.of(0),"SAMPLE");
@@ -169,4 +184,58 @@ class SourceValuesProviderTest {
         var selected=new UnitEvidence(u.unit(),u.controlAvailable(),u.statements(),u.occurrences(),u.targets(),u.nodes(),u.derivations(),u.selections(),u.events(),u.guards(),u.proofs(),u.frontiers(),Optional.of(e));
         assertEquals(List.of("PROGA001","PROGB001","PROGC001","PROGD001"),values(selected));
     }
+    @Test void growingAssignmentHistoryKeepsAllProofsWithSharedPrimitiveVersions() {
+        int n=1024; var base=fixture(List.of(),List.of(),List.of());
+        var statements=new ArrayList<Statement>();var nodes=new ArrayList<Node>();var links=new ArrayList<Derivation>();
+        var writes=new ArrayList<NominalValues.Assignment>();
+        for(int i=0;i<=n;i++) {
+            statements.add(new Statement(new StatementId(UNIT,"s"+i),ORIGIN));
+            nodes.add(new Node("n"+i,"ROOT","s"+i,base.nodes().getFirst().support()));
+            links.add(new Derivation("d"+i,i==0?List.of():List.of("n"+(i-1)),"n"+i,List.of(),i==0?"PRIMARY_ENTRY":"flow",List.of("p"),List.of()));
+            if(i<n)writes.add(new NominalValues.Assignment("s"+i,"P",read("P")));
+        }
+        var statement=new StatementId(UNIT,"s"+n);
+        var occurrences=List.of(new Occurrence(statement,"COBOL","CALL","PROGRAM","cobol-zos-dynamic-call-minimal@1","COMPUTED",List.of(new Operand(new OperandId(statement,"o"),ORIGIN)),List.of(),true,List.of("n"+n)));
+        var old=base.nominalValues().orElseThrow();
+        var facts=new NominalValues("NOMINAL_TEXT_SOURCE_V1",old.facts().symbols(),writes,List.of(),List.of(new NominalValues.Query("s"+n,"P")));
+        var e=new NominalValueEvidence(facts,old.declarations(),old.seeds(),List.of(),old.uncertainties());
+        var unit=new UnitEvidence(UNIT,true,statements,occurrences,List.of(),nodes,links,List.of(),List.of(),List.of(),base.proofs(),List.of(),Optional.of(e));
+        var provider=new SourceValuesProvider(unit,Set.of("s"+n));var candidate=provider.candidates("s"+n).getFirst();
+        assertEquals("SELF0001",candidate.rawValue());assertEquals(n+1,candidate.support().evidence().size());
+        var expected=new HashSet<String>();expected.add("P");for(int i=0;i<n;i++)expected.add("s"+i);
+        assertEquals(expected,new HashSet<>(candidate.support().evidence().stream().map(SourceValuesProvider.Evidence::reference).toList()));
+        assertEquals(n+1,provider.workItems());assertFalse(provider.limited());
+        assertTrue(provider.stateStatistics().records()<32L*n,"whole support or state histories were copied");
+    }
+
+    @Test void sharedPredecessorEvaluatesOneTransferForEveryOutgoingAlternative() {
+        var base=fixture(List.of(new NominalValues.Assignment("s0","P",read("Q"))),List.of(),List.of());
+        var nodes=new ArrayList<>(base.nodes());var links=new ArrayList<>(base.derivations());
+        for(int i=0;i<128;i++) {
+            nodes.add(new Node("alt"+i,"ROOT","s2",base.nodes().getFirst().support()));
+            links.add(new Derivation("alt-link"+i,List.of("n0"),"alt"+i,List.of(),"flow",List.of("p"),List.of()));
+        }
+        var occurrence=base.occurrences().getFirst();var qualifications=new ArrayList<>(occurrence.qualifications());
+        for(int i=0;i<128;i++)qualifications.add("alt"+i);
+        var complete=new Occurrence(occurrence.id(),occurrence.technology(),occurrence.command(),occurrence.namespace(),occurrence.nameProfile(),occurrence.targetKind(),occurrence.operands(),occurrence.values(),occurrence.valueRemainder(),qualifications);
+        var unit=new UnitEvidence(base.unit(),base.controlAvailable(),base.statements(),List.of(complete),base.targets(),nodes,links,base.selections(),base.events(),base.guards(),base.proofs(),base.frontiers(),base.nominalValues());
+        var expected=new SourceValuesProvider(base,Set.of("s2"));var actual=new SourceValuesProvider(unit,Set.of("s2"));
+        assertEquals(expected.candidates("s2"),actual.candidates("s2"));
+        assertEquals(1,actual.stateStatistics().transferEvaluations());
+    }
+
+    @Test void typedProofIdentityCannotAliasStatementsAndSymbolsContainingSeparators() {
+        var base=fixture(List.of(),List.of(),List.of());
+        var statements=List.of(new Statement(new StatementId(UNIT,"stmt/a"),ORIGIN),new Statement(new StatementId(UNIT,"stmt"),ORIGIN),base.statements().get(2));
+        var nodes=List.of(new Node("n0","ROOT","stmt/a",base.nodes().getFirst().support()),new Node("n1","ROOT","stmt",base.nodes().getFirst().support()),base.nodes().get(2));
+        var facts=new NominalValues("NOMINAL_TEXT_SOURCE_V1",List.of(new NominalValues.Symbol("P",8),new NominalValues.Symbol("a/P",8)),List.of(new NominalValues.Assignment("stmt/a","P",literal("REAL0001")),new NominalValues.Assignment("stmt","a/P",read("P"))),List.of(),List.of(new NominalValues.Query("s2","a/P")));
+        var duplicate=assertThrows(IllegalArgumentException.class,()->new NominalValues(facts.authority(),facts.symbols(),List.of(facts.assignments().getFirst(),facts.assignments().getFirst()),List.of(),facts.queries()));
+        assertEquals("duplicate nominal assignment",duplicate.getMessage());
+        var source=new NominalValueEvidence(facts,List.of(new NominalValueEvidence.Declaration("P",ORIGIN),new NominalValueEvidence.Declaration("a/P",ORIGIN)),List.of(),List.of(),List.of());
+        var unit=new UnitEvidence(UNIT,true,statements,base.occurrences(),List.of(),nodes,base.derivations(),List.of(),List.of(),List.of(),base.proofs(),List.of(),Optional.of(source));
+        var candidate=new SourceValuesProvider(unit,Set.of("s2")).candidates("s2").getFirst();
+        assertEquals("REAL0001",candidate.rawValue());assertEquals(2,candidate.support().evidence().size());
+        assertEquals(Set.of("stmt/a","stmt"),new HashSet<>(candidate.support().evidence().stream().map(SourceValuesProvider.Evidence::reference).toList()));
+    }
+
 }

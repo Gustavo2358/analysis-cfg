@@ -146,6 +146,23 @@ class LeanPolicy(unittest.TestCase):
         self.assertNotEqual(0, result.returncode)
         self.assertIn('REMOTE_QUALIFICATION_PROHIBITED', result.stderr)
 
+    def test_full_producers_use_configured_sources_and_the_prepared_air_pin(self):
+        for configured in (False, True):
+            env = {'W2D_SOURCE_ROOT': '/synthetic/occupied-workspace'} if configured else {}
+            expected = Path(env.get('W2D_SOURCE_ROOT', str(self.root.parent))).resolve()
+            with self.subTest(configured=configured), patch.dict(os.environ, env, clear=True), \
+                    patch.object(lean_project, 'prepare') as prepare, \
+                    patch.object(lean_project.tempfile, 'mkdtemp', return_value=str(self.root / 'isolated')), \
+                    patch.object(lean_project.subprocess, 'run') as execute:
+                lean_project.full_local(self.root)
+                prepare.assert_called_once_with(self.root)
+                argv = next(call.args[0] for call in execute.call_args_list
+                            if any(str(item).endswith('prepare_w5_producers.py') for item in call.args[0]))
+                self.assertEqual(str(expected / 'proleap-poc'), argv[argv.index('--frontend') + 1])
+                self.assertEqual(str(expected / 'cobol-lower'), argv[argv.index('--lower') + 1])
+                self.assertEqual(str(self.root / '.harness-results/build/air-java'), argv[argv.index('--air') + 1])
+                self.assertTrue(next(call.kwargs['check'] for call in execute.call_args_list if call.args[0] == argv))
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
