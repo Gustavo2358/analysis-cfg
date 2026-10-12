@@ -110,9 +110,8 @@ public final class DependencyAnalysis {
         Objects.requireNonNull(program);Objects.requireNonNull(cfg);Objects.requireNonNull(pages);Objects.requireNonNull(resources);
         program.admission();resources.requireExecutionProgram(program);
         if(cfg.status()!=CfgBuildResult.Status.CFG_BUILT)throw new Failure(Kind.CFG_UNSUPPORTED,"CFG_UNSUPPORTED");
-        var qualification=DependencyInput.qualify(program,Optional.empty(),List.of());
         var owner=new ManagedExecutableDependencyResult(program,pages,resources);
-        try{owner.bind(prepareExecutable(program,cfg,program,pages,resources,owner),qualification);return owner;}
+        try{owner.qualifyPlain();owner.bind(prepareExecutable(program,cfg,program,pages,resources,owner),owner.plainQualification());return owner;}
         catch(RuntimeException|Error failure){try{owner.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
     }
     /** Explicit source authority composes with the same native executable analysis and shared page owner. */

@@ -429,6 +429,62 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     @Override public Optional<ProgramStore.OperationDirectory> operationDirectory(){
         borrowedOpen();if(operationDirectory==null)operationDirectory=new NativeOperations();return Optional.of(operationDirectory);
     }
+    /** Plain qualification visits selected terminators in physical Unit/Sequence
+     * order. Admission proves operation identity uniqueness; no Invoke payload,
+     * target expression, contract or effect DTO is needed for this descriptor. */
+    void plainDependencyOccurrenceHandles(java.util.function.LongConsumer consumer){
+        borrowedOpen();Objects.requireNonNull(consumer);
+        try(var units=snapshot.elements(field(snapshot.root(),4),UNIT)){
+            while(units.advance())try(var sequences=snapshot.elements(field(units.value(),5),SEQUENCE)){
+                while(sequences.advance()){
+                    progress(ProgramStore.ExecutionPhase.INDEX);
+                    long operation=field(sequences.value(),2);
+                    if(plainDependencyOccurrenceFlags(operation)!=0)consumer.accept(operation);
+                }
+            }
+        }
+    }
+    /** Exact equivalent of CallDependencyPlan.selected, with only scalar target
+     * metadata. Bit4 is selected, bit1 literal, bit2 CICS; no ID is packed. */
+    int plainDependencyOccurrenceFlags(long operation){
+        borrowedOpen();if(snapshot.shape(operation)!=OPERATIONS_INVOKE)return 0;
+        long target=field(operation,2);AirShape shape=snapshot.shape(target);
+        if(shape!=INTERACTIONS_LITERAL_TARGET&&shape!=INTERACTIONS_COMPUTED_TARGET)return 0;
+        if(compareTextToString(field(target,0),"program")!=0)return 0;
+        long namespace=field(target,1);boolean cics=compareTextToString(namespace,"cics.program")==0;
+        if(!cics&&compareTextToString(namespace,"cobol.program")!=0)return 0;
+        return 4|(shape==INTERACTIONS_LITERAL_TARGET?1:0)|(cics?2:0);
+    }
+    /** Existing admitted site -> original typed terminator address. No full
+     * operation projection or foreign sequence may enter native CALL choice. */
+    long dependencyCallSource(io.github.gustavo2358.analysis.structure.ProgramIndex.Site site){
+        borrowedOpen();Objects.requireNonNull(site);
+        if(!(site.sequence() instanceof StructuralSequence sequence)||sequence.owner()!=this
+            ||site.offset()!=snapshot.size(field(sequence.handle,1)))
+            throw new IllegalArgumentException("native CALL site must belong to this admitted terminator");
+        long operation=field(sequence.handle,2);
+        if(snapshot.shape(operation)!=OPERATIONS_INVOKE)throw new IllegalArgumentException("native CALL Invoke required");
+        return operation;
+    }
+    OperationId dependencyCallIdentity(long operation){borrowedOpen();return occurrence(field(field(operation,0),0),OperationId.class);}
+    /** Computed target projection is one explicit compatibility read; arguments,
+     * results, effects, outcomes and contract are not provider-selection inputs. */
+    Interactions.Target dependencyCallTarget(long operation){borrowedOpen();return occurrence(field(operation,2),Interactions.Target.class);}
+    /** Envelope for one complete descriptor, funded before its ID/text allocation.
+     * Full publication/unit/local widths are retained; never a hash or prefix. */
+    long plainDependencyOccurrenceFunding(long operation){
+        borrowedOpen();long identity=field(field(operation,0),0),unit=field(identity,0),publication=field(unit,0);
+        long characters=Math.addExact(snapshot.characterCount(field(publication,0)),
+            Math.addExact(snapshot.characterCount(field(unit,1)),snapshot.characterCount(field(identity,1))));
+        return Math.addExact(1024,Math.multiplyExact(8,characters));
+    }
+    QualifiedDependencyOccurrence plainDependencyOccurrence(long operation,int flags){
+        borrowedOpen();if((flags&4)==0||(flags&~7)!=0)throw new IllegalArgumentException("unselected plain occurrence");
+        var identity=(OperationId)id(field(field(operation,0),0));boolean literal=(flags&1)!=0,cics=(flags&2)!=0;
+        return new QualifiedDependencyOccurrence(Optional.empty(),identity.unit().localId(),cics?"CICS":"COBOL",
+            cics?CicsNameInterpreter.PROFILE:CallNameInterpreter.PROFILE,literal?"LITERAL":"COMPUTED",
+            List.of(),List.of(),List.of(identity),!literal);
+    }
     /** Exact admitted Invoke header, without projecting its target/contract/body.
      * Missing or non-Invoke identities have no site coverage. Borrowed lifetime
      * and the existing paged operation catalogue govern this scalar view. */
@@ -666,6 +722,7 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     private final class StructuralSequence implements ProgramStore.SequenceView {
         private final long handle;
         StructuralSequence(long handle){this.handle=handle;}
+        private SnapshotProgram owner(){return SnapshotProgram.this;}
         @Override public LabelId label(){return occurrence(field(handle,0),LabelId.class);}
         @Override public List<Instruction> instructions(){return borrowed(field(handle,1),INSTRUCTION,Instruction.class);}
         @Override public Terminator terminator(){return occurrence(field(handle,2),Terminator.class);}

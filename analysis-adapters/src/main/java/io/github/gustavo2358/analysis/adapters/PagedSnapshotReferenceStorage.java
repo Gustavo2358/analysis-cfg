@@ -35,7 +35,10 @@ public final class PagedSnapshotReferenceStorage implements SnapshotReferenceLis
         catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     @Override public synchronized long begin(long source,int kind) {
-        open();try{key(source,kind);if(keys.find(staged)!=0)throw new IllegalStateException("reference memo table already exists");long table=keys.intern(staged);metadata.set(base(table)+STATUS,1);return table;}
+        // This private arena is created only here and never collected. An exact
+        // intern plus the paged status distinguishes a fresh key from both
+        // unfinished and finished tables, without a second ordered lookup.
+        open();try{key(source,kind);long table=keys.intern(staged);long offset=base(table);if(metadata.get(offset+STATUS)!=0)throw new IllegalStateException("reference memo table already exists");metadata.set(offset+STATUS,1);return table;}
         catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     @Override public synchronized void finish(long handle,long root) {

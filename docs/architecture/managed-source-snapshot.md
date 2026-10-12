@@ -1,5 +1,166 @@
 # Managed source storage boundary
 
+## Native bounded page-address working set — 2026-10-12
+
+The previous one-address real Main16384 still exits7 TIME481.715473s,without
+watchdog or product/oracle;64/256/4096 pass their whole semantic oracles.
+The separate delegated4096 admission diagnostic closes STRUCTURALLY_VALID in
+92.156011s,with all pools zero. It models address reuse,not physical residency:
+1,615,316,807 successful read/write operations;865,137,076/996,346,107/
+1,311,454,525 recognized by fixed1/2/4 recent-address models;1,170,583,699 actual
+general-directory probes also include other operations. Extra512B observer and
+modeled256B NativeInput are explicit. It is not Main,deadline or cause proof.
+
+The working FilePageStore now keeps four fixed primitive full-handle/slot pairs,
+most-recently used first. Each candidate is accepted only when its authoritative
+cache row still holds the full generation. No payload,required state,new cache
+row or input-sized map is retained. At most four candidate comparisons precede
+the original directory lookup;range/address/poison/checksum/CLOCK/statistics
+remain authoritative. Constructor control576 funds64B over original512:
+four long/int pairs48B,private counter8B and8B conservative padding. This is
+32B over the one-address544 baseline,not a configured quota or page-cache change.
+
+One identical prospective test on the actual frozen one-address runtime is
+RED0.364823s (one cost failure plus protocol pass);working GREEN0.364828s has
+two passes.45controls vary five geometric sizes64..1024,width2/3/4 and three
+orders. General probes become zero while independent complete payload arrays,
+hit/miss/eviction/I-O/live-page counters and fixed residency remain exact.
+All candidate positions are challenged by release/reuse/cache1/2/4/16 and
+37-page permutations. The original two one-address laws pass again0.314709s;
+that wrapper's inherited32B description refers to its measurement baseline,
+not the new64B control. Original44 neighbors PASS127.206428s,zero skips,all
+sources/assertions/budgets unchanged. Original7 compiled guards PASS with no
+refresh/relaxation. Two additive methods preserve all1483 originals in1485.
+Current CLI/freeze/FAST1485/mandatory full remain pending.
+No asymptotic/deadline/root/provider/all-store/global qualification follows.
+
+## Native physical page lookup working frontier — 2026-10-12
+
+The recipe runtime passes five original complete selected products byte-for-byte,
+but actual16384 still exits7 TIME482.124031s with no product/oracle. Separate JDK
+profiling exits7 TIME482.066579s;FilePageStore.find is the leaf in8173/16298 main
+Java execution samples. This suggests an investigation,not exact CPU share or
+proof of the previous unprofiled TIME cause. Raw JFR remains ignored locally;
+environment/properties are never exported. OwnerDECODE is not a pipeline stage.
+
+FilePageStore now retains one fixed full-generation handle/slot candidate,never
+payload or required state. It still validates range/address and owner failure;
+the current authoritative handles row must equal the complete handle. Release,
+replacement and physical reuse cannot revive it. Bytes always come from the
+current cache row;misses still validate checksums. Hits/reference bits are charged
+to the same original statistics. A private probe counter is not a wire metric.
+The constructor funds32 additional fixed resident bytes (control544 instead512),
+not a quota/cache-capacity increase. No required page or tuple is discarded.
+
+Instrumented old lookup baseline adds only that counter/funded control before
+optimization,not an uninstrumented historical qualification. Same final test
+source on its frozen RED and live GREEN observes2N ->0 general probes in15 hot
+controls:five geometric sizes64..1024 at cache1/16/128. Payload updates,hits,I/O,
+generation reuse,cold corruption/poison,ranges/cleanup/close remain exact.
+RED0.364722s/GREEN0.364749s,one expected cost RED plus protocol PASS,then two
+GREEN laws. First attempt had a not-yet-cold corruption witness;second wrapper
+attempt accidentally replaced an exit-code predicate;both raw attempts retained.
+Original42 admission/lifetime/store methods PASS129.715912s,zero skips and all
+original sources/assertions/budgets unchanged. Mandatory1483 preserves1481+2.
+Current compiled guards/freeze/actual CLI/FAST/full pending. No general linear,
+deadline/root/provider/all-store/global qualification follows from hot-page probes.
+
+## Native CALL target-choice working frontier — 2026-10-12
+
+Exact site-plan own-child diagnostic closed TIME482.001462s: admission at360/420,
+CFG at450 and CallDependencyPlan.choose at470. This is not dominant cost or proof
+of the previous actual TIME stage. Two existing dependency owners now select a
+native literal from typed scalar target flags and complete Operation identity;
+computed admission receives its original complete target as explicit compatibility.
+Neither choice reconstructs unrelated Invoke arguments/results/effects/outcomes/
+contract. Resident/provider rules, public APIs, pins, wire and quotas are unchanged.
+Required maps/registrations/queries and complete computed target reads remain debt.
+Same-source focused RED1.416580s/GREEN15.039380s at4/16/64: zero unrelated payload,
+manual full identities/exclusions/provider choice/all metrics and all-pool cleanup.
+Original48 neighboring methods PASS101.619884s,zero skips. All7 compiled guards
+PASS after exact private-class/internal-edge review and three active inventory
+syncs; first capture missing classpath prerequisite preserved,not semantic failure.
+Original1472 plus7 new laws remain mandatory1479.22 owned working paths; fresh
+actual CLI follows. No16k PASS,FAST/full/sourcecommit or global qualification yet.
+
+## Native site-plan working frontier — 2026-10-12
+
+After plain qualification, actual16k closed OOM474.810763s at SitePlanner.compile.
+The shared planner's old TreeSet/List retained complete SiteView/Operation bodies.
+Current native selection stores only registration-interest and canonical operation
+codes in typed paged columns. Existing external order supplies stable full-key
+Entry/Operation sorting; equal matched pairs retain the first matching row. Filters
+and per-site query factories still receive a complete transient original SiteView
+at planning time, once per original binding; queries/callbacks are not rerun during
+consume. Native lists reconstruct one complete SiteView on explicit get/iteration.
+SiteView remains the same public record. Resident planning and public signatures,
+wire/pins/quotas/cache/deadline are unchanged. Execution/admitted-owner expiry closes
+only derived columns, and failed compilation releases newly staged plan stores.
+Requests, observations and complete SiteView read compatibility remain debt: this
+is not an all-store or whole-provider/root-heap claim.
+
+Final same-source law frozen RED1.967560s/live GREEN29.358698s, zero skips;
+4/16/64 inputs retain6656B selection controls, complete records/canonical order,
+permuted and duplicated interests/metrics/facts, cold body reads, range/mutation
+guards, expiry and exact cleanup. Attempt01 compile rejects a redundant cast,
+not semantic RED. First GREEN attempt passed cold reads and exact cleanup but
+failed a test premise expecting input in the empty execution fork; final assertion
+checks the still-live root and all original exact baselines. Raw attempts remain.
+Original41 planning/epoch/runtime/scale/zero-match/native capacity/deadline methods
+PASS3.971213s and original22 native result/writer/header/failure laws PASS102.422619s,
+zero skips and unchanged assertions/budgets. Additive inventory1478 preserves all
+1472 original methods and adds only six laws. Frozen929files/15components/2261paths;
+one private SitePlanner$NativeSites class added, no removal, existing changed
+classes confined to SitePlanner/ExecutionPlan/PlanningExecution. Actual64/256/4096
+whole-oracle CLIs PASS2.367908/7.479226/119.199763s;16384 closed exit7 TIME
+in481.067008s with exact input/sentinel preserved and no external watchdog.
+No product/oracle for16384. Same128m/default480s. Charged owner phaseDECODE
+does not identify pipeline stage; exact frozen own-child late-stack diagnostic
+is in progress. FAST/full/sourcecommit,
+all-store/global21/curves/E2E/legacy/human/external remain pending;no campaign DONE.
+
+## Plain qualification working frontier — 2026-10-12
+
+The fixed-tuple actual16k run closed exit7 TIME in481.229565s, with resource
+owner phaseDECODE. This phase labels the shared storage owner, not the pipeline
+stage. Source proof and a separate own-child SIGQUIT diagnostic are preserved;
+the diagnostic reached DependencyInput.prepareOccurrences via prepareManaged
+and closed exit1/OutOfMemoryError Java heap space in453.008782s. It is not PASS
+or proof of the previous TIME's cause. Raw driver/result incorrectly infer
+pre-validation; their bytes are preserved with an explicit correction sidecar.
+
+The current managed plain qualification owns only exact source handles and
+three scalar descriptor flags in two-word paged rows. Typed selection matches
+CallDependencyPlan.selected for literal/computed program targets in cobol.program
+or cics.program; non-Invoke and other categories/namespaces remain excluded.
+Admitted unique operations preserve original physical Unit/Sequence order,
+independently of sorted fact output. No Invoke target expression, effects,
+contract or full body is decoded or retained at this boundary. Complete typed
+publication/unit/local identity is read only for one descriptor, with a width-
+dependent envelope reserved before allocation and held by its projection/cursor.
+Close/denial retires only derived rows and scopes; source/backend are borrowed.
+SOURCE and detached compatibility qualification are unchanged and remain debt.
+
+Actual final cold-boundary law: frozen previous runtime RED1.116161s;
+current GREEN11.332178s, zero skips. Source guard
+rejects any Invoke payload read; every manual mixed literal/computed COBOL/CICS
+field and reversed physical order survive. Four/sixteen/64 inputs retain the
+same catalogue control; denial expires the owner and cleanup is exact. The
+original22 neighboring owner/program/writer/header/cursor/failure methods PASS
+102.622285s, all previous assertions and budgets unchanged. Inventory is additive:
+all1472 original methods plus the prior4 laws and new1 remain, mandatory1477.
+Frozen runtime928files/15components; changes confined to three plain-qualification
+source owners since fixed-tuple freeze. This is focused evidence only: current
+actual64/256/4096 whole-oracle CLIs PASS2.317898/7.275687/119.851453s. The16k
+case closed exit1/OutOfMemoryError Java heap space in474.810763s at
+SitePlanner.compile -> ProgramIndex.Site.operation, after plain qualification.
+Input/sentinel preserved, no external watchdog, no product/oracle for16k. This
+identifies the next planning retention frontier, not a dominant-cost proof.
+The prospective late TIME diagnostic was not executed (failure is OOM).
+New FAST/full/sourcecommit,
+provider/FILE/observations/commonWORK/all-store/global21/curves/legacy/human and
+external authority remain pending. No global or old-cold causality claim.
+
 AS-W07/09 IN_PROGRESS; source1.0--1.6 unchanged, no AIR/CFG model invented.
 
 ## Bounded hot metadata (2026-10-11; local qualification, global PARTIAL)
@@ -740,3 +901,193 @@ FILE, observations, common WORK accounting, real large AIR admission, all-store,
 global21/new gaps, original dimensions/isolated repeated curves, campaign-wide E2E,
 legacy retirement, human review and external integration remain pending. This
 closes one local materialization frontier, not AS-W00--W10 or the campaign.
+
+## Native full header keys and owner metadata (2026-10-11, working)
+
+The next real witness is one admitted literal CALL with a 300005-code-unit
+operation identity. On the preceding runtime, AIR and CFG completed, but managed
+preparation requested 19207232 scratch bytes for a complete header projection,
+above the unchanged 16777216 quota. The 100005 control passed. The actual
+production CLI independently reproduced exit 7, requested 19216064 bytes and
+preserved its destination sentinel. This is not the separate many-CALL AIR
+admission blocker and does not justify raising a quota or shortening an identity.
+
+The managed owner now compares full publication, Unit and local identity
+components in two fixed 128-character blocks. The existing exact paged full-ID
+comparison governs stored keys; transient lookup compares every UTF16 code unit
+and then length, never hashes, joined strings or truncated prefixes. Entry-first
+site ordering, Operation-first lookup and last-fact-wins replacement are preserved.
+The two buffers and constant metadata callbacks receive 1024 additional fixed
+resident bytes before allocation. Required comparisons still spend common WORK.
+This is a representation correction, not a new semantic limit or key certificate.
+
+The fact row has 28 internal words: its previous 27 anchors/fields are unchanged,
+and the last word stores one owner-local Operation ordinal plus three annotation
+bits. This disposable temporary row is not AIR/CFG/dependencies transport.
+Metadata is recorded while the original producer fact is already borrowed,
+through the original admitted operation directory; no typed fact or String is
+retained by the callback. Physical-demand and partial/unproved Unit flags derive
+from the fixed plan and immutable indexed metadata. The ordinal then supplies
+original Invoke coverage without decoding a complete key again. There is no new
+producer pin, public descriptor or wire contract.
+
+Metadata shares publication, transaction rollback and failed-tail destruction
+with the fact itself. Callback/read/write/funding failures abort the derived owner
+and preserve their primary exception; they do not publish semantic unknown.
+Expired tail scopes remain expired after those physical cells are reused.
+Public compatibility append records zero metadata and retains its old fact
+semantics. The explicit package-local complete-Header finish overload remains
+compatibility; its full projection has not been advertised as bounded. Provider
+DTOs and resident occurrence qualification are still separate migration debt.
+
+The unchanged real 300005 law passes in 1.666694s with no complete fact projection.
+Actual CLI widths 16384/100005/300005 pass the independent whole-semantic oracle
+against the original control with its complete Operation identity renamed.
+Width-dependent resource metric values are excluded; their schemas and all
+semantic fields remain checked. The widest actual CLI took 3.069051s: a single
+observation, not a median, isolated curve or global bound.
+
+The existing 119 fact/SOURCE/coverage/cursor/failure/storage laws pass in
+595.413675s, zero failures/errors/skips. Three new metadata and staged key laws
+pass in 19.893152s, including colliding hash keys sharing a 300005-character
+prefix, full identity ordering, exact negative lookup, replacement and cleanup.
+The initial callback-failure test incorrectly expected the borrowed file to
+shrink; that failed run is preserved. The file backend explicitly keeps released
+physical slots charged for reuse until its own close. The corrected test requires
+exact live logical pages, resident/scratch baselines, the primary failure instance,
+usable borrowed state and all pools zero after backend closure. No production
+code changed for that oracle correction.
+
+All 18 original CLI contracts and seven original compiled guards pass. The
+compiled class inventory and all public descriptors remain exact; only jdeps
+edges in five owned internal classes changed. Only that active core inventory was
+synchronized. All 1468 previous mandatory methods remain unchanged, plus the real
+width law and three metadata methods: 1472 passed in the original FAST below.
+The frozen 15-component runtime contains no added/removed productive classes;
+53 classfiles changed within the four productive source owners.
+
+Five newly executed actual products preserve every previous whole byte:
+SOURCE32000 (72.127773s, 22824055 bytes), manifests 1/4 and SOURCEFILE16 through
+both dependency and pipeline CLIs, including its complete CFG. These selected
+products do not requalify the original large cases, global21 or all-store growth.
+Original FAST1472 attempt 01 was interrupted without a result or known exit code;
+its raw log, including 272 NUL bytes, and report snapshot remain preserved. No
+PASS is inferred from that incomplete attempt. Attempt 02 completed in
+3056.747759s with zero failures/errors/skips, including the unchanged real
+300005-character law. Its report/runtime audit proves all 1477 productive
+classfiles, 599 Java sources, 579 fixtures and 15 components exact to the frozen
+actual CLI runtime, without helper shadow. The first audit rejected JUnit's
+seven-space alignment because it expected eight; that wrapper failure is preserved.
+The corrected audit checks all six summary counts independently of whitespace.
+Its actual AST-extracted count loop accepts five controls and rejects 15 invalid
+count/incomplete/failure/skip mutations. No Java or FAST rerun was needed for
+the parser correction. Fresh original local full qualification passed in
+6783.072692s, including all 22 FILE composite E2Es, with the original frontend,
+lowering and AIR producer checkouts clean and unchanged. All nine productive
+publication/Unit/Entry component probes at 16384/100005/300005 characters passed
+their whole semantic oracles. The largest took 22.550873/7.526359/1.816842s,
+respectively; these are single observations, not performance curves.
+The distinct new legal open-literal witness passed 64/256/1024/4096 CALLs with
+known/raw PROGA, unknown remainder and every nonmetric product field preserved;
+the 4096 case took 180.995699s. The 16384 case failed with exit7 in 484.462672s,
+TIME in VALIDATION at the original shared480s deadline, with no external watchdog
+expiry and the output sentinel preserved. It produced no dependency product.
+A diagnostic rerun on identical bytes failed similarly in 483.015767s; samples
+at60/180/300s are not dominant-cost proof. A focused law observed retained pages
+after a negative completion query. The separate graph-storage working correction
+uses existing full-tuple find and inserts only on complete, removing a redundant
+index without changing public descriptors, pins or quotas. The law is GREEN on
+memory and forced-file cache1;11 unchanged graph/local/validation/cycle laws pass
+in27.005674s. Actual productive4096 rerun passes in174.834329s with its whole
+oracle;16384 still fails VALIDATION TIME in481.844699s with sentinel preserved
+and no external watchdog. Thus the query-history correction does not suffice for
+that deadline. The identical promoted JUnit source observes RED1of3 in1.466634s
+on the earlier runtime and GREEN3of3 in2.117763s on the graph runtime, no skips.
+A frozen query-only runtime diagnostic closes with the same VALIDATION TIME
+in483.010598s, exact input and sentinel preserved. Samples120s declarations,
+240s local graph and360s grounding graph are not dominant-cost proof.
+The next exact context0 partition stores full(source,0) as a source-word index;
+all nonzero contexts retain complete tuples. Six independent1024/2048/4096
+memory/file-cache1 cost controls observe RED5.522563s then GREEN1.716765s,
+with pages/WORK exactly equal to the existing primitive dictionary. At4096,
+the preceding representation used7009 vs4668 pages and5648337 vs1299450 fileWORK.
+Eleven neighbors with strengthened zero/nonzero separation pass23.549063s;
+the fourth graph cost method is promoted, mandatory1473 retains all1472 earlier
+methods. The same promoted four-method source observes RED1of4 only at the new
+cost law2.218116s and GREEN4of4 in3.419871s, no skips. Static review proves the
+whole original test exact after removing only additions and only one inventory
+method added. FAST/full remain pending. Actual current productive4096 passes
+its whole oracle in136.223265s;16384 still fails VALIDATION TIME in481.303959s,
+identical bytes and original128m/default quotas/cache/shared480s, no watchdog,
+sentinel preserved. Representation gains do not suffice for this deadline;
+the later240/360/450s diagnostic closed exit7 in487.003543s, no external watchdog,
+sentinel/input preserved. Samples locate local-constraint identity interning,
+grounding and reference-admission identity memo insertion; no dominant cost is
+proven. Factory-boundary component diagnostic closed4096 structurally valid
+110.735692s and16384 TIME VALIDATION481.406100s,held resources zero,input
+unchanged,no external watchdog. For16384,decode153.5s,declarations25.6s,
+local constraints141.2s,grounding69.8s; final gap reaches general Validator
+precision reference checks over borrowed declarations,not exclusive method or
+dominant cause attribution. Ports untouched,envelope preflight not replayed;
+not CLI qualification. Archives context0-diagnostic17files545910B and admission
+stages13files576858B,each plus manifest,without binaries or large input copies.
+Next working identity memo delta uses existing sparse column at source-1 over
+all positive long addresses. Complete canonical tuples/equality stay unchanged.
+Twelve cost controls RED3.851993s/GREEN2.721222s match direct column pages/WORK;
+4096 spaced/file128/cache1 pages4668->6437 and WORK2172315->530127 is an
+explicit storage/work trade-off,not all-input improvement. NearMAX pages4668->606
+and WORK2209375->716066. Original18neighbors PASS40.023774s. Identical promoted
+seven-method identity family RED1of7 only new law16.439111s and GREEN7of7
+18.992168s,zero skips. Static review keeps all1472 original inventory methods and
+complete six-method identity source exact; mandatory1474 adds only two cost laws.
+Frozen15components928files differs from context0 only in identity memo class.
+Same-byte4096 passed129.715449s/whole oracle0;16384 still failed exit7 TIME
+VALIDATION485.914077s,no watchdog,sentinel preserved,original128m/defaults/480s.
+Identity focused59files722677B and actual12files538320B plus manifests and one
+large output by hash reference. This point memo alone does not resolve deadline.
+Next declaration point-index delta uses sparse key-1 column while preserving
+five-field dense rows/first-definition order/frontier/duplicates/sealing. Twelve
+controls RED12.164311s/GREEN7.527556s match direct pages/WORK. Spaced4096/file128/
+cache1 pages7594->9363,WORK7892588->1853084;nearMAX pages7594->3532,
+WORK7995344->2064098,not universal improvement. Original22neighbors
+PASS44.331364s,budgets/assertions unchanged. Identical four-method declaration
+source RED1of4 only new law2.869168s/GREEN4of4 zero skips9.929893s. Static
+review preserves complete original three-method source and1472 old inventory;
+mandatory1475 adds only three cost laws. Frozen928files15components differs
+from identity runtime only in declaration point-index class. Actual same-byte4096
+passed126.811060s/whole oracle0;16384 still TIME VALIDATION484.680551s,
+exit7,no watchdog,sentinel preserved,original128m/defaultcache/quota/480s.
+Declaration focused58files697969B and actual12files537114B plus manifests
+and one large output reference. Point laws do not resolve deadline alone.
+Exact seven-word tuple reuse observer now runs control4096:16 fixed entries,
+1536 funded bytes peridentityowner,all calls delegated,zero shortcuts. It closed
+structurally valid101.720161s:main owner4598328calls/1477667exact candidates;
+minor version owner5/1. Capacity zero,input/runtime unchanged;archive11files
+542659B plus manifest. Not CLI qualification,curve or dominant cause proof.
+Measured working delta now implements sixteen exact complete seven-word tuple
+candidates and handles,total1536funded control(+1280 vs point memo),unchanged
+limits. Each hit checks WORK/deadline;arena never collects during this port's
+lifetime and eviction never retires required tuples. Law RED2.248212s/GREEN
+1.568375s:16384warm calls WORK1657856memory/1799170file->16384each,37pages
+unchanged. Required1040tuples survive eviction;full signed64words/childrefs,
+spent warm-hit abort/cleanup tested. Original23neighbors PASS52.851822s;
+identical eight-method identity source RED1of8 only new law18.841979s,
+GREEN8of8 zero skips21.246688s. Static review preserves all1472 earlier methods
+and complete original six-method identity source;mandatory1476 adds four laws.
+Frozen928files15components differs only identity class since declaration runtime.
+Same-byte4096/16384 actualCLIs running128m/defaults/480s and whole oracle;
+no claim yet that this opportunity resolves the integrated deadline.
+ART local c6760033 captured245file preceding RUNNING frontier;foreign note and
+no-origin preserved. No newFAST/full/consumer source commit or global closure.
+Earlier header FAST/full qualification does not qualify this new graph
+delta. It is not the earlier
+computed/cold AIR-admission witness or proof of that witness's cause. Local
+header source commit1b628967af9e3b4d02a14e90f1911c8815de71f3 records the eight
+qualified source/test/inventory paths locally; evidence is reused by exact content,
+not rerun just for commit. The graph delta and C0 documents remain working;
+their commit and all remaining campaign frontiers below remain pending.
+The preceding FAST1468/full-prefix/remaining-command evidence applies only to
+the preceding runtime, not these 53 changed classfiles. Human review, provider/
+qualification/FILE/observation migration, common WORK coverage, original large
+admission, isolated repeated curves, campaign-wide E2E, legacy retirement and
+external authority remain open. This working section does not close the campaign.

@@ -12,7 +12,7 @@ public final class PagedSnapshotGraphStorage implements SnapshotGraphWalk.Storag
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation resident;
     private PagedLongArray tasks;
-    private PagedLongIndex ancestry,completed;
+    private PagedLongIndex ancestry,contextZero;
     private CanonicalTupleArena contexts;
     private long[] staged;
     private long size,currentNode,currentDepth;
@@ -24,7 +24,7 @@ public final class PagedSnapshotGraphStorage implements SnapshotGraphWalk.Storag
         resident=resources.reserve(AnalysisResources.Pool.RESIDENT,256,PHASE);
         try {
             staged=new long[2];tasks=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
-            ancestry=new PagedLongIndex(pages,resources,PHASE);completed=new PagedLongIndex(pages,resources,PHASE);
+            ancestry=new PagedLongIndex(pages,resources,PHASE);contextZero=new PagedLongIndex(pages,resources,PHASE);
             // Source handles are literal words, never references into the canonical context arena.
             contexts=new CanonicalTupleArena(pages,resources,PHASE,2,new int[0]);
         } catch(RuntimeException|Error failure) {
@@ -77,16 +77,21 @@ public final class PagedSnapshotGraphStorage implements SnapshotGraphWalk.Storag
             else if(!ancestry.remove(node))throw new IllegalStateException("graph ancestry marker missing");
         } catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
-    private long context(long node,int element) {
-        staged[0]=node;staged[1]=element;return contexts.intern(staged);
-    }
     @Override public synchronized boolean completed(long node,int element) {
         open();positive(node);if(element<0)throw new IllegalArgumentException("nonnegative graph context required");
-        try{return completed.find(context(node,element))!=0;}catch(RuntimeException|Error failure){failed=true;throw failure;}
+        // Only complete inserts a pair. A negative query must not retain query history.
+        try {
+            // (source,0) is exactly source; nonzero contexts remain complete two-word keys.
+            if(element==0)return contextZero.find(node)!=0;
+            staged[0]=node;staged[1]=element;return contexts.find(staged)!=0;
+        }catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     @Override public synchronized void complete(long node,int element) {
         open();positive(node);if(element<0)throw new IllegalArgumentException("nonnegative graph context required");
-        try{completed.intern(context(node,element),1);}catch(RuntimeException|Error failure){failed=true;throw failure;}
+        try {
+            if(element==0)contextZero.intern(node,1);
+            else {staged[0]=node;staged[1]=element;contexts.intern(staged);}
+        }catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     @Override public synchronized AirSnapshotBuilder.Lease claim(long bytes) {
         open();
@@ -99,9 +104,9 @@ public final class PagedSnapshotGraphStorage implements SnapshotGraphWalk.Storag
         if(closed)return;closed=true;Throwable failure=null;
         try{if(tasks!=null)tasks.close();}catch(RuntimeException|Error cleanup){failure=cleanup;}
         try{if(ancestry!=null)ancestry.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-        try{if(completed!=null)completed.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
+        try{if(contextZero!=null)contextZero.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         try{if(contexts!=null)contexts.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-        tasks=null;ancestry=null;completed=null;contexts=null;staged=null;size=currentNode=currentDepth=0;resident.close();
+        tasks=null;ancestry=null;contextZero=null;contexts=null;staged=null;size=currentNode=currentDepth=0;resident.close();
         if(failure instanceof RuntimeException exception)throw exception;if(failure instanceof Error error)throw error;
     }
 }

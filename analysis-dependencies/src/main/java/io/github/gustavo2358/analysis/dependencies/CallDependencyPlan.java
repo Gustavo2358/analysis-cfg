@@ -22,7 +22,10 @@ public final class CallDependencyPlan {
         };
     }
     static boolean readable(Operations.Invoke i) {
-        if(!(i.target() instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read r))return false;
+        return readable(i.target());
+    }
+    private static boolean readable(Interactions.Target target) {
+        if(!(target instanceof Interactions.ComputedTarget t&&t.name() instanceof Expressions.Read r))return false;
         return r.place() instanceof Places.ObjectPlace||r.place() instanceof Places.Choice||r.place() instanceof Places.RegionSlice slice
             &&slice.offset() instanceof Expressions.Literal offset&&offset.value() instanceof Values.IntValue
             &&slice.length() instanceof Expressions.Literal length&&length.value() instanceof Values.IntValue;
@@ -68,7 +71,10 @@ public final class CallDependencyPlan {
                 "scalarAdmissionAccepted","scalarAdmissionRefused","regionalAdmissionAttempts","regionalSelections",
                 "scalarSelections","possibleValuesQueries","deduplicatedValueQueries","sourceQualifiedResolvedByExistingQuery","entryCallCandidatesVisited"))metrics.put(key,0L);
         var invokes=new HashMap<UnitId,List<io.github.gustavo2358.analysis.structure.ProgramIndex.Site>>();
-        for(var site:session.index().sites(Operations.Invoke.class))if(selected((Operations.Invoke)site.operation()))
+        var nativeProgram=session.index().store() instanceof SnapshotProgram program?program:null;
+        for(var site:session.index().sites(Operations.Invoke.class))if(nativeProgram!=null
+            ?nativeProgram.plainDependencyOccurrenceFlags(nativeProgram.dependencyCallSource(site))!=0
+            :selected((Operations.Invoke)site.operation()))
             invokes.computeIfAbsent(site.owner().id(),ignored->new ArrayList<>()).add(site);
         for(var context:session.contexts()) {
             var entry=context.entryView().id();String id=part(entry.publication().localId())+part(entry.unit().localId())+part(entry.localId());
@@ -78,13 +84,20 @@ public final class CallDependencyPlan {
             var scoped=session.selectEntries(List.of(entry));
             for(var indexed:invokes.getOrDefault(entry.unit(),List.of())) {
                 metrics.merge("entryCallCandidatesVisited",1L,Math::addExact);
-                var invoke=(Operations.Invoke)indexed.operation();Provider provider;
+                long source=nativeProgram==null?0:nativeProgram.dependencyCallSource(indexed);
+                int flags=nativeProgram==null?0:nativeProgram.plainDependencyOccurrenceFlags(source);
+                var invoke=nativeProgram==null?(Operations.Invoke)indexed.operation():null;
+                OperationId operation=nativeProgram==null?invoke.header().id():nativeProgram.dependencyCallIdentity(source);
+                // Literal choice observes no target spelling/policy/body. A computed
+                // target still supplies the exact original expression to admission.
+                var target=nativeProgram==null?invoke.target():(flags&1)!=0?null:nativeProgram.dependencyCallTarget(source);
+                Provider provider;
                 metrics.merge("targetResolutionRequests",1L,Long::sum);
-                if(invoke.target() instanceof Interactions.LiteralTarget)provider=Provider.LITERAL;
+                if((flags&1)!=0||target instanceof Interactions.LiteralTarget)provider=Provider.LITERAL;
                 else {
                     metrics.merge("qualifiedComputedOccurrences",1L,Long::sum);
-                    if(!readable(invoke))provider=Provider.UNRESOLVED;
-                    else if(((Expressions.Read)((Interactions.ComputedTarget)invoke.target()).name()).place() instanceof Places.ObjectPlace object) {
+                    if(!readable(target))provider=Provider.UNRESOLVED;
+                    else if(((Expressions.Read)((Interactions.ComputedTarget)target).name()).place() instanceof Places.ObjectPlace object) {
                         boolean accepted=admission.computeIfAbsent(object.object(),subject->{
                             metrics.merge("scalarAdmissionAttempts",1L,Long::sum);
                             var probe=PossibleValuesAnalysis.prepare(scoped,PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(subject));
@@ -96,11 +109,11 @@ public final class CallDependencyPlan {
                         });
                         provider=accepted?Provider.SCALAR:Provider.REGIONAL;
                         if(accepted)demand.add(object.object());
-                        queries.add(new PointQuery<>(ProgramPoint.before(entry,invoke.header().id()),object.object()));
+                        queries.add(new PointQuery<>(ProgramPoint.before(entry,operation),object.object()));
                     } else provider=Provider.STORAGE;
                 }
-                providers.put(new SiteKey(entry,invoke.header().id()),provider);
-                selected.computeIfAbsent(provider,k->new HashSet<>()).add(invoke.header().id());
+                providers.put(new SiteKey(entry,operation),provider);
+                selected.computeIfAbsent(provider,k->new HashSet<>()).add(operation);
                 if(provider==Provider.SCALAR)metrics.merge("scalarSelections",1L,Long::sum);
                 if(provider==Provider.REGIONAL||provider==Provider.STORAGE)metrics.merge("regionalSelections",1L,Long::sum);
             }

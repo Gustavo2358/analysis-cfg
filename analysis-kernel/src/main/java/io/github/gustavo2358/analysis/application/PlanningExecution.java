@@ -15,6 +15,7 @@ public final class PlanningExecution implements AutoCloseable {
     private final Map<AnalysisKey,CachedRun> runs = new HashMap<>();
     private final Set<Long> executed = new HashSet<>();
     private final List<FactStorage<?>> factStores = new ArrayList<>();
+    private final List<AutoCloseable> planStores=new ArrayList<>();
     private long epoch;
     private boolean executing;
     public PlanningExecution(AnalysisSession session, AnalysisRegistry registry) {
@@ -23,7 +24,13 @@ public final class PlanningExecution implements AutoCloseable {
     public <F> ExecutionPlan<F> plan(List<ConsumerRegistration<F>> registrations) {
         requireOpen(); if (executing) throw new IllegalStateException("registration during execution requires a later explicit epoch");
         long next = Math.incrementExact(epoch);
-        var plan = SitePlanner.compile(identity,next,session,registry,registrations); epoch = next; return plan;
+        int first=planStores.size();
+        try{var plan = SitePlanner.compile(identity,next,session,registry,registrations,planStores::add,this::requireOpen);epoch = next;return plan;}
+        catch(RuntimeException|Error failure){
+            for(int at=planStores.size()-1;at>=first;at--)try{planStores.remove(at).close();}
+                catch(Exception|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}
+            throw failure;
+        }
     }
     public <F> PreparedAnalysisResult<F> execute(String resultId, ExecutionPlan<F> plan) {
         return execute(resultId,plan,null);
@@ -245,6 +252,8 @@ public final class PlanningExecution implements AutoCloseable {
         session = null; registry = null;
         Throwable failure = null;
         try {
+            for(int at=planStores.size()-1;at>=0;at--)try{planStores.get(at).close();}
+                catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
             for(var store:factStores)try{store.close();}
                 catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(cleanup!=failure)failure.addSuppressed(cleanup);}
             for (var run : runs.values()) {
@@ -254,7 +263,7 @@ public final class PlanningExecution implements AutoCloseable {
                     else if (cleanup != failure) failure.addSuppressed(cleanup);
                 }
             }
-        } finally { runs.clear(); executed.clear();factStores.clear(); }
+        } finally { runs.clear(); executed.clear();factStores.clear();planStores.clear(); }
         if (failure instanceof RuntimeException runtime) throw runtime;
         if (failure instanceof Error error) throw error;
     }

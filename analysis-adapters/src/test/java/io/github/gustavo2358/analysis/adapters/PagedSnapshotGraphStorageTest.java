@@ -17,10 +17,44 @@ final class PagedSnapshotGraphStorageTest {
     @Test void orderedPrimitiveFrontierAndExactContextMemoSpillWithoutHistoricalStackGrowth() {
         var resident=resources(32_000_000,1_000_000_000);var spilled=resources(65536,1_000_000_000);
         try(var memory=new MemoryPageStore(128,resident);var file=new FilePageStore(directory,128,1,spilled)) {
+            completionQueries(memory,resident);completionQueries(file,spilled);
             frontier(memory,resident);frontier(file,spilled);assertTrue(spilled.heapPeak()<=65536);
         }
         assertEquals(0,resident.heapUsed());assertEquals(0,spilled.heapUsed());
         assertEquals(0,spilled.used(AnalysisResources.Pool.TEMPORARY));
+    }
+    /** Query history is not required state; complete alone adds full source/context pairs. */
+    private static void completionQueries(PageStore pages,AnalysisResources ledger) {
+        long initial=ledger.heapUsed(),borrowed=pages.allocate(),node=(1L<<42)+7;
+        try {
+            try(var port=new PagedSnapshotGraphStorage(pages,ledger)) {
+                long live=pages.statistics().livePages(),heap=ledger.heapUsed(),temporary=ledger.used(AnalysisResources.Pool.TEMPORARY);
+                for(int n=0;n<1024;n++) {
+                    assertFalse(port.completed(node+n,n%7));
+                    assertEquals(live,pages.statistics().livePages());assertEquals(heap,ledger.heapUsed());
+                    assertEquals(temporary,ledger.used(AnalysisResources.Pool.TEMPORARY));
+                }
+                port.complete(node,1);port.complete(Long.MAX_VALUE,Integer.MAX_VALUE);
+                assertTrue(port.completed(node,1));assertTrue(port.completed(Long.MAX_VALUE,Integer.MAX_VALUE));
+                assertFalse(port.completed(node,2));assertFalse(port.completed(node+1,1));
+                assertFalse(port.completed(Long.MAX_VALUE-1,Integer.MAX_VALUE));
+                assertFalse(port.completed(Long.MAX_VALUE,Integer.MAX_VALUE-1));
+                port.active(node,true);assertFalse(port.completed(node,0));port.active(node,false);
+                port.complete(node+1,0);assertTrue(port.completed(node+1,0));assertFalse(port.completed(node+1,1));
+                port.complete(Long.MAX_VALUE,0);assertTrue(port.completed(Long.MAX_VALUE,0));
+                assertTrue(port.completed(Long.MAX_VALUE,Integer.MAX_VALUE));assertFalse(port.completed(Long.MAX_VALUE-1,0));
+                live=pages.statistics().livePages();heap=ledger.heapUsed();temporary=ledger.used(AnalysisResources.Pool.TEMPORARY);
+                for(int n=0;n<1024;n++) {
+                    assertFalse(port.completed(node+20+n,n%7));assertTrue(port.completed(node,1));
+                    assertEquals(live,pages.statistics().livePages());assertEquals(heap,ledger.heapUsed());
+                    assertEquals(temporary,ledger.used(AnalysisResources.Pool.TEMPORARY));
+                }
+            }
+            assertEquals(1,pages.statistics().livePages());
+            if(pages instanceof FilePageStore)assertEquals(initial,ledger.heapUsed());
+            byte[] probe=new byte[1];assertDoesNotThrow(()->pages.read(borrowed,0,probe,0,1));
+        } finally {pages.release(borrowed);}
+        assertEquals(0,pages.statistics().livePages());
     }
     private static void frontier(PageStore pages,AnalysisResources ledger) {
         long initial=ledger.heapUsed();
@@ -50,6 +84,38 @@ final class PagedSnapshotGraphStorageTest {
         }
         assertEquals(0,pages.statistics().livePages());if(pages instanceof FilePageStore)assertEquals(initial,ledger.heapUsed());
         long borrowed=pages.allocate();pages.release(borrowed);
+    }
+    @Test void zeroContextUsesExactSourceDictionaryWithoutDuplicatedTupleWorkOrPayload() {
+        for(int count:new int[]{1024,2048,4096})for(boolean file:new boolean[]{false,true}) {
+            var graphLedger=resources(32_000_000,1_000_000_000);var directLedger=resources(32_000_000,1_000_000_000);
+            long[] actual,baseline;
+            try(PageStore pages=file?new FilePageStore(directory,128,1,graphLedger):new MemoryPageStore(128,graphLedger)) {
+                actual=contextZeroCost(pages,graphLedger,count,true);
+                assertEquals(0,pages.statistics().livePages());
+            }
+            try(PageStore pages=file?new FilePageStore(directory,128,1,directLedger):new MemoryPageStore(128,directLedger)) {
+                baseline=contextZeroCost(pages,directLedger,count,false);
+                assertEquals(0,pages.statistics().livePages());
+            }
+            assertArrayEquals(baseline,actual,"full(source,0) must need no duplicated tuple payload or indirect comparison work");
+            assertEquals(0,graphLedger.heapUsed());assertEquals(0,directLedger.heapUsed());
+            assertEquals(0,graphLedger.used(AnalysisResources.Pool.TEMPORARY));assertEquals(0,directLedger.used(AnalysisResources.Pool.TEMPORARY));
+        }
+    }
+    /** Primitive dictionary is only a representation cost comparator, not a dependency oracle. */
+    private static long[] contextZeroCost(PageStore pages,AnalysisResources ledger,int count,boolean managedGraph) {
+        long beforePages=pages.statistics().livePages(),beforeWork=ledger.workUsed();
+        if(managedGraph)try(var graph=new PagedSnapshotGraphStorage(pages,ledger)) {
+            beforePages=pages.statistics().livePages();beforeWork=ledger.workUsed();
+            for(int at=count-1;at>=0;at--){long source=Long.MAX_VALUE-8192+at;assertFalse(graph.completed(source,0));graph.complete(source,0);}
+            for(int at=0;at<count;at++)assertTrue(graph.completed(Long.MAX_VALUE-8192+at,0));
+            return new long[]{pages.statistics().livePages()-beforePages,ledger.workUsed()-beforeWork};
+        } else try(var direct=new PagedLongIndex(pages,ledger,AnalysisResources.Phase.VALIDATION)) {
+            beforePages=pages.statistics().livePages();beforeWork=ledger.workUsed();
+            for(int at=count-1;at>=0;at--){long source=Long.MAX_VALUE-8192+at;assertEquals(0,direct.find(source));direct.intern(source,1);}
+            for(int at=0;at<count;at++)assertEquals(1,direct.find(Long.MAX_VALUE-8192+at));
+            return new long[]{pages.statistics().livePages()-beforePages,ledger.workUsed()-beforeWork};
+        }
     }
     @Test void completeTypedGrammarUsesManagedDeepFramesAndLeavesBorrowedInputAvailable() {
         var resident=resources(32_000_000,1_000_000_000);var spilled=resources(65536,1_000_000_000);

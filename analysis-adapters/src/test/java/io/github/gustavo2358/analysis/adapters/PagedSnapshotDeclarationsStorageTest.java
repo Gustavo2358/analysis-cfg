@@ -118,6 +118,56 @@ final class PagedSnapshotDeclarationsStorageTest {
         }
         assertEquals(0,pages.statistics().livePages());
     }
+    /** Point lookup and first-definition row order are distinct exact relations. */
+    @Test void exactPointIndexAvoidsOrderedLookupAndPreservesAllFiveFactsAndDefinitionOrder() {
+        for(int count:new int[]{1024,2048,4096})for(boolean high:new boolean[]{false,true})for(boolean file:new boolean[]{false,true}) {
+            var actualResources=resources(32_000_000,1_000_000_000);var baselineResources=resources(32_000_000,1_000_000_000);long[] actual,baseline;
+            try(PageStore pages=file?new FilePageStore(directory,128,1,actualResources):new MemoryPageStore(128,actualResources)) {
+                actual=pointIndexCost(pages,actualResources,count,high,true);
+            }
+            try(PageStore pages=file?new FilePageStore(directory,128,1,baselineResources):new MemoryPageStore(128,baselineResources)) {
+                baseline=pointIndexCost(pages,baselineResources,count,high,false);
+            }
+            assertArrayEquals(baseline,actual,"point index must not duplicate an ordered relation");
+            for(var ledger:new AnalysisResources[]{actualResources,baselineResources}) {
+                assertEquals(0,ledger.heapUsed());assertEquals(0,ledger.used(AnalysisResources.Pool.TEMPORARY));
+                assertEquals(0,ledger.used(AnalysisResources.Pool.OPEN_FILES));
+            }
+        }
+    }
+    private static long pointKey(int at,boolean high){return high?Long.MAX_VALUE-at:1L+32L*at;}
+    private static long pointFact(int at,int column){return 1L+at+column*10_000L;}
+    private static long[] pointIndexCost(PageStore pages,AnalysisResources ledger,int count,boolean high,boolean managed) {
+        long[] result;
+        if(managed) {
+            try(var port=new PagedSnapshotDeclarationsStorage(pages,ledger)) {
+                long before=pages.statistics().livePages(),work=ledger.workUsed();
+                for(int at=count-1;at>=0;at--)assertTrue(port.define(pointKey(at,high),pointFact(at,0),pointFact(at,1),pointFact(at,2),pointFact(at,3),pointFact(at,4)));
+                for(int epoch=0;epoch<4;epoch++)for(int at=0;at<count;at++)for(var fact:SnapshotDeclarations.Fact.values())assertEquals(pointFact(at,fact.ordinal()),port.fact(pointKey(at,high),fact));
+                result=new long[]{pages.statistics().livePages()-before,ledger.workUsed()-work};
+                long live=pages.statistics().livePages();
+                for(int at=0;at<1024;at++)assertEquals(0,port.fact(1_000_000_000L+at,SnapshotDeclarations.Fact.NODE));
+                assertEquals(live,pages.statistics().livePages());
+                assertFalse(port.define(pointKey(0,high),99,98,97,96,95));
+                for(int at=0;at<count;at++)for(var fact:SnapshotDeclarations.Fact.values())assertEquals(pointFact(at,fact.ordinal()),port.declaration(count-1-at,fact));
+                port.freeze();assertEquals(1,port.fact(pointKey(0,high),SnapshotDeclarations.Fact.NODE));
+                assertThrows(IllegalStateException.class,()->port.define(pointKey(0,high),1,2,3,4,5));
+                assertEquals(10001,port.fact(pointKey(0,high),SnapshotDeclarations.Fact.IDENTITY));
+            }
+        } else {
+            try(var index=new PagedLongArray(pages,Long.MAX_VALUE,ledger,AnalysisResources.Phase.VALIDATION);
+                var rows=new PagedLongArray(pages,Long.MAX_VALUE,ledger,AnalysisResources.Phase.VALIDATION)) {
+                long before=pages.statistics().livePages(),work=ledger.workUsed();
+                for(int at=count-1;at>=0;at--){assertEquals(0,index.get(pointKey(at,high)-1));long ordinal=count-at;
+                    for(int column=0;column<5;column++)rows.set((ordinal-1)*5+column,pointFact(at,column));index.set(pointKey(at,high)-1,ordinal);}
+                for(int epoch=0;epoch<4;epoch++)for(int at=0;at<count;at++)for(int column=0;column<5;column++) {
+                    long ordinal=index.get(pointKey(at,high)-1);assertEquals(pointFact(at,column),rows.get((ordinal-1)*5+column));
+                }
+                result=new long[]{pages.statistics().livePages()-before,ledger.workUsed()-work};
+            }
+        }
+        assertEquals(0,pages.statistics().livePages());long borrowed=pages.allocate();pages.release(borrowed);return result;
+    }
     @Test void deniedConstructionAndSpentWorkAbortCleanlyWithoutClosingBorrowedPageStore() {
         for(long heap:new long[]{1000,4000,7000,10000}) {
             var resources=resources(heap,1_000_000);

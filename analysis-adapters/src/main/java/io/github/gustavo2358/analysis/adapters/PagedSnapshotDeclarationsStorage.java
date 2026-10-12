@@ -17,7 +17,7 @@ public final class PagedSnapshotDeclarationsStorage implements SnapshotDeclarati
     private static final int FACTS=5,QUEUE_FIELDS=3;
     private final AnalysisResources resources;
     private final AnalysisResources.Reservation resident;
-    private PagedLongIndex index;
+    private PagedLongArray index;
     private PagedLongArray rows,frontier;
     private long count,head,tail,currentNode,currentOwner,currentDepth;
     private boolean closed,failed,frozen;
@@ -26,7 +26,7 @@ public final class PagedSnapshotDeclarationsStorage implements SnapshotDeclarati
         Objects.requireNonNull(pages);this.resources=Objects.requireNonNull(resources);
         resident=resources.reserve(AnalysisResources.Pool.RESIDENT,256,PHASE);
         try {
-            index=new PagedLongIndex(pages,resources,PHASE);
+            index=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
             rows=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
             frontier=new PagedLongArray(pages,Long.MAX_VALUE,resources,PHASE);
         } catch(RuntimeException|Error failure){closeSuppressed(failure);throw failure;}
@@ -35,20 +35,22 @@ public final class PagedSnapshotDeclarationsStorage implements SnapshotDeclarati
         mutable();positive(key);positive(node);positive(identity);
         if(unit<0||sequence<0||owner<0)throw new IllegalArgumentException("nonnegative AIR association handles required");
         try {
-            if(index.find(key)!=0)return false;
+            if(index.get(key-1)!=0)return false;
             if(count==Long.MAX_VALUE/FACTS)throw new IllegalStateException("AIR declaration address space exhausted");
             long offset=count*FACTS;
             rows.set(offset,node);rows.set(offset+1,identity);rows.set(offset+2,unit);
             rows.set(offset+3,sequence);rows.set(offset+4,owner);
             long ordinal=count+1;
-            if(index.intern(key,ordinal)!=ordinal)throw new IllegalStateException("AIR declaration key changed during definition");
+            // Exact positive key addressing is independent of dense first-definition row order.
+            // This owner alone writes the index, under the same synchronized definition.
+            index.set(key-1,ordinal);
             count++;return true;
         } catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     @Override public synchronized long fact(long key,SnapshotDeclarations.Fact field) {
         open();positive(key);Objects.requireNonNull(field);
         try {
-            long ordinal=index.find(key);return ordinal==0?0:rows.get((ordinal-1)*FACTS+field.ordinal());
+            long ordinal=index.get(key-1);return ordinal==0?0:rows.get((ordinal-1)*FACTS+field.ordinal());
         } catch(RuntimeException|Error failure){failed=true;throw failure;}
     }
     @Override public synchronized long declaration(long ordinal,SnapshotDeclarations.Fact field) {

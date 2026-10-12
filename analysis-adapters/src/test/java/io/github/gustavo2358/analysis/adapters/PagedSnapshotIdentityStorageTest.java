@@ -211,6 +211,92 @@ final class PagedSnapshotIdentityStorageTest {
         assertEquals(0,pages.statistics().livePages());
         if(pages instanceof FilePageStore)assertEquals(initial,ledger.heapUsed());return result;
     }
+    /** Point-address memo law; the sparse-column comparator is not a full admission oracle. */
+    @Test void exactAddressMemoAvoidsOrderedLookupAndKeepsFullSparsePositiveDomain() {
+        for(int count:new int[]{1024,2048,4096})for(boolean high:new boolean[]{false,true})for(boolean file:new boolean[]{false,true}) {
+            var actualResources=resources(32_000_000);var baselineResources=resources(32_000_000);long[] actual,baseline;
+            try(PageStore pages=file?new FilePageStore(directory,128,1,actualResources):new MemoryPageStore(128,actualResources)) {
+                actual=addressMemoCost(pages,actualResources,count,high,true);
+            }
+            try(PageStore pages=file?new FilePageStore(directory,128,1,baselineResources):new MemoryPageStore(128,baselineResources)) {
+                baseline=addressMemoCost(pages,baselineResources,count,high,false);
+            }
+            assertArrayEquals(baseline,actual,"point memo must use the exact sparse address mapping without ordered-index overhead");
+            for(var ledger:new AnalysisResources[]{actualResources,baselineResources}) {
+                assertEquals(0,ledger.heapUsed());assertEquals(0,ledger.used(AnalysisResources.Pool.TEMPORARY));
+                assertEquals(0,ledger.used(AnalysisResources.Pool.OPEN_FILES));
+            }
+        }
+    }
+    private static long addressMemoSource(int at,boolean high){return high?Long.MAX_VALUE-at:1L+32L*at;}
+    private static long[] addressMemoCost(PageStore pages,AnalysisResources ledger,int count,boolean high,boolean managed) {
+        long[] result;
+        if(managed) {
+            try(var port=new PagedSnapshotIdentityStorage(pages,ledger)) {
+                long before=pages.statistics().livePages(),work=ledger.workUsed();
+                for(int at=count-1;at>=0;at--){long source=addressMemoSource(at,high);assertEquals(0,port.known(source));port.remember(source,1L+at);}
+                for(int epoch=0;epoch<4;epoch++)for(int at=0;at<count;at++)assertEquals(1L+at,port.known(addressMemoSource(at,high)));
+                result=new long[]{pages.statistics().livePages()-before,ledger.workUsed()-work};
+                long live=pages.statistics().livePages();
+                for(int at=0;at<1024;at++)assertEquals(0,port.known(1_000_000_000L+at));
+                assertEquals(live,pages.statistics().livePages(),"negative queries retain no pages");
+                port.remember(addressMemoSource(0,high),1);assertEquals(1,port.known(addressMemoSource(0,high)));
+                var conflict=assertThrows(IllegalStateException.class,()->port.remember(addressMemoSource(0,high),2));
+                assertEquals("immutable snapshot identity memo changed",conflict.getMessage());
+                assertThrows(IllegalStateException.class,()->port.known(addressMemoSource(0,high)));
+            }
+        } else {
+            try(var direct=new PagedLongArray(pages,Long.MAX_VALUE,ledger,AnalysisResources.Phase.VALIDATION)) {
+                long before=pages.statistics().livePages(),work=ledger.workUsed();
+                for(int at=count-1;at>=0;at--){long index=addressMemoSource(at,high)-1;assertEquals(0,direct.get(index));assertEquals(0,direct.get(index));direct.set(index,1L+at);}
+                for(int epoch=0;epoch<4;epoch++)for(int at=0;at<count;at++)assertEquals(1L+at,direct.get(addressMemoSource(at,high)-1));
+                result=new long[]{pages.statistics().livePages()-before,ledger.workUsed()-work};
+            }
+        }
+        assertEquals(0,pages.statistics().livePages());long borrowed=pages.allocate();pages.release(borrowed);
+        return result;
+    }
+    @Test void fixedCompleteTupleWorkingSetConsumesGuardedWorkWithoutLimitingRequiredCardinality() {
+        var resident=resources(8_000_000);var spilled=resources(32768);
+        try(var memory=new MemoryPageStore(128,resident);var file=new FilePageStore(directory,128,1,spilled)) {
+            fixedTupleReuse(memory,resident);fixedTupleReuse(file,spilled);assertTrue(spilled.heapPeak()<=32768);
+        }
+        for(var ledger:new AnalysisResources[]{resident,spilled}) {
+            assertEquals(0,ledger.heapUsed());assertEquals(0,ledger.used(AnalysisResources.Pool.TEMPORARY));
+            assertEquals(0,ledger.used(AnalysisResources.Pool.OPEN_FILES));
+        }
+    }
+    private static long fixedTuple(PagedSnapshotIdentityStorage port,int n) {
+        return port.intern(1,0,0,Long.MIN_VALUE+n,(1L<<44)+n,-17-n,Long.MAX_VALUE-n);
+    }
+    private static void fixedTupleReuse(PageStore pages,AnalysisResources ledger) {
+        try(var port=new PagedSnapshotIdentityStorage(pages,ledger)) {
+            long[] keys=new long[16];for(int n=0;n<16;n++)keys[n]=fixedTuple(port,n);
+            long live=pages.statistics().livePages(),work=ledger.workUsed();
+            for(int epoch=0;epoch<1024;epoch++)for(int n=0;n<16;n++)assertEquals(keys[n],fixedTuple(port,n));
+            assertEquals(1024L*16,ledger.workUsed()-work,"exact fixed working-set hits must consume one guarded unit,not replay ordered lookup");
+            assertEquals(live,pages.statistics().livePages());
+            for(int n=16;n<1040;n++) {
+                long key=fixedTuple(port,n);assertEquals(1,port.word(key,0));assertEquals(0,port.word(key,1));assertEquals(0,port.word(key,2));
+                assertEquals(Long.MIN_VALUE+n,port.word(key,3));assertEquals((1L<<44)+n,port.word(key,4));
+                assertEquals(-17-n,port.word(key,5));assertEquals(Long.MAX_VALUE-n,port.word(key,6));
+            }
+            for(int n=0;n<16;n++)assertEquals(keys[n],fixedTuple(port,n),"candidate eviction never retires required tuples");
+            long parent=port.intern(2,keys[0],keys[1],Long.MIN_VALUE,3,4,Long.MAX_VALUE);
+            assertEquals(parent,port.intern(2,keys[0],keys[1],Long.MIN_VALUE,3,4,Long.MAX_VALUE));
+            assertNotEquals(parent,port.intern(2,keys[0],keys[2],Long.MIN_VALUE,3,4,Long.MAX_VALUE));
+            assertNotEquals(parent,port.intern(2,keys[2],keys[1],Long.MIN_VALUE,3,4,Long.MAX_VALUE));
+            if(pages instanceof FilePageStore)assertTrue(ledger.used(AnalysisResources.Pool.TEMPORARY)>32768);
+        }
+        assertEquals(0,pages.statistics().livePages());long borrowed=pages.allocate();pages.release(borrowed);
+        try(var port=new PagedSnapshotIdentityStorage(pages,ledger)) {
+            fixedTuple(port,7);ledger.work(ledger.limits().workUnits()-ledger.workUsed(),AnalysisResources.Phase.VALIDATION);
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->fixedTuple(port,7));
+            assertEquals(AnalysisResources.Resource.WORK,failure.resource());assertEquals(AnalysisResources.Phase.VALIDATION,failure.phase());
+            assertThrows(IllegalStateException.class,()->fixedTuple(port,7));
+        }
+        assertEquals(0,pages.statistics().livePages());
+    }
     private static void add(List<Long> handles,List<Object> expected,long handle,Object value){handles.add(handle);expected.add(value);}
     private static long field(AirSnapshot snapshot,long record,String name) {
         AirShape shape=snapshot.shape(record);

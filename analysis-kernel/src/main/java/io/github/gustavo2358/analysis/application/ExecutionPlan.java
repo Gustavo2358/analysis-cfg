@@ -19,7 +19,7 @@ public final class ExecutionPlan<F> {
                   Map<String,List<SiteView>> sites, List<AnalysisKey> keys, Map<String,BatchPlan> batches,
                   Map<String,Map<String,Set<PointQuery<?>>>> requests, Map<String,Long> metrics) {
         this.owner = owner; this.epoch = epoch; this.registrations = List.copyOf(registrations);
-        var selected = new TreeMap<String,List<SiteView>>(); sites.forEach((k,v) -> selected.put(k,List.copyOf(v))); this.sites = Collections.unmodifiableMap(selected);
+        var selected = new TreeMap<String,List<SiteView>>(); sites.forEach((k,v) -> selected.put(k,v instanceof SitePlanner.NativeSites?Collections.unmodifiableList(v):List.copyOf(v))); this.sites = Collections.unmodifiableMap(selected);
         this.keys = List.copyOf(keys); this.batches = Collections.unmodifiableMap(new TreeMap<>(batches));
         var requested = new TreeMap<String,Map<String,Set<PointQuery<?>>>>();
         requests.forEach((consumer, byBatch) -> {

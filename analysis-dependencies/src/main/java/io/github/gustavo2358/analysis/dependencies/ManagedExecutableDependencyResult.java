@@ -9,7 +9,7 @@ import java.util.function.ToIntFunction;
 /** Complete general native CALL result owner, not a direct-profile engine.
  * Canonical full-key index, order, edge prefixes and annotations are paged.
  * A cursor holds one funded complete DTO until advance/close. List get remains
- * explicit detached compatibility. FILE, observations, plain qualification and
+ * explicit detached compatibility. FILE, observations, source qualification and
  * nested proof/candidate DTOs are separate migration debt, not all-store claims.
  * Never owns the checked program or shared page backend. */
 public final class ManagedExecutableDependencyResult implements AutoCloseable {
@@ -20,6 +20,8 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     private PagedDependencyFactStorage facts;
     private PagedLongIndex index,operations;
     private PagedLongArray annotations,order;
+    private PagedLongArray occurrenceRows;
+    private int occurrenceCount,plainComputed;
     private EntryId soughtEntry;
     private OperationId soughtOperation;
     private char[] headerLeft,headerRight;
@@ -56,6 +58,23 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     private void available(){live();if(!ready)throw new IllegalStateException("managed executable dependency result incomplete");}
+    /** Canonical admitted operation addresses and small descriptor flags only.
+     * The original plain order is independent of sorted fact/output order. */
+    void qualifyPlain(){
+        live();if(occurrences!=null)throw new IllegalStateException("plain qualification already prepared");
+        try{
+            occurrenceRows=new PagedLongArray(pages,Long.MAX_VALUE,resources,AnalysisResources.Phase.DEMAND);
+            program.plainDependencyOccurrenceHandles(handle->{
+                int flags=program.plainDependencyOccurrenceFlags(handle),ordinal=occurrenceCount;
+                occurrenceRows.set(ordinal*2L,handle);occurrenceRows.set(ordinal*2L+1,flags);
+                occurrenceCount=Math.incrementExact(occurrenceCount);if((flags&1)==0)plainComputed=Math.incrementExact(plainComputed);
+            });
+            occurrences=new io.github.gustavo2358.analysis.structure.ProgramStore.BorrowedList<>(occurrenceCount,
+                ordinal->{live();long at=ordinal*2L;return program.plainDependencyOccurrence(occurrenceRows.get(at),Math.toIntExact(occurrenceRows.get(at+1)));},this::live);
+        }catch(RuntimeException|Error failure){abort(failure);throw failure;}
+    }
+    private long occurrenceFunding(int ordinal){return occurrenceRows==null?0:program.plainDependencyOccurrenceFunding(occurrenceRows.get(ordinal*2L));}
+    DependencyInput.Qualification plainQualification(){live();if(occurrenceRows==null)throw new IllegalStateException("plain qualification absent");return new DependencyInput.Qualification(Optional.empty(),occurrences);}
     FactStorage<DependencySiteFact> transaction(){live();return facts.transaction(metadataRecorder);}
     /** Borrow already-funded producer IDs once; persist only owner-local ordinal
      * and three annotation bits in the same paged fact row. No DTO is retained. */
@@ -184,6 +203,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         available();Objects.checkIndex(ordinal,occurrences.size());ProgramProjection projection=null;AnalysisResources.Reservation capacity=null;
         try {
             capacity=resources.reserve(AnalysisResources.Pool.SCRATCH,1024,AnalysisResources.Phase.REPLAY);
+            capacity.grow(occurrenceFunding(ordinal),AnalysisResources.Phase.REPLAY);
             projection=new ProgramProjection(capacity);projection.next=programProjections;if(programProjections!=null)programProjections.previous=projection;programProjections=projection;capacity=null;
             projection.capacity.onOwnerClose(projection::close);projection.open();
             var occurrence=occurrences.get(ordinal);
@@ -207,12 +227,13 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         }catch(RuntimeException|Error failure){abort(failure);if(capacity!=null)try{capacity.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
     }
     /** General PROGRAM assembly over real fact ordinals. The original complete
-     * projection remains explicit compatibility; occurrence/header DTOs remain
-     * separate debt,not disguised as a bounded provider or SOURCE bridge. */
+     * projection remains explicit compatibility. Plain descriptors are funded here;
+     * SOURCE/proof DTOs remain debt,not a bounded provider or SOURCE bridge. */
     public ProgramCursor openProgram(int ordinal){
         available();Objects.checkIndex(ordinal,occurrences.size());AnalysisResources.Reservation capacity=null;
         try{
             capacity=resources.reserve(AnalysisResources.Pool.RESIDENT,4096,AnalysisResources.Phase.SORT);
+            capacity.grow(occurrenceFunding(ordinal),AnalysisResources.Phase.SORT);
             var cursor=new ProgramCursor(occurrences.get(ordinal),capacity);capacity=null;cursor.capacity.onOwnerClose(cursor::close);cursor.initialize();cursor.open();return cursor;
         }catch(RuntimeException|Error failure){abort(failure);if(capacity!=null)try{capacity.close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
     }
@@ -402,7 +423,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         live();occurrences=qualification.occurrences();ready=true;
         try {
             var counts=new TreeMap<>(base.metrics());
-            counts.put("sourceQualifiedResolvedByExistingQuery",0L);counts.put("qualifiedComputedOccurrences",qualification.occurrences().stream().filter(o->o.targetKind().equals("COMPUTED")&&(!o.qualifications().isEmpty()||!o.executableOperations().isEmpty())).count());
+            counts.put("sourceQualifiedResolvedByExistingQuery",0L);counts.put("qualifiedComputedOccurrences",occurrenceRows!=null?(long)plainComputed:qualification.occurrences().stream().filter(o->o.targetKind().equals("COMPUTED")&&(!o.qualifications().isEmpty()||!o.executableOperations().isEmpty())).count());
             counts.put("conditionalSourceValueRuns",0L);counts.put("conditionalSourceValueQueries",0L);counts.put("conditionalSourceWorkItems",0L);counts.put("conditionalSourceResourceLimits",0L);counts.put("targetResolutionRequests",(long)qualification.occurrences().size());
             var programs=DependencyResult.borrowedResult(qualification.occurrences().size(),i->{try(var projection=projectProgram(i)){return projection.resolution();}},this::available,()->false,()->false);
             result=new DependencyResult(base.publication(),base.airVersion(),siteView(),edgeView(),counts,base.publicationInventory(),base.origins(),base.artifacts(),base.sourceUncertaintyRefs(),base.analysisReasons(),base.fileDependencies(),base.sourceDependencies(),base.sourceQualifiedDependencies(),programs);return result;
@@ -500,9 +521,9 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         while(programCursors!=null)try{programCursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         while(programProjections!=null)try{programProjections.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         while(cursors!=null)try{cursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-        for(var owned:new AutoCloseable[]{order,annotations,operations,index,facts,control})if(owned!=null)try{owned.close();}
+        for(var owned:new AutoCloseable[]{occurrenceRows,order,annotations,operations,index,facts,control})if(owned!=null)try{owned.close();}
             catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-        order=null;annotations=null;operations=null;index=null;facts=null;control=null;program=null;result=null;resources=null;pages=null;occurrences=null;soughtEntry=null;soughtOperation=null;headerLeft=null;headerRight=null;metadataRecorder=null;metadataFlags=null;
+        occurrenceRows=null;order=null;annotations=null;operations=null;index=null;facts=null;control=null;program=null;result=null;resources=null;pages=null;occurrences=null;soughtEntry=null;soughtOperation=null;headerLeft=null;headerRight=null;metadataRecorder=null;metadataFlags=null;
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("managed executable cleanup",failure);
     }
 }

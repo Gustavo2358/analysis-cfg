@@ -45,6 +45,12 @@ public final class FilePageStore implements PageStore {
     private FileChannel channel;
     private int clock, freeCount;
     private long issued, physical, freeHead, live, hits, misses, evictions, bytesRead, bytesWritten;
+    // Private diagnostic counter; not a fact, quota, wire metric or cache key.
+    private long directoryProbes;
+    // Four fixed full-generation address candidates, never payload or required state.
+    // The fixed cache row remains authoritative after release/replacement/reuse.
+    private long lastLookupHandle, secondLookupHandle, thirdLookupHandle, fourthLookupHandle;
+    private int lastLookupSlot=-1, secondLookupSlot=-1, thirdLookupSlot=-1, fourthLookupSlot=-1;
     private boolean cleaning;
     private boolean closed, failed;
     private Reason failedReason;
@@ -66,7 +72,8 @@ public final class FilePageStore implements PageStore {
         while (slots < (long) cachePages * 2) slots <<= 1;
         mask = slots - 1;
         // Conservative capacity including arrays, per-page headers, cache directory and control state.
-        long capacity = Math.addExact(512, Math.addExact(Math.multiplyExact((long) cachePages,
+        // Fund 64 additional fixed bytes for four primitive address pairs and diagnostics.
+        long capacity = Math.addExact(576, Math.addExact(Math.multiplyExact((long) cachePages,
                 (long) pageBytes + 128), Math.multiplyExact((long) slots, 16)));
         try {
             resident = resources.reserve(AnalysisResources.Pool.RESIDENT, capacity, phase);
@@ -182,9 +189,20 @@ public final class FilePageStore implements PageStore {
 
     private int slot(long page) {
         requireAddress(page);
+        if(page==lastLookupHandle&&lastLookupSlot>=0&&handles[lastLookupSlot]==page) {
+            hits++;referenced[lastLookupSlot]=true;return lastLookupSlot;
+        }
+        int recent = -1;
+        if(page==secondLookupHandle&&secondLookupSlot>=0&&handles[secondLookupSlot]==page) recent=secondLookupSlot;
+        else if(page==thirdLookupHandle&&thirdLookupSlot>=0&&handles[thirdLookupSlot]==page) recent=thirdLookupSlot;
+        else if(page==fourthLookupHandle&&fourthLookupSlot>=0&&handles[fourthLookupSlot]==page) recent=fourthLookupSlot;
+        if(recent>=0) {
+            rememberLookup(page,recent);hits++;referenced[recent]=true;return recent;
+        }
         int cached = find(page);
         if (cached >= 0) {
             if (handles[cached] != page) throw new Failure(Reason.INVALID_HANDLE, "obsolete page generation");
+            rememberLookup(page,cached);
             hits++; referenced[cached] = true; return cached;
         }
         misses++;
@@ -199,8 +217,22 @@ public final class FilePageStore implements PageStore {
             if (crc(pages[slot]) != expected) throw corruption("page checksum mismatch");
             handles[slot] = page; referenced[slot] = true; dirty[slot] = false;
             insert(page, slot);
+            rememberLookup(page,slot);
             return slot;
         } catch (IOException io) { throw ioFailure(io); }
+    }
+
+    private void rememberLookup(long page,int slot) {
+        if(page!=lastLookupHandle) {
+            if(page!=secondLookupHandle) {
+                if(page!=thirdLookupHandle) {
+                    fourthLookupHandle=thirdLookupHandle;fourthLookupSlot=thirdLookupSlot;
+                }
+                thirdLookupHandle=secondLookupHandle;thirdLookupSlot=secondLookupSlot;
+            }
+            secondLookupHandle=lastLookupHandle;secondLookupSlot=lastLookupSlot;
+        }
+        lastLookupHandle=page;lastLookupSlot=slot;
     }
 
     private int replacement() {
@@ -289,6 +321,7 @@ public final class FilePageStore implements PageStore {
         key &= SLOT_MASK;
         int at = bucket(key);
         for (int n = 0; n < directoryKeys.length; n++, at = (at + 1) & mask) {
+            directoryProbes++;
             if (directoryKeys[at] == 0) return -1;
             if (directoryKeys[at] == key) return directorySlots[at];
         }
@@ -358,6 +391,8 @@ public final class FilePageStore implements PageStore {
         resident.close(); descriptor.close();
         // Closing transfers no page graph to the caller; even a retained closed adapter is small.
         pages = null; payloadBuffers = null; handles = null; dirty = null; referenced = null;live=0;
+        lastLookupHandle=secondLookupHandle=thirdLookupHandle=fourthLookupHandle=0;
+        lastLookupSlot=secondLookupSlot=thirdLookupSlot=fourthLookupSlot=-1;
         directoryKeys = null; directorySlots = null; freeSlots = null;
         header = null; checksum = null;
         if (deleted) temporary.close(); // Failed cleanup must not pretend that disk was reclaimed.

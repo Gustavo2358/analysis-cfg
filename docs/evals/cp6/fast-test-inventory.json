@@ -409,15 +409,19 @@
       "failedConstructionAndSpentWorkReleaseOwnedIndexesWithoutClosingBorrowedInput",
       "streamedAtomSummariesMatchAcrossBackendsAndSurvivePayloadLargerThanResidency",
       "tupleMetadataReadFailureAbortsPortAndKeepsBorrowedSnapshotAvailable",
-      "hugeIntegerOrderAndWhitespaceFactsAgreeAcrossBackendsWithoutPayloadReplay"
+      "hugeIntegerOrderAndWhitespaceFactsAgreeAcrossBackendsWithoutPayloadReplay",
+      "exactAddressMemoAvoidsOrderedLookupAndKeepsFullSparsePositiveDomain",
+      "fixedCompleteTupleWorkingSetConsumesGuardedWorkWithoutLimitingRequiredCardinality"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotDeclarationsStorageTest": [
       "declarationPayloadAndEveryFrontierOccurrenceSpillWithoutChangingPrimitiveFacts",
       "completeDeclarationInventoryMatchesIndependentFactsAcrossBorrowedResidentAndPagedInputs",
-      "deniedConstructionAndSpentWorkAbortCleanlyWithoutClosingBorrowedPageStore"
+      "deniedConstructionAndSpentWorkAbortCleanlyWithoutClosingBorrowedPageStore",
+      "exactPointIndexAvoidsOrderedLookupAndPreservesAllFiveFactsAndDefinitionOrder"
     ],
     "io.github.gustavo2358.analysis.adapters.PagedSnapshotGraphStorageTest": [
       "orderedPrimitiveFrontierAndExactContextMemoSpillWithoutHistoricalStackGrowth",
+      "zeroContextUsesExactSourceDictionaryWithoutDuplicatedTupleWorkOrPayload",
       "completeTypedGrammarUsesManagedDeepFramesAndLeavesBorrowedInputAvailable",
       "constructionAndOperationalFailureCloseEveryOwnedIndexAndKeepBorrowedRunStore"
     ],
@@ -575,6 +579,27 @@
     ],
     "io.github.gustavo2358.analysis.adapters.NativeGeneralHeaderWidthTest": [
       "realSingleLiteralCallKeepsCompleteWideOperationIdentityWithoutFullHeaderProjection"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeCallPlanTargetTest": [
+      "literalProviderChoiceReadsOnlyTypedSelectionMetadataAndCompleteIdentities"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeFilePageLookupTest": [
+      "repeatedSameFullHandleAvoidsGeneralDirectoryProbesWithoutCachingPayload",
+      "actualProbeCounterAndGenerationEvictionCorruptionRangesAndCloseRemainExact"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeFilePageWorkingSetTest": [
+      "boundedTwoThreeFourPageTracesAvoidGeneralProbesAndPreservePayloadAndPhysicalCache",
+      "allCandidatePositionsRejectStaleGenerationsAndEvictedRowsAndLargerWorkingSetsRemainExact"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativePlainQualificationTest": [
+      "plainQualificationKeepsOnlyPagedAddressesAndReadsNoColdInvokePayload"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeRecipeInsertionCostTest": [
+      "insertionsUseOneCanonicalInternAndMembershipUsesExactMonotonicCardinality",
+      "completeKeysZeroRootsReadonlyMissesPoisonedReuseAndBorrowedPagesStayExact"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeSitePlanOwnershipTest": [
+      "nativePlanRetainsPagedSelectionNotCompleteColdOperationsAndExpiresWithExecution"
     ],
     "io.github.gustavo2358.analysis.adapters.NativeHeaderMetadataTest": [
       "sameRowMetadataCommitsWithPrefixRollsBackWithTailAndNeverRevivesExpiredScopes",
