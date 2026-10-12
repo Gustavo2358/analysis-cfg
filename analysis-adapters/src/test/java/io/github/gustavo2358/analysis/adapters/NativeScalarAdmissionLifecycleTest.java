@@ -9,6 +9,7 @@ import io.github.gustavo2358.analysis.dependencies.*;
 import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.structure.*;
 import io.github.gustavo2358.analysis.values.StorageAnalysisMode;
+import io.github.gustavo2358.analysis.values.PossibleValuesAnalysis;
 import java.lang.reflect.*;
 import java.nio.file.*;
 import java.util.*;
@@ -18,7 +19,7 @@ import static io.github.gustavo2358.analysis.adapters.ResultFixtures.*;
 
 /** Prospective order-control capacity laws; not whole-plan residency or allstore. */
 final class NativeScalarAdmissionLifecycleTest {
-    private enum Fault { NONE, RESERVE, GROW, EXPIRE, QUOTA }
+    private enum Fault { NONE, RESERVE, GROW, EXPIRE, QUOTA, VIEW_RESERVE, VIEW_QUOTA, VIEW_EXPIRE }
     private static final class InjectedFailure extends RuntimeException {
         private static final long serialVersionUID=1L;
     }
@@ -28,10 +29,21 @@ final class NativeScalarAdmissionLifecycleTest {
         final ProgramStore.ExecutionBudget delegate;
         final InjectedFailure marker=new InjectedFailure();
         Fault fault=Fault.NONE;
-        int reserves,grows,live;
+        int reserves,grows,live,viewReserves;
         Budget(SnapshotProgram program,AnalysisResources resources){this.program=program;this.resources=resources;delegate=program.executionBudget().orElseThrow();}
         public ProgramStore.CapacityLease reserve(ProgramStore.CapacityPool pool,long amount,ProgramStore.ExecutionPhase phase) {
             boolean order=pool==ProgramStore.CapacityPool.SCRATCH&&phase==ProgramStore.ExecutionPhase.DEMAND&&amount==160;
+            boolean view=pool==ProgramStore.CapacityPool.SCRATCH&&phase==ProgramStore.ExecutionPhase.DEMAND&&amount==512;
+            if(view) {
+                viewReserves++;
+                if(fault==Fault.VIEW_RESERVE)throw marker;
+                if(fault==Fault.VIEW_EXPIRE)program.close();
+                if(fault==Fault.VIEW_QUOTA) {
+                    try(var held=resources.reserve(AnalysisResources.Pool.SCRATCH,resources.limits().scratchBytes()-resources.used(AnalysisResources.Pool.SCRATCH),AnalysisResources.Phase.CONTROL)) {
+                        assertTrue(held.amount()>0);return delegate.reserve(pool,amount,phase);
+                    }
+                }
+            }
             if(order){reserves++;if(fault==Fault.RESERVE)throw marker;}
             if(order&&fault==Fault.QUOTA) {
                 try(var held=resources.reserve(AnalysisResources.Pool.SCRATCH,resources.limits().scratchBytes()-resources.used(AnalysisResources.Pool.SCRATCH),AnalysisResources.Phase.CONTROL)) {
@@ -118,6 +130,50 @@ final class NativeScalarAdmissionLifecycleTest {
             var failure=assertThrows(AnalysisResources.Exhausted.class,()->choose(session));assertEquals(AnalysisResources.Resource.SCRATCH,failure.resource());assertEquals(AnalysisResources.Phase.DEMAND,failure.phase());
             assertEquals(0,budget.live);assertEquals(before,resources.used(AnalysisResources.Pool.SCRATCH));assertNotNull(program.admission().snapshot());
             budget.fault=Fault.NONE;assertEquals(expected,choose(session).providers());assertEquals(before,resources.used(AnalysisResources.Pool.SCRATCH));
+        });
+    }
+    @Test void candidateViewReservationFailureIsOperationalAndAllowsFreshSelection()throws Exception {
+        nativeModel(true,(session,program,resources,budget,expected)->{
+            long before=resources.used(AnalysisResources.Pool.SCRATCH);budget.fault=Fault.VIEW_RESERVE;
+            assertSame(budget.marker,assertThrows(InjectedFailure.class,()->choose(session)));
+            assertEquals(1,budget.viewReserves);assertEquals(0,budget.live);assertEquals(before,resources.used(AnalysisResources.Pool.SCRATCH));
+            assertNotNull(program.admission().snapshot());budget.fault=Fault.NONE;
+            assertEquals(expected,choose(session).providers());assertEquals(2,budget.viewReserves);assertEquals(before,resources.used(AnalysisResources.Pool.SCRATCH));
+        });
+    }
+    @Test void candidateViewActualScratchDenialRetiresOrderLinksWithoutPublishing()throws Exception {
+        nativeModel(true,(session,program,resources,budget,expected)->{
+            long before=resources.used(AnalysisResources.Pool.SCRATCH);budget.fault=Fault.VIEW_QUOTA;
+            var failure=assertThrows(AnalysisResources.Exhausted.class,()->choose(session));
+            assertEquals(AnalysisResources.Resource.SCRATCH,failure.resource());assertEquals(AnalysisResources.Phase.DEMAND,failure.phase());
+            assertEquals(1,budget.viewReserves);assertEquals(0,budget.live);assertEquals(before,resources.used(AnalysisResources.Pool.SCRATCH));
+            assertNotNull(program.admission().snapshot());budget.fault=Fault.NONE;assertEquals(expected,choose(session).providers());
+        });
+    }
+    @Test void expiryBeforeCandidateViewAllocationCannotPublishChoices()throws Exception {
+        nativeModel(true,(session,program,resources,budget,expected)->{
+            budget.fault=Fault.VIEW_EXPIRE;assertThrows(IllegalStateException.class,()->choose(session));
+            assertEquals(1,budget.viewReserves);assertEquals(0,budget.live);
+            assertThrows(IllegalStateException.class,()->program.admission().snapshot());
+        });
+    }
+    @Test void decisionProfilesRetireLocallyAndUnknownProfileExpiresWithNativeOwner()throws Exception {
+        nativeModel(true,(session,program,resources,budget,expected)->{
+            var subject=session.index().objectDeclarations().keySet().iterator().next();
+            var effects=PossibleValuesAnalysis.admissionDecisions(session,PossibleValuesAnalysis.EFFECTS_PROFILE);
+            var direct=PossibleValuesAnalysis.admissionDecisions(session,PossibleValuesAnalysis.PROFILE);
+            var unknown=PossibleValuesAnalysis.admissionDecisions(session,"unsupported-profile");
+            try {
+                assertEquals(PossibleValuesAnalysis.Status.ACCEPTED,effects.decide(subject).status());
+                assertEquals("UNSUPPORTED_EFFECT_PROFILE",direct.decide(subject).reason());
+                var refusal=unknown.decide(subject);assertEquals(PossibleValuesAnalysis.Status.UNSUPPORTED,refusal.status());
+                assertEquals("UNSUPPORTED_EFFECT_PROFILE",refusal.reason());assertEquals(0,refusal.unsupportedStorageProfiles());assertEquals(1,refusal.unsupportedEffectProfiles());
+                effects.close();effects.close();assertThrows(IllegalStateException.class,()->effects.decide(subject));
+                assertEquals("UNSUPPORTED_EFFECT_PROFILE",direct.decide(subject).reason());assertNotNull(program.admission().snapshot());
+                program.close();
+                assertThrows(IllegalStateException.class,()->direct.decide(subject));
+                assertThrows(IllegalStateException.class,()->unknown.decide(subject));
+            } finally {effects.close();direct.close();unknown.close();}
         });
     }
 }

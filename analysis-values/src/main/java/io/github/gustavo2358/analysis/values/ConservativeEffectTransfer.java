@@ -26,31 +26,15 @@ final class ConservativeEffectTransfer {
         return result;
     }
     private static TextProfile.Location occurrence(OperandId id,TextProfile p) {
-        var object=p.session.index().referencedObject(id);
-        if(object==null||!p.subjects.containsKey(object.id()))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
-        return p.subjects.get(object.id());
+        return ScalarConservativeAdmission.occurrence(id,p.session,p.subjects);
     }
     private static TextProfile.Location exact(Place place,TextProfile p) {
-        if(!(place instanceof Places.ObjectPlace o)||!p.subjects.containsKey(o.object()))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
-        return p.subjects.get(o.object());
+        return ScalarConservativeAdmission.exact(place,p.subjects);
     }
     private static void select(Scopes.MemoryScope scope,TextProfile p,Set<TextProfile.Location> out) {
         // Unmodeled declarations may alias a demanded Cell. Never interpret their
         // absence from the scalar table as proof that an effect is disjoint.
-        var pending=new ArrayDeque<Scopes.MemoryScope>();pending.add(scope);
-        while(!pending.isEmpty()) {
-            var current=pending.removeFirst();
-            if(current instanceof Scopes.ObjectsMemory objects) {
-                if(objects.objects().stream().anyMatch(o->!p.subjects.containsKey(o)))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
-            } else if(current instanceof Scopes.VisibleMemory visible) {
-                var unit=p.session.index().unit(visible.unit());
-                for(var owner:p.session.index().store().units())for(var object:owner.objects()) {
-                    boolean included=owner.id().equals(visible.unit())||unit.visibleObjects().contains(object.id())
-                        ||visible.includingExternal()&&object.visibility()!=Memory.Visibility.PRIVATE;
-                    if(included&&!p.subjects.containsKey(object.id()))throw new TextProfile.Refusal(false,"UNSUPPORTED_EFFECT_PLACE");
-                }
-            } else if(current instanceof Scopes.MemoryUnion union)pending.addAll(union.members());
-        }
+        ScalarConservativeAdmission.scope(scope,p.session,p.subjects);
         for(var item:p.subjects.entrySet())if(p.selected(item.getValue())&&contains(scope,item.getKey(),item.getValue(),p))out.add(item.getValue());
     }
     private static boolean contains(Scopes.MemoryScope s,ObjectId id,TextProfile.Location l,TextProfile p) {

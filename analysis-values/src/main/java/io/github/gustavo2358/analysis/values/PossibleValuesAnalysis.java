@@ -18,6 +18,37 @@ public final class PossibleValuesAnalysis implements AnalysisDefinition<Possible
     public enum Status { ACCEPTED, UNSUPPORTED, INVALID_INPUT }
     public record Admission(Status status,String reason,Optional<PossibleValuesAnalysis> analysis,
                             long unsupportedStorageProfiles,long unsupportedEffectProfiles) { }
+    /** Individual semantic eligibility only; ACCEPTED does not own an execution
+     * or promise candidate facts. Existing prepare remains the execution factory. */
+    public record AdmissionDecision(Status status,String reason,
+                                    long unsupportedStorageProfiles,long unsupportedEffectProfiles) { }
+    /** Exact-session/profile decision compiler. Closing retires only its own
+     * controls. Operational failures propagate, never become semantic refusal. */
+    public interface AdmissionDecisions extends AutoCloseable {
+        AdmissionDecision decide(ObjectId subject);
+        @Override void close();
+    }
+    /** Native owners require their inventories; resident compatibility is an
+     * explicit separate representation with no native residency promise. */
+    public static AdmissionDecisions admissionDecisions(AnalysisSession session,String profile) {
+        Objects.requireNonNull(session);
+        if(session.index().store().executionBudget().isPresent()
+                &&(PROFILE.equals(profile)||EFFECTS_PROFILE.equals(profile)))
+            return NativeScalarAdmissionConstraints.open(session,profile);
+        return ResidentScalarAdmissionConstraints.open(session,profile);
+    }
+    /** Necessary demand-storage eligibility on this admitted immutable session.
+     * False is exactly the individual UNSUPPORTED_DEMAND_STORAGE guard; true is
+     * not full admission: copies, effects, preconditions and initial values still
+     * require prepare. No expression traversal, value pool or retained catalog.
+     * Native owner/read/progress failures propagate; never become false. */
+    public static boolean supportsDemandStorage(AnalysisSession session,ObjectId subject) {
+        Objects.requireNonNull(session);Objects.requireNonNull(subject);
+        var index=session.index();index.store().progress(ProgramStore.ExecutionPhase.DEMAND);
+        var object=index.object(subject);
+        var storage=object!=null&&object.storage() instanceof Memory.CellBinding binding?index.storage(binding.storage()):null;
+        return ScalarStorageAdmission.cell(object,storage)!=null;
+    }
     public static Admission prepare(AnalysisSession session) {
         return prepare(session,PROFILE);
     }

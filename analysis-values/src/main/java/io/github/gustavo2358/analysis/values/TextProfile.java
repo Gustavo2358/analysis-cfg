@@ -55,7 +55,7 @@ final class TextProfile {
                 var base=object.storage() instanceof Memory.CellBinding binding?index.storage(binding.storage()):null;
                 cell=base instanceof Memory.Cell value?value:null;
             } else cell=index.directCell(declaration.getKey());
-            if(!(object.storage() instanceof Memory.CellBinding)||cell==null||!cellDomain(object.typeRef())||!cellDomain(cell.typeRef())) {
+            if(ScalarStorageAdmission.cell(object,cell)==null) {
                 // A declaration alone has no transfer effect. Demand closure and every
                 // actual effect below still require supported storage; none is discarded.
                 if(demand==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
@@ -173,11 +173,13 @@ final class TextProfile {
         NativeSubjects(ProgramIndex index,Map<StorageId,Location> cells){this.index=index;this.cells=cells;}
         void include(boolean text){count=Math.incrementExact(count);if(text)textCount=Math.incrementExact(textCount);}
         private Location location(Memory.ObjectDeclaration object){
-            if(object==null||!(object.storage() instanceof Memory.CellBinding binding)||!cellDomain(object.typeRef()))return null;
+            if(object==null||!(object.storage() instanceof Memory.CellBinding binding))return null;
+            var location=cells.get(binding.storage());
+            if(location==null||ScalarStorageAdmission.cell(object,location.cell())==null)return null;
             // The complete admission scan above inserts only supported Cells;
             // immutable bindings can borrow that association without decoding
             // and checking the same storage body for every alias query.
-            return cells.get(binding.storage());
+            return location;
         }
         @Override public int size(){index.objectDeclarations().size();return count;}
         @Override public Location get(Object key){return key instanceof ObjectId id?location(index.object(id)):null;}
@@ -225,40 +227,43 @@ final class TextProfile {
     }
     private static boolean text(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.TEXT; }
     private static boolean bool(Types.TypeRef type) { return type instanceof Types.Known k&&k.type()==Types.Builtin.BOOL; }
-    // Auxiliary integer cells participate in alias/effect bounds, without numeric
-    // evaluation or candidate queries. Their open value uses the existing top.
-    private static boolean cellDomain(Types.TypeRef type) {
-        return type instanceof Types.Known k&&(k.type()==Types.Builtin.TEXT||k.type()==Types.Builtin.INT);
-    }
     private void prepare(Operation operation) {
         if(operation instanceof Operations.Assign assign) {
-            if(!(assign.destination() instanceof Places.ObjectPlace destination))
-                throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
-            var location=subjects.get(destination.object());
-            if(location==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+            var location=ScalarAssignmentAdmission.destination(assign,subjects);
             if(!selected(location)){admitted.add(operation.header().id());return;}
+            var sourceLocation=ScalarAssignmentAdmission.source(assign,subjects);
             if(assign.value() instanceof Expressions.Literal literal && literal.value() instanceof Values.TextValue text)
                 writes.put(operation.header().id(),new LiteralWrite(location,universe.supported(text,assign.header().id(),assign.header().origin(),List.of(),preparation)));
-            else if(assign.value() instanceof Expressions.Read read && read.place() instanceof Places.ObjectPlace source) {
-                var sourceLocation=subjects.get(source.object());
-                if(sourceLocation==null)throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
+            else if(sourceLocation!=null) {
                 writes.put(operation.header().id(),new CopyWrite(location,sourceLocation));
             } else if(assign.value() instanceof Expressions.FitText||assign.value() instanceof Expressions.SliceText) {
-                for(var source:TextExpressions.reads(assign.value()))if(!subjects.containsKey(source))throw new Refusal(false,"UNSUPPORTED_STORAGE_PROFILE");
                 writes.put(operation.header().id(),new ExpressionWrite(location,assign));
             } else throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
         } else if(operation instanceof Operations.HavocMust || operation instanceof Operations.HavocMay || operation instanceof Operations.Opaque) {
             conservative.put(operation.header().id(),ConservativeEffectTransfer.prepare(operation,this));
         } else if(effectAware && operation instanceof Operations.Invoke invoke) {
-            if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
-            effects.put(operation.header().id(),ForeignEffectTransfer.prepare(invoke.effectBound(),modeledCells,subjects));
-        } else if(!(operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind||operation instanceof Operations.Nop||operation instanceof Operations.Return||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt))
+            effects.put(operation.header().id(),prepareForeign(invoke,modeledCells,subjects));
+        } else if(!scalarControl(operation))
             throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
-        if(session.index().unprovedPreconditions(operation.header().id()))
-            throw new Refusal(false,"UNPROVED_SCALAR_OPERATION_PRECONDITION");
+        requirePreconditions(session,operation);
         var write=writes.get(operation.header().id());
         if(write!=null){preparedWrites.add(write);overwrites.put(operation.header().id(),KillAuthority.exactCell(session,operation,write.location().cell()).orElseThrow(()->new Refusal(false,"UNPROVED_STRONG_OVERWRITE")));}
         admitted.add(operation.header().id());
+    }
+    /** Shared decision-only guards; execution and selected-write authority remain separate. */
+    static boolean scalarControl(Operation operation) {
+        return operation instanceof Operations.LocalInvoke||operation instanceof Operations.LocalBoundary
+            ||operation instanceof Operations.LocalResume||operation instanceof Operations.LocalUnwind
+            ||operation instanceof Operations.Nop||operation instanceof Operations.Return
+            ||operation instanceof Operations.Jump||operation instanceof Operations.Branch||operation instanceof Operations.Halt;
+    }
+    static ForeignEffectTransfer prepareForeign(Operations.Invoke invoke,List<Location> cells,Map<ObjectId,Location> subjects) {
+        if(!invoke.results().isEmpty())throw new Refusal(false,"UNSUPPORTED_EFFECT_PROFILE");
+        return ForeignEffectTransfer.prepare(invoke.effectBound(),cells,subjects);
+    }
+    static void requirePreconditions(AnalysisSession session,Operation operation) {
+        if(session.index().unprovedPreconditions(operation.header().id()))
+            throw new Refusal(false,"UNPROVED_SCALAR_OPERATION_PRECONDITION");
     }
     PossibleValuesState transferOperation(PossibleValuesState state,Operation operation,ValuesWork work) {
         session.index().requireOperation(operation);

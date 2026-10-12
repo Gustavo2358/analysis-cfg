@@ -160,11 +160,13 @@ public final class CallDependencyPlan {
         }
         return new Selection(registrations,providers,metrics);
     }
-    /** Exact per-subject decisions. A supported union certifies acceptance only;
-     * a semantic refusal (including INVALID_INPUT) never substitutes for the
-     * original individual decision/order. Operational errors are not fallback.
-     * The execution demand and providers remain exactly the original choices.
-     * This reduces homogeneous admission probes, not mixed-case/global scans. */
+    /** Exact per-subject decisions from one session/profile/Entry compiler.
+     * Necessary storage rejection precedes expression compilation; it is not
+     * full admission. Refusal order and INVALID_INPUT stay subject-specific.
+     * ACCEPTED owns no execution, ValueUniverse or completed value facts.
+     * Original execution demand and typed provider choices are preserved.
+     * Operational failures propagate and never become semantic fallback.
+     * First-seen request controls and the compiler retire on close. */
     private static final class ScalarAdmissions implements AutoCloseable {
         private final ProgramStore store;
         private final Map<ObjectId,Boolean> decisions=new LinkedHashMap<>();
@@ -184,27 +186,46 @@ public final class CallDependencyPlan {
             decisions.put(subject,null);
         }
         void prepare(AnalysisSession session,Map<String,Long> metrics) {
-            if(decisions.size()>1) {
-                var joint=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE,decisions.keySet());
-                try {
-                    if(joint.status()==PossibleValuesAnalysis.Status.ACCEPTED) {
-                        for(var decision:decisions.entrySet()) {
-                            store.progress(ProgramStore.ExecutionPhase.DEMAND);decision.setValue(true);
-                            metrics.merge("scalarAdmissionAttempts",1L,Long::sum);metrics.merge("scalarAdmissionAccepted",1L,Long::sum);
-                        }
-                        return;
+            if(decisions.isEmpty())return;
+            // This view borrows existing first-seen controls; no new input-sized
+            // eligibility map or subject set. Full AIR admission already happened.
+            // Unknown/indirect storage refuses before expression closure in the
+            // original preparation, and cannot poison unrelated scalar choices.
+            int eligible=0;
+            for(var decision:decisions.entrySet()) {
+                if(PossibleValuesAnalysis.supportsDemandStorage(session,decision.getKey()))eligible=Math.incrementExact(eligible);
+                else decision.setValue(false);
+            }
+            if(eligible>0) {
+                // Fixed borrowed-view/iterator controls, separate from first-seen
+                // links. Fund before allocation; no per-subject extra capacity.
+                var budget=store.executionBudget();
+                var viewCapacity=eligible>1&&budget.isPresent()?budget.orElseThrow().reserve(ProgramStore.CapacityPool.SCRATCH,512,ProgramStore.ExecutionPhase.DEMAND):null;
+                try(viewCapacity;var compiler=PossibleValuesAnalysis.admissionDecisions(session,PossibleValuesAnalysis.EFFECTS_PROFILE)) {
+                    for(var subject:candidates()) {
+                        var decision=compiler.decide(subject);
+                        if(decision.status()==PossibleValuesAnalysis.Status.INVALID_INPUT)
+                            throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,decision.reason());
+                        decisions.put(subject,decision.status()==PossibleValuesAnalysis.Status.ACCEPTED);
                     }
-                } finally {joint.analysis().ifPresent(PossibleValuesAnalysis::close);}
+                }
             }
             for(var decision:decisions.entrySet()) {
                 store.progress(ProgramStore.ExecutionPhase.DEMAND);metrics.merge("scalarAdmissionAttempts",1L,Long::sum);
-                var probe=PossibleValuesAnalysis.prepare(session,PossibleValuesAnalysis.EFFECTS_PROFILE,Set.of(decision.getKey()));
-                try {
-                    if(probe.status()==PossibleValuesAnalysis.Status.INVALID_INPUT)throw new DependencyAnalysis.Failure(DependencyAnalysis.Kind.INVALID_INPUT,probe.reason());
-                    boolean accepted=probe.status()==PossibleValuesAnalysis.Status.ACCEPTED;decision.setValue(accepted);
-                    metrics.merge(accepted?"scalarAdmissionAccepted":"scalarAdmissionRefused",1L,Long::sum);
-                } finally {probe.analysis().ifPresent(PossibleValuesAnalysis::close);}
+                metrics.merge(Boolean.TRUE.equals(decision.getValue())?"scalarAdmissionAccepted":"scalarAdmissionRefused",1L,Long::sum);
             }
+        }
+        private Set<ObjectId> candidates() {
+            return new AbstractSet<ObjectId>() {
+                @Override public int size(){int count=0;for(var decision:decisions.values())if(decision==null)count=Math.incrementExact(count);return count;}
+                @Override public Iterator<ObjectId> iterator(){
+                    var entries=decisions.entrySet().iterator();return new Iterator<>() {
+                        private ObjectId next;
+                        @Override public boolean hasNext(){while(next==null&&entries.hasNext()){var value=entries.next();if(value.getValue()==null)next=value.getKey();}return next!=null;}
+                        @Override public ObjectId next(){if(!hasNext())throw new NoSuchElementException();var result=next;next=null;return result;}
+                    };
+                }
+            };
         }
         boolean accepted(ObjectId subject){return Objects.requireNonNull(decisions.get(subject),"subject not admitted");}
         @Override public void close(){decisions.clear();if(orderCapacity!=null){orderCapacity.close();orderCapacity=null;}}

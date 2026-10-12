@@ -13,10 +13,17 @@
       "literalOnlyPlanNeverReservesScalarOrderControls",
       "reserveAndGrowthFailuresAreOperationalAtomicAndAllowAFreshAttempt",
       "expiredOwnerCannotPublishChoicesAndStillRetiresOrderCapacity",
-      "actualScratchDenialBeforeOrderInsertionPreservesTheLiveOwner"
+      "actualScratchDenialBeforeOrderInsertionPreservesTheLiveOwner",
+      "candidateViewReservationFailureIsOperationalAndAllowsFreshSelection",
+      "candidateViewActualScratchDenialRetiresOrderLinksWithoutPublishing",
+      "expiryBeforeCandidateViewAllocationCannotPublishChoices",
+      "decisionProfilesRetireLocallyAndUnknownProfileExpiresWithNativeOwner"
     ],
     "io.github.gustavo2358.analysis.adapters.NativeComputedAdmissionCostTest": [
       "acceptedSubjectsShareOnePreparationAcrossFiveIndependentGeometries"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeMixedComputedAdmissionCostTest": [
+      "unsupportedStorageDoesNotMultiplyAcceptedScalarPreparationAcrossFortyControls"
     ],
     "io.github.gustavo2358.analysis.adapters.NativeJointObservationEligibilityTest": [
       "emptyNativePlansNeverReserveJointCapacity"
@@ -1628,6 +1635,19 @@
       "foreignStableRunCannotMasqueradeAsUnreachableInAnotherSession",
       "controlledObservationFailureIsAtomicAndPreservesStableRun"
     ],
+    "io.github.gustavo2358.analysis.values.ScalarAdmissionGuardTest": [
+      "badDemandRefusesBeforeGlobalExpressionOverflow",
+      "validDemandPropagatesOverflowEvenForUnselectedWrite",
+      "demandStorageEligibilityDoesNotCertifyOperationsOrTraverseExpressions",
+      "demandedStorageGuardAdmitsOnlyWholeTextOrIntegerCells",
+      "assignmentGuardPreservesDestinationThenValueReasons",
+      "supportedShapesBorrowLocationWithoutProducingCandidates"
+    ],
+    "io.github.gustavo2358.analysis.values.ConservativeAdmissionGuardTest": [
+      "explicitUnsupportedObjectsAreGlobalEvenInsideNestedScopes",
+      "allAndStorageScopesDoNotInventAnExplicitObjectGuard",
+      "visibleScopeAndExactPlaceRequireTheirIncludedStorage"
+    ],
     "io.github.gustavo2358.analysis.values.SupportSourceTest": [
       "producerSurvivesBlocksAndStrongUpdateKillsOldSupport",
       "equalCandidateDiamondUnionsBothProducers",
@@ -1897,6 +1917,13 @@
       "scalarKeysAreCongruentAcrossMapShapesAndIncludeSupportsAndUnknownness",
       "regionalFingerprintsAgreeWithRealEngineEquivalenceInRepeatedExecution",
       "segmentKeysIgnoreAvlShapeAndAgreeWithValueEquality"
+    ],
+    "io.github.gustavo2358.analysis.values.ScalarAdmissionDecisionTest": [
+      "selectiveExpressionRefusalCannotDowngradeIndependentCells",
+      "storageAndUnknownProfilePrecedeArithmeticAndFailedBuildCanRetry",
+      "identicalIdsInDifferentSessionsCannotShareDecisionsAndCloseIsLocal",
+      "retiringDecisionControlsPreservesCompleteAcceptedPointFacts",
+      "selectedEntriesWithTheSameIndexKeepDistinctInitialConstraints"
     ]
   },
   "cfg-adapters": {

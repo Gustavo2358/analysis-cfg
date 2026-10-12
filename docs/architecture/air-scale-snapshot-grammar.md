@@ -1,5 +1,44 @@
 # Managed ordered typed graph grammar
 
+## Productive decision-constraint frontier — 2026-10-12
+
+An exact-session/profile/selected-Entry scalar decision handle now compiles
+conditional/global/common guards once into owner-local storage ordinals and
+iterative SCC rank minima. It owns no candidate universe or executable analysis;
+accepted execution remains the original full solver. Native columns and fixed
+controls are funded before allocation, failed builds retire partial ownership,
+and owner expiry forbids reuse. Resident compatibility remains explicitly separate.
+
+Unchanged productive expression-mixed40/storage-mixed40/homogeneous40 bounds and
+semantic oracles pass, as do216resident/432native manual decisions,52native fault
+controls,20integrated methods and5public API laws including selected-Entry state
+isolation and complete detached point facts. Seven original boundaries pass.
+The generic-effect Invoke boundary failure was fixed in TextProfile, never by
+relaxing the guard. Exact descriptors/Maven preserved; additive decision API
+requires human review. No grammar, AIR/profile/wire/pin/codec/quota change.
+
+Pre-publication record (2026-10-12,18:06UTC): originalFAST1525 passes2758.318s with
+zero failures/errors/skips; all1506 prior methods remain intact. Complete audit
+verifies1497 productive classes/nine consumer/two AIR modules,15 components,
+2284 consumer files and651 producer files equal the six actual CLI runtimes.
+All six original complete CLI oracles and whole-byte comparisons pass. Public
+Main16384 passes596.350596733s with128MiB,original131454605B input,1200s deadline/
+1245s watchdog and unchanged other quotas/cache; one unprofiled observation,
+not a repeated curve, RSS/allstore proof or performance gain.
+Previous publisheda161 CI1506 succeeded3398.109s separately; not this new wave.
+
+Next witness:30 complete semantic/projection/cleanup controls over five D/Q sizes,
+memory/file-cache1 and sequence permutations, then30 duplicate regional CALL/FILE
+preparation violations. Actual declaration reads equal twice the positive direct
+single-preparation control. Whole dependency records exclude only work metrics.
+The initial wrong COMPLETE expectation was repaired to the existing exact
+PARTIAL/PHYSICAL_PROPAGATION_DISABLED contract; raw failure remains preserved.
+No productive source, fixture, quota or cost bound changed for that correction.
+Structural instrumentation is not unprofiled timing/CPU/I/O or global proof.
+Transient expression/initial payloads, CALL+FILE/commonWORK/allstore/nativeglobal21/
+repeatedcurves/E2E/legacy/final sensitive full remain explicit pending obligations;
+no global linear-time/JVM/RSS or campaign-completion claim. Older captures follow.
+
 ## Qualified local frontier —2026-10-12
 
 OriginalFAST1506 passes2706.261s, zero failures/errors/skips. Complete class

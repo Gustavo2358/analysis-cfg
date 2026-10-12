@@ -1,5 +1,60 @@
 # Managed source storage boundary
 
+## Productive scalar decision frontier — 2026-10-12
+
+The local planner now uses an exact session/profile/selected-Entry decision
+handle instead of a refused union followed by one full preparation per subject.
+AdmissionDecision is deliberately not Admission: ACCEPTED owns no execution
+or ValueUniverse. Existing prepare and complete accepted solvers remain intact.
+Native ranks/edges/CSR/initial addresses and iterative SCC minima use owned
+columns, funded before allocation; resident compatibility is separate and
+advertises no native residency promise. Unsupported native profiles own only
+a funded constant-size refusal handle. Missing native inventories are errors.
+
+The unchanged expression-mixed40 productive witness passes with its original
+manual provider map, logical counters, two registrations, cleanup and bounds
+Assign<=2(D+1)/Invoke<=5(Q+1); previous68-violation RED is preserved. Original
+storage-mixed40 and homogeneous40 also pass. Manual216 resident/432 native
+decisions,52 injected native failure/lifetime controls, five public API laws,
+Entry-selection isolation, full detached accepted ValueFact/supports and
+twenty integrated methods pass. All seven original architecture guards pass.
+
+Shared guards remain in scalar preparation's existing boundary. An attempted
+Invoke dependency in ForeignEffectTransfer was rejected by the original guard;
+the composition moved back to TextProfile without weakening that guard.
+All old public descriptors and Maven edges are preserved; decision API is
+additive and requires human review. No AIR/profile/wire/pin/quota changes.
+
+Pre-publication record (2026-10-12,18:06UTC): local CLI/FAST qualification,
+not final full/global qualification.
+Original FAST1525 passes in2758.318s with zero failures/errors/skips; all1506
+old methods remain intact. Whole-runtime audit verifies1497 productive classes
+across nine consumer/two AIR modules,15 components,2284 consumer files and651
+producer files against the exact frozen CLI runtime. Six actual CLI products
+pass their original complete oracles and whole-byte equality. Public Main16384
+passes in596.350596733s observed with128MiB/input131454605B/1200s deadline/
+1245s watchdog and unchanged other quotas/cache; output97958525B remains exact.
+This single unprofiled observation is not a repeated curve or performance gain.
+
+The next unchanged-product witness completes30 full semantic/projection/cleanup
+controls across five D/Q sizes and memory/file-cache1, then reports30 duplicate
+compatible CALL/FILE preparation violations: actual declaration reads are twice
+the positive single-preparation control. Only work metric maps are excluded from
+whole dependency-record equality. Its first failed expectation of COMPLETE was
+corrected to the existing exact PARTIAL/PHYSICAL_PROPAGATION_DISABLED contract;
+that failed raw attempt is preserved, not a semantic or cost PASS. This witness
+is structural instrumentation, not a clock/CPU/I/O or universal complexity proof.
+
+Transient expression and
+initial payload decoding, resident compatibility, CALL+FILE sharing, commonWORK,
+all-store coverage, nativeglobal21/new gaps, repeated curves, integrated E2E,
+legacy retirement and final sensitive-kernel full remain explicit obligations.
+No bounded total JVM/RSS, universal linear solver or campaign-completion claim.
+
+Published a161 separately passed remote original FAST_CI1506 and CODE_CHANGE
+in3398.109s; that CI does not qualify this new local classifier. No merge.
+Earlier captures below are historical.
+
 ## Qualified local frontier —2026-10-12
 
 Original FAST1506 passes in2706.261s, with zero failures/errors/skips and a
