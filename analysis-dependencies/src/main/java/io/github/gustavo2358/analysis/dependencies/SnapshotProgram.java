@@ -435,6 +435,8 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
     public Optional<Evidence.CoverageStatus> invokeCoverage(OperationId identity){
         Objects.requireNonNull(identity);operationDirectory();return operationDirectory.coverage(identity);
     }
+    /** Private-module bridge for a previously checked owner-local code ordinal. */
+    Optional<Evidence.CoverageStatus> invokeCoverageOrdinal(int ordinal){operationDirectory();return operationDirectory.coverageAt(ordinal);}
     /** All code, in original Unit/Sequence/occurrence order. Only primitive
      * source handles, exact keys and sorted ordinals live in the paged owner. */
     private final class NativeOperations implements ProgramStore.OperationDirectory,AutoCloseable {
@@ -476,7 +478,12 @@ public final class SnapshotProgram implements DependencyProgramStore, CfgProgram
         @Override public OperationId identity(int ordinal){available();Objects.checkIndex(ordinal,size());return occurrence(field(field(sourceOrder.handle(ordinal),0),0),OperationId.class);}
         private Optional<Evidence.CoverageStatus> coverage(OperationId identity){
             try {
-                available();int ordinal=ordinal(identity);if(ordinal<0)return Optional.empty();
+                available();return coverageAt(ordinal(identity));
+            }catch(RuntimeException|Error failure){try{close();}catch(RuntimeException|Error cleanup){if(cleanup!=failure)failure.addSuppressed(cleanup);}throw failure;}
+        }
+        private Optional<Evidence.CoverageStatus> coverageAt(int ordinal){
+            try {
+                available();if(ordinal<0||ordinal>=sourceOrder.size())return Optional.empty();
                 long operation=sourceOrder.handle(ordinal);if(snapshot.shape(operation)!=OPERATIONS_INVOKE)return Optional.empty();
                 long header=field(operation,0),value=snapshot.scalar(snapshot.field(header,OPERATIONS_HEADER,2));
                 return Optional.of(switch(Math.toIntExact(value)){

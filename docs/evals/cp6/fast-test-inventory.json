@@ -573,6 +573,14 @@
       "eachFundedNativeAnnotationCombinationPreservesDetachedFactStatusReasonsAndWholeSiteBytes",
       "actualPhysicalDisabledSourceProductRetainsKnownCandidateAndPerSiteReason"
     ],
+    "io.github.gustavo2358.analysis.adapters.NativeGeneralHeaderWidthTest": [
+      "realSingleLiteralCallKeepsCompleteWideOperationIdentityWithoutFullHeaderProjection"
+    ],
+    "io.github.gustavo2358.analysis.adapters.NativeHeaderMetadataTest": [
+      "sameRowMetadataCommitsWithPrefixRollsBackWithTailAndNeverRevivesExpiredScopes",
+      "metadataCallbackFailureRemainsPrimaryExpiresOwnedScopesAndLeavesBorrowedBackendAlive",
+      "fullCollidingHeaderKeysBeyondProjectionBudgetKeepCanonicalOrderLastFactWinsAndLookupExact"
+    ],
     "io.github.gustavo2358.analysis.adapters.NativeGeneralProgramCursorTest": [
       "actualGeneralWriterAcrossFiveGeometriesDoesNotProjectCompleteFactsForProgramAggregation",
       "scopedGeneralProgramFieldsBoundsAndParentExpiryPreserveBorrowedOwners",

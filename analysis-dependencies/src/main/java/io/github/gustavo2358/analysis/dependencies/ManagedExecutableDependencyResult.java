@@ -1,7 +1,6 @@
 package io.github.gustavo2358.analysis.dependencies;
 
 import io.github.gustavo2358.air.model.Ids.*;
-import io.github.gustavo2358.analysis.plan.AnalysisKey;
 import io.github.gustavo2358.analysis.solver.*;
 import io.github.gustavo2358.analysis.consumers.FactStorage;
 import java.util.*;
@@ -23,6 +22,9 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     private PagedLongArray annotations,order;
     private EntryId soughtEntry;
     private OperationId soughtOperation;
+    private char[] headerLeft,headerRight;
+    private java.util.function.ToLongFunction<DependencySiteFact> metadataRecorder;
+    private ToIntFunction<DependencySiteFact> metadataFlags;
     private Cursor cursors;
     private ProgramProjection programProjections;
     private ProgramCursor programCursors;
@@ -37,6 +39,8 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         resources.requireExecutionProgram(program);program.admission();
         control=resources.reserve(AnalysisResources.Pool.RESIDENT,2048,AnalysisResources.Phase.DEMAND);
         try {
+            control.grow(1024,AnalysisResources.Phase.SORT);
+            headerLeft=new char[128];headerRight=new char[128];metadataRecorder=this::metadataOf;
             facts=new PagedDependencyFactStorage(pages,resources);
             annotations=new PagedLongArray(pages,Long.MAX_VALUE,resources,AnalysisResources.Phase.DEMAND);
             order=new PagedLongArray(pages,Long.MAX_VALUE,resources,AnalysisResources.Phase.SORT);
@@ -52,35 +56,53 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     private void available(){live();if(!ready)throw new IllegalStateException("managed executable dependency result incomplete");}
-    FactStorage<DependencySiteFact> transaction(){live();return facts.transaction();}
-    private static int compare(PagedDependencyFactStorage.Header a,PagedDependencyFactStorage.Header b){return compare(a.entry(),a.operation(),b);}
-    private static int compare(EntryId entry,OperationId operation,PagedDependencyFactStorage.Header b){
-        int value=AnalysisKey.ENTRY_ORDER.compare(entry,b.entry());
-        if(value==0)value=operation.unit().publication().localId().compareTo(b.operation().unit().publication().localId());
-        if(value==0)value=operation.unit().localId().compareTo(b.operation().unit().localId());
-        if(value==0)value=operation.localId().compareTo(b.operation().localId());return value;
+    FactStorage<DependencySiteFact> transaction(){live();return facts.transaction(metadataRecorder);}
+    /** Borrow already-funded producer IDs once; persist only owner-local ordinal
+     * and three annotation bits in the same paged fact row. No DTO is retained. */
+    void metadataFlags(ToIntFunction<DependencySiteFact> flags){live();metadataFlags=Objects.requireNonNull(flags);}
+    private long metadataOf(DependencySiteFact fact){
+        live();int ordinal=program.operationDirectory().orElseThrow().ordinal(fact.operation());
+        int flags=metadataFlags==null?0:metadataFlags.applyAsInt(fact);
+        if((flags&~7)!=0)throw new IllegalArgumentException("invalid fact annotation flags");
+        return ((ordinal+1L)<<3)|flags;
+    }
+    private int comparePart(String wanted,PagedDependencyFactStorage.IdentityView other,PagedDependencyFactStorage.IdentityPart part){
+        long size=other.characterCount(part),common=Math.min(wanted.length(),size);
+        for(long at=0;at<common;){int count=(int)Math.min(headerLeft.length,common-at);other.readCharacters(part,at,headerLeft,0,count);resources.work(count,AnalysisResources.Phase.SORT);
+            for(int i=0;i<count;i++){int c=Character.compare(wanted.charAt(Math.toIntExact(at)+i),headerLeft[i]);if(c!=0)return c;}at+=count;
+        }return Long.compare(wanted.length(),size);
+    }
+    private int compareWanted(UnitId unit,String local,PagedDependencyFactStorage.IdentityView other){
+        int value=comparePart(unit.publication().localId(),other,PagedDependencyFactStorage.IdentityPart.PUBLICATION);
+        if(value==0)value=comparePart(unit.localId(),other,PagedDependencyFactStorage.IdentityPart.UNIT);
+        if(value==0)value=comparePart(local,other,PagedDependencyFactStorage.IdentityPart.LOCAL);return value;
+    }
+    private int compareFacts(long a,long b,boolean operationFirst){
+        try(var left=facts.openFact(Math.toIntExact(a-1));var right=facts.openFact(Math.toIntExact(b-1))){
+            int value;
+            try(var x=operationFirst?left.operation():left.entry();var y=operationFirst?right.operation():right.entry()){value=x.compareFullIdentity(y,headerLeft,headerRight);}
+            if(value==0)try(var x=operationFirst?left.entry():left.operation();var y=operationFirst?right.entry():right.operation()){value=x.compareFullIdentity(y,headerLeft,headerRight);}
+            return value;
+        }
     }
     private int compare(long a,long b){
         if(a==b)return 0;
-        if(a==0)return facts.withHeader(Math.toIntExact(b-1),h->compare(soughtEntry,soughtOperation,h));
-        if(b==0)return -facts.withHeader(Math.toIntExact(a-1),h->compare(soughtEntry,soughtOperation,h));
-        return facts.withHeader(Math.toIntExact(a-1),left->facts.withHeader(Math.toIntExact(b-1),right->compare(left,right)));
-    }
-    private static int operationOrder(OperationId a,OperationId b){
-        int value=a.unit().publication().localId().compareTo(b.unit().publication().localId());
-        if(value==0)value=a.unit().localId().compareTo(b.unit().localId());
-        if(value==0)value=a.localId().compareTo(b.localId());return value;
+        if(b==0)return -compare(0,a);
+        if(a!=0)return compareFacts(a,b,false);
+        try(var fact=facts.openFact(Math.toIntExact(b-1))){
+            int value;try(var entry=fact.entry()){value=compareWanted(soughtEntry.unit(),soughtEntry.localId(),entry);}
+            if(value==0)try(var operation=fact.operation()){value=compareWanted(soughtOperation.unit(),soughtOperation.localId(),operation);}return value;
+        }
     }
     private int compareOperation(long a,long b){
         if(a==b)return 0;
         // The transient zero key is below every Entry for the sought complete
         // Operation identity. It is never inserted or confused with an Id hash.
-        if(a==0)return facts.withHeader(Math.toIntExact(b-1),h->{int value=operationOrder(soughtOperation,h.operation());return value==0?-1:value;});
+        if(a==0)try(var fact=facts.openFact(Math.toIntExact(b-1));var operation=fact.operation()){int value=compareWanted(soughtOperation.unit(),soughtOperation.localId(),operation);return value==0?-1:value;}
         if(b==0)return -compareOperation(0,a);
-        return facts.withHeader(Math.toIntExact(a-1),left->facts.withHeader(Math.toIntExact(b-1),right->{
-            int value=operationOrder(left.operation(),right.operation());return value==0?AnalysisKey.ENTRY_ORDER.compare(left.entry(),right.entry()):value;
-        }));
+        return compareFacts(a,b,true);
     }
+    private boolean operationMatches(int ordinal,OperationId wanted){try(var fact=facts.openFact(ordinal);var operation=fact.operation()){return compareWanted(wanted.unit(),wanted.localId(),operation)==0;}}
     private void include(int ordinal){
         long key=ordinal+1L,prior=index.intern(key,key);
         // Preserve the existing last-fact-wins contract for a complete SiteKey.
@@ -96,24 +118,30 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
         finally{soughtEntry=null;soughtOperation=null;}
     }
-    void appendPartial(DependencySiteFact fact){live();try{int ordinal=facts.size();facts.append(fact);include(ordinal);}
+    void appendPartial(DependencySiteFact fact){live();try{int ordinal=facts.size();facts.append(fact,metadataOf(fact));include(ordinal);}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}}
     void finishIndex(ToIntFunction<PagedDependencyFactStorage.Header> flags){
+        Objects.requireNonNull(flags);finishIndexOrdinals(ordinal->facts.withHeader(ordinal,flags::applyAsInt));
+    }
+    /** Native metadata needs no complete key projection. The package-local
+     * callback overload above remains an explicit compatibility projection. */
+    void finishIndex(){finishIndexOrdinals(ordinal->(int)(facts.ownerMetadata(ordinal)&7));}
+    private void finishIndexOrdinals(java.util.function.IntUnaryOperator flags){
         live();try(var rows=index.cursor()){
             int siteCount=0,edgeCount=0;
             while(rows.advance()){
                 int ordinal=Math.toIntExact(rows.value()-1),site=siteCount++;
                 final int previousEdges=edgeCount;
-                int added=facts.withHeader(ordinal,h->{
-                    int annotation=flags.applyAsInt(h);annotations.set(ordinal,annotation);
+                int added;try(var h=facts.openFact(ordinal)){
+                    int annotation=flags.applyAsInt(ordinal);annotations.set(ordinal,annotation);
                     if(annotation!=0||h.analysisStatus()==DependencySiteFact.AnalysisStatus.PARTIAL)partialSites++;
                     structural|=h.reachability()==DependencySiteFact.Reachability.UNKNOWN;
-                    candidateCount=Math.addExact(candidateCount,h.candidates());
-                    return h.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL?0:h.candidates();
-                });
+                    candidateCount=Math.addExact(candidateCount,h.candidateCount());
+                    added=h.reachability()==DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL?0:h.candidateCount();
+                }
                 edgeCount=Math.addExact(previousEdges,added);order.set(site*2L,ordinal);order.set(site*2L+1,edgeCount);
             }
-            sites=siteCount;edges=edgeCount;
+            sites=siteCount;edges=edgeCount;metadataFlags=null;
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     long partialSites(){live();return partialSites;}
@@ -140,11 +168,12 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     public long candidateCount(){available();return candidateCount;}
     private int factOrdinal(int site){available();Objects.checkIndex(site,sites);return Math.toIntExact(order.get(site*2L));}
     int operationOrdinal(int site,io.github.gustavo2358.analysis.structure.ProgramStore.OperationDirectory directory){
-        try{return facts.withHeader(factOrdinal(site),h->directory.ordinal(h.operation()));}
+        Objects.requireNonNull(directory);
+        try{if(directory!=program.operationDirectory().orElseThrow())throw new IllegalArgumentException("foreign operation directory");return Math.toIntExact((facts.ownerMetadata(factOrdinal(site))>>>3)-1);}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     boolean requiresNominal(int site){
-        try{return facts.withHeader(factOrdinal(site),h->h.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL&&!Boolean.FALSE.equals(h.modelValueRemainder()));}
+        try(var h=facts.openFact(factOrdinal(site))){return h.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL&&!Boolean.FALSE.equals(h.modelValueRemainder());}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     public void requireContext(SnapshotProgram source,AnalysisResources execution){available();if(program!=source||resources!=execution)throw new IllegalArgumentException("foreign managed executable result context");execution.requireExecutionProgram(source);}
@@ -164,7 +193,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
                         soughtOperation=null;
                         while(rows.advance()){
                             int factOrdinal=Math.toIntExact(rows.value()-1);
-                            if(!facts.withHeader(factOrdinal,h->h.operation().equals(operation)))break;
+                            if(!operationMatches(factOrdinal,operation))break;
                             projection.capacity.grow(128,AnalysisResources.Phase.REPLAY);
                             var lease=facts.project(factOrdinal);projection.leases.add(lease);projections=Math.incrementExact(projections);
                             // Additional complete envelope bounds resolution's
@@ -229,7 +258,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
                     try(var rows=operations.cursor(0)){
                         soughtOperation=null;
                         while(rows.advance()){
-                            int ordinal=Math.toIntExact(rows.value()-1);if(!facts.withHeader(ordinal,h->h.operation().equals(operation)))break;
+                            int ordinal=Math.toIntExact(rows.value()-1);if(!operationMatches(ordinal,operation))break;
                             siteRows.set(sitesCount,ordinal);sitesCount=Math.incrementExact(sitesCount);accept(ordinal,order,reasonOrder);
                         }
                     }finally{soughtOperation=null;}
@@ -389,7 +418,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
     public PageStore borrowedPages(){available();return pages;}
     public io.github.gustavo2358.air.model.Evidence.CoverageStatus siteCoverage(int site){
         available();Objects.checkIndex(site,sites);
-        try{return facts.withHeader(factOrdinal(site),h->program.invokeCoverage(h.operation()).orElseThrow(()->new IllegalStateException("missing original site coverage")));}
+        try{int ordinal=Math.toIntExact((facts.ownerMetadata(factOrdinal(site))>>>3)-1);return program.invokeCoverageOrdinal(ordinal).orElseThrow(()->new IllegalStateException("missing original site coverage"));}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     /** Field scopes read the canonical site without a complete fact projection.
@@ -473,7 +502,7 @@ public final class ManagedExecutableDependencyResult implements AutoCloseable {
         while(cursors!=null)try{cursors.close();}catch(RuntimeException|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
         for(var owned:new AutoCloseable[]{order,annotations,operations,index,facts,control})if(owned!=null)try{owned.close();}
             catch(Exception|Error cleanup){if(failure==null)failure=cleanup;else if(failure!=cleanup)failure.addSuppressed(cleanup);}
-        order=null;annotations=null;operations=null;index=null;facts=null;control=null;program=null;result=null;resources=null;pages=null;occurrences=null;soughtEntry=null;soughtOperation=null;
+        order=null;annotations=null;operations=null;index=null;facts=null;control=null;program=null;result=null;resources=null;pages=null;occurrences=null;soughtEntry=null;soughtOperation=null;headerLeft=null;headerRight=null;metadataRecorder=null;metadataFlags=null;
         if(failure instanceof RuntimeException error)throw error;if(failure instanceof Error error)throw error;if(failure!=null)throw new IllegalStateException("managed executable cleanup",failure);
     }
 }

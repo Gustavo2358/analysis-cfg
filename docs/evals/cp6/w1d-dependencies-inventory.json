@@ -649,7 +649,6 @@
       "io.github.gustavo2358.analysis.dependencies.ManagedDependencyResult",
       "io.github.gustavo2358.analysis.dependencies.ManagedExecutableDependencyResult",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage",
-      "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$Header",
       "io.github.gustavo2358.analysis.dependencies.QualifiedDependencyOccurrence",
       "io.github.gustavo2358.analysis.dependencies.ReachabilityProvider",
       "io.github.gustavo2358.analysis.dependencies.ReachabilityProvider$Fact",
@@ -1949,6 +1948,8 @@
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$FactCursor",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$Header",
+      "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$IdentityPart",
+      "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$IdentityView",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$Projection",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$SupportCursor",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$SupportProjection",
@@ -1957,7 +1958,6 @@
       "io.github.gustavo2358.analysis.dependencies.SourceDependencyResult",
       "io.github.gustavo2358.analysis.dependencies.TargetResolver",
       "io.github.gustavo2358.analysis.dependencies.TargetResolver$Resolution",
-      "io.github.gustavo2358.analysis.plan.AnalysisKey",
       "io.github.gustavo2358.analysis.solver.AnalysisResources",
       "io.github.gustavo2358.analysis.solver.AnalysisResources$Phase",
       "io.github.gustavo2358.analysis.solver.AnalysisResources$Pool",
@@ -1972,6 +1972,7 @@
       "io.github.gustavo2358.analysis.structure.ProgramStore$OperationDirectory",
       "java.lang.AutoCloseable",
       "java.lang.Boolean",
+      "java.lang.Character",
       "java.lang.Error",
       "java.lang.Exception",
       "java.lang.IllegalArgumentException",
@@ -1992,7 +1993,6 @@
       "java.lang.invoke.MethodHandles$Lookup",
       "java.lang.invoke.MethodType",
       "java.util.ArrayList",
-      "java.util.Comparator",
       "java.util.Iterator",
       "java.util.List",
       "java.util.Map",
@@ -2002,9 +2002,11 @@
       "java.util.function.BooleanSupplier",
       "java.util.function.Function",
       "java.util.function.IntFunction",
+      "java.util.function.IntUnaryOperator",
       "java.util.function.Predicate",
       "java.util.function.Supplier",
       "java.util.function.ToIntFunction",
+      "java.util.function.ToLongFunction",
       "java.util.stream.Stream"
     ],
     "io.github.gustavo2358.analysis.dependencies.ManagedExecutableDependencyResult$Cursor": [
@@ -2044,7 +2046,6 @@
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$CandidateCursor",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$FactCursor",
-      "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$Header",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$IdentityView",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$SupportCursor",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$TextView",
@@ -2087,7 +2088,6 @@
       "java.util.Iterator",
       "java.util.List",
       "java.util.Objects",
-      "java.util.function.Function",
       "java.util.function.LongConsumer",
       "java.util.function.LongUnaryOperator",
       "java.util.function.Supplier"
@@ -2344,7 +2344,8 @@
       "java.util.List",
       "java.util.Objects",
       "java.util.function.Function",
-      "java.util.function.IntConsumer"
+      "java.util.function.IntConsumer",
+      "java.util.function.ToLongFunction"
     ],
     "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage$CandidateCursor": [
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage",
@@ -2704,12 +2705,15 @@
       "io.github.gustavo2358.analysis.consumers.FactStorage",
       "io.github.gustavo2358.analysis.dependencies.DependencySiteFact",
       "io.github.gustavo2358.analysis.dependencies.PagedDependencyFactStorage",
+      "java.lang.Error",
       "java.lang.IllegalStateException",
       "java.lang.Math",
       "java.lang.Object",
+      "java.lang.RuntimeException",
       "java.lang.String",
       "java.lang.Throwable",
-      "java.util.Objects"
+      "java.util.Objects",
+      "java.util.function.ToLongFunction"
     ],
     "io.github.gustavo2358.analysis.dependencies.QualifiedDependencyOccurrence": [
       "io.github.gustavo2358.air.model.Ids",

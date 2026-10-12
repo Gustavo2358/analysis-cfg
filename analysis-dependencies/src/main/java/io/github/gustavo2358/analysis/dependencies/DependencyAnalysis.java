@@ -177,6 +177,11 @@ public final class DependencyAnalysis {
             var execution=new PlanningExecution(session,new AnalysisRegistry(List.of(new PossibleValuesProvider(),new RegionalValuesProvider(),new StorageValuesProvider(),new ReachabilityProvider())))) {
             var selection=CallDependencyPlan.choose(session,"call",false,mode);
             var plan=execution.plan(selection.registrations());
+            if(managed!=null){
+                var physicalMetadata=physicalDemands(session,selection);
+                managed.metadataFlags(f->(f.targetKind()==DependencySiteFact.TargetKind.COMPUTED&&physicalMetadata.contains(new CallDependencyPlan.SiteKey(f.entry(),f.operation()))?1:0)
+                    |(session.index().partialControl(f.caller())?2:0)|(session.index().unprovedPreconditions(f.caller())?4:0));
+            }
             var result=managed!=null?execution.executeStored("dependencies@1",plan,ignored->managed.transaction()):staged==null?execution.execute("dependencies@1",plan):execution.executeStored("dependencies@1",plan,ignored->staged.transaction());
             if(managed!=null)managed.indexPrepared();
             for(var analysis:result.analyses())if(analysis.status()==AnalysisOutcome.Status.INVALID_INPUT)throw new Failure(Kind.INVALID_INPUT,analysis.reason());
@@ -202,7 +207,7 @@ public final class DependencyAnalysis {
                     if(managed==null)retained.put(key,partial);else managed.appendPartial(partial);
                 }
             });
-            var physicalNotAnalyzed=physicalDemands(session,selection);
+            var physicalNotAnalyzed=managed==null?physicalDemands(session,selection):Set.<CallDependencyPlan.SiteKey>of();
             List<DependencySiteFact> sites;List<DependencyResult.Edge> edges;
             if(managed==null) {
             sites=retained.values().stream()
@@ -212,8 +217,7 @@ public final class DependencyAnalysis {
             for(var site:sites)if(site.reachability()!=DependencySiteFact.Reachability.UNREACHABLE_IN_MODEL)
                 for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,site.effectiveUnknownRemainder()));
             } else {
-                managed.finishIndex(h->(h.targetKind()==DependencySiteFact.TargetKind.COMPUTED&&physicalNotAnalyzed.contains(new CallDependencyPlan.SiteKey(h.entry(),h.operation()))?1:0)
-                    |(session.index().partialControl(h.caller())?2:0)|(session.index().unprovedPreconditions(h.caller())?4:0));
+                managed.finishIndex();
                 sites=managed.siteView();edges=managed.edgeView();
             }
             var metrics=new TreeMap<String,Long>(selection.metrics());
@@ -316,7 +320,7 @@ public final class DependencyAnalysis {
         for(var site:sites)for(var candidate:site.candidates())edges.add(new DependencyResult.Edge(site.caller(),site.entry(),site.operation(),candidate,true));
         } else {
             for(var site:inventory(publication))managed.appendPartial(CallDependencyConsumer.partial(site,Optional.empty(),List.of(reason)));
-            managed.finishIndex(ignored->0);sites=managed.siteView();edges=managed.edgeView();
+            managed.finishIndex();sites=managed.siteView();edges=managed.edgeView();
         }
         return new DependencyResult(publication.publicationId(),publication.airVersion(),sites,edges,
             Map.of("possibleValuesPreparations",0L,"possibleValuesRuns",0L,"reachabilityRuns",0L,"partialSites",(long)sites.size(),"logicalOnlyMode",mode.physical()?0L:1L,"experimentalPhysicalMode",mode.physical()?1L:0L,"physicalGroupsApplied",0L,"physicalWritesApplied",0L),

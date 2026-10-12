@@ -29,7 +29,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private static final AnalysisResources.Phase PHASE=AnalysisResources.Phase.DEMAND;
     // First eight columns retain their original meaning. The remaining fixed
     // field anchors are paged, not resident objects or separate field tapes.
-    private static final int STRIDE=27;
+    private static final int STRIDE=28;
     private final AnalysisResources resources;
     private AnalysisResources.Reservation control;
     private PagedLongArray offsets,payload;
@@ -59,9 +59,15 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     @Override public synchronized int size(){open();return count;}
     @Override public synchronized void append(DependencySiteFact fact) {
         if(active!=null)throw new IllegalStateException("use the exclusive current fact transaction");
-        appendFact(fact);
+        appendFact(fact,0);
     }
-    private void appendFact(DependencySiteFact fact) {
+    /** Optional owner-local scalar metadata; never a published identity or DTO. */
+    synchronized void append(DependencySiteFact fact,long metadata) {
+        if(active!=null)throw new IllegalStateException("use the exclusive current fact transaction");
+        appendFact(fact,metadata);
+    }
+    synchronized long ownerMetadata(int ordinal){open();Objects.checkIndex(ordinal,count);try{return offsets.get(ordinal*(long)STRIDE+27);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}
+    private void appendFact(DependencySiteFact fact,long metadata) {
         Objects.requireNonNull(fact);open();
         try {
             int next=Math.incrementExact(count);long begin=cells,row=count*(long)STRIDE;
@@ -80,7 +86,7 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
             offsets.set(row+24,cells);ids(fact.premises());offsets.set(row+25,cells);ids(fact.uncertaintyRefs());
             long analysis=cells;word(fact.analysisStatus().ordinal());offsets.set(row+26,cells);indexed(fact.analysisReasons().size(),i->text(fact.analysisReasons().get(i)));
             offsets.set(row,begin);offsets.set(row+1,cells);offsets.set(row+2,keyEnd);
-            offsets.set(row+3,kind);offsets.set(row+4,reach);offsets.set(row+5,candidates);offsets.set(row+6,analysis);offsets.set(row+7,model);count=next;
+            offsets.set(row+3,kind);offsets.set(row+4,reach);offsets.set(row+5,candidates);offsets.set(row+6,analysis);offsets.set(row+7,model);offsets.set(row+27,metadata);count=next;
         }catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     /** Sequential consumer ranges share these same two tapes. No fixed tape
@@ -91,8 +97,13 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
      * Closing the active failed tail physically clears its payload/directory;
      * closing an earlier range cannot alter another committed range. */
     public synchronized FactStorage<DependencySiteFact> transaction() {
+        return transaction(null);
+    }
+    /** Callback borrows the producer's existing typed fact only during append.
+     * Its scalar value shares the same row/tail destruction as every other column. */
+    synchronized FactStorage<DependencySiteFact> transaction(java.util.function.ToLongFunction<DependencySiteFact> metadata) {
         open();
-        try{control.grow(256,PHASE);var next=new Transaction(count);active=next;return next;}
+        try{control.grow(256,PHASE);var next=new Transaction(count,metadata);active=next;return next;}
         catch(RuntimeException|Error failure){abort(failure);throw failure;}
     }
     /** Transfer the committed ranges to this explicit result owner before the
@@ -124,14 +135,15 @@ public final class PagedDependencyFactStorage implements FactStorage<DependencyS
     private static Boolean remainder(long value){return switch(Math.toIntExact(value)){case 0->null;case 1->Boolean.FALSE;case 2->Boolean.TRUE;default->throw new IllegalStateException("invalid nullable remainder");};}
     private final class Transaction implements FactStorage<DependencySiteFact> {
         private final int first;
+        private java.util.function.ToLongFunction<DependencySiteFact> metadata;
         private int size;
         private boolean retired;
-        Transaction(int first){this.first=first;}
+        Transaction(int first,java.util.function.ToLongFunction<DependencySiteFact> metadata){this.first=first;this.metadata=metadata;}
         private void available(){open();if(retired)throw new IllegalStateException("fact transaction expired");}
-        @Override public void append(DependencySiteFact fact){synchronized(PagedDependencyFactStorage.this){available();if(active!=this)throw new IllegalStateException("fact transaction already sealed");appendFact(fact);size=Math.incrementExact(size);}}
+        @Override public void append(DependencySiteFact fact){synchronized(PagedDependencyFactStorage.this){available();if(active!=this)throw new IllegalStateException("fact transaction already sealed");Objects.requireNonNull(fact);try{appendFact(fact,metadata==null?0:metadata.applyAsLong(fact));size=Math.incrementExact(size);}catch(RuntimeException|Error failure){abort(failure);throw failure;}}}
         @Override public int size(){synchronized(PagedDependencyFactStorage.this){available();return size;}}
         @Override public DependencySiteFact get(int ordinal){synchronized(PagedDependencyFactStorage.this){available();Objects.checkIndex(ordinal,size);return PagedDependencyFactStorage.this.get(Math.addExact(first,ordinal));}}
-        @Override public void close(){synchronized(PagedDependencyFactStorage.this){if(retired)return;retired=true;if(!closed&&active==this)try{truncate(first);}finally{active=null;}}}
+        @Override public void close(){synchronized(PagedDependencyFactStorage.this){if(retired)return;retired=true;metadata=null;if(!closed&&active==this)try{truncate(first);}finally{active=null;}}}
     }
     private void truncate(int first) {
         try {
